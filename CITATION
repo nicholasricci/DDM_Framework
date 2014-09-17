@@ -1,0 +1,18 @@
+To cite this software use:
+
+  M. Marzolla, G. D'Angelo, M. Mandrioli, A Parallel Data Distribution
+  Management Algorithm, to appear in proc. IEEE/ACM International
+  Symposium on Distributed Simulation and Real Time Applications
+  (DS-RT 2013), oct 30—nov 1, 2013, Delft, the Netherlands
+
+If you use BibTeX for LaTeX, use:
+
+  @inproceedings{ddm-dsrt13,
+    author = "Moreno Marzolla and Gabriele D'Angelo and Marco Mandrioli",
+    title = "A Parallel Data Distribution Management Algorithm",
+    booktitle = "Proc. IEEE/ACM International Symposium on Distributed Simulation and Real Time Applications (DS-RT 2013)",
+    month = oct # " 30--" # nov # " 1",
+    year = 2013,
+    address = "Delft, the Netherlands"
+  }
+

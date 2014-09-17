@@ -1,0 +1,5 @@
+\select@language {italian}
+\select@language {italian}
+\contentsline {chapter}{\numberline {1}Obiettivi}{2}
+\contentsline {chapter}{\numberline {2}Cos'\`e il Data Distribuited Management?}{3}
+\contentsline {chapter}{\numberline {3}Analisi del sistema}{4}
