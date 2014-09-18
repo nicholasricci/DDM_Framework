@@ -1,3 +1,5 @@
-int main(int argc, char *argv[]) {
-  return 0;
+#include "../inc/comparison.h"
+
+int print_comparison(int argc, char *argv[]) {
+  return 2;
 } 

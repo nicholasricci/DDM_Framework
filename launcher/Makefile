@@ -4,32 +4,24 @@ FLAGEXE=-o
 FLAGOBJ=-c
 
 BIN=bin/
-OBJ=obj/
 SRC=src/
 INC=inc/
 
-ALL: makedirs comparison inputoutput launcher
+header = $(INC)comparison.h $(INC)inputoutput.h $(INC)launcher.h
+source = $(SRC)comparison.c $(SRC)inputoutput.c $(SRC)launcher.c
 
-makedirs:	
-		mkdir $(BIN)
-		mkdir $(OBJ)
+ALL:			makedirs launcher
 
-comparison: 	comparison.c
-		$(CC) $(CFLAGS) $(FLAGEXE) $(BIN)comparison comparison.c
-		$(CC) $(CFLAGS) $(FLAGOBJ) comparison.c
-		mv comparison.o $(OBJ)
-
-inputoutput: 	inputoutput.c
-		$(CC) $(CFLAGS) $(FLAGEXE) $(BIN)inputoutput inputoutput.c
-		$(CC) $(CFLAGS) $(FLAGOBJ) inputoutput.c
-		mv inputoutput.o $(OBJ)
-
-launcher: 	launcher.c
-		$(CC) $(CFLAGS) $(FLAGEXE) $(BIN)launcher launcher.c
-		$(CC) $(CFLAGS) $(FLAGOBJ) launcher.c
-		mv launcher.o $(OBJ)
-		
+makedirs:		
+			mkdir -p $(BIN)
+			
+launcher:		$(header) $(source)
+			$(CC) $(CFLAGS) $(FLAGEXE) $(BIN)launcher $(source)			
 clean:
-	rm -f -R $(BIN)
-	rm -f -R $(OBJ)
+			rm -f -R $(BIN)
+			rm -f -R $(OBJ)
+			
+
+
+
 
