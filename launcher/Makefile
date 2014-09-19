@@ -19,9 +19,3 @@ launcher:		$(header) $(source)
 			$(CC) $(CFLAGS) $(FLAGEXE) $(BIN)launcher $(source)			
 clean:
 			rm -f -R $(BIN)
-			rm -f -R $(OBJ)
-			
-
-
-
-
