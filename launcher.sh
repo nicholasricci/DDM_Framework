@@ -1,6 +1,19 @@
 #!/bin/bash
 
 echo "Launcher starts!"
+echo "Compile and create executables for all algorithms in Algorithms folder"
+cd Algorithms
+algs=($(ls -d */))
+for i in ${algs[*]}
+do
+  cd $i
+  make
+  cd ..
+done
+cd ..
+
+echo "Come back to root folder"
+
 echo "Move to launcher folder"
 cd launcher
 #Check first parameter if insterted, if "clean" string then use make clean command
