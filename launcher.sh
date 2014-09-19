@@ -7,7 +7,12 @@ algs=($(ls -d */))
 for i in ${algs[*]}
 do
   cd $i
-  make
+  if [ ! -z "$1" ] && [ "$1" == "clean" ];
+  then
+    make clean
+  else
+    make
+  fi
   cd ..
 done
 cd ..
