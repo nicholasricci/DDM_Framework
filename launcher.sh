@@ -1,6 +1,9 @@
 #!/bin/bash
 
 echo "Launcher starts!"
+#Go inside "Algorithms" folder and for each algorithm execute the command "make" 
+#if the launcher has one argument and is "clean" then execute the command "make clean" for each algorithm
+#it's better if in each algorithm there is a clean target in make file.
 echo "Compile and create executables for all algorithms in Algorithms folder"
 cd Algorithms
 algs=($(ls -d */))
