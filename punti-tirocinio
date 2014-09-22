@@ -1,3 +1,4 @@
 -eliminato dal sort_matching_standard tutte le definizioni riferite a windows
 -messa a punto dell'algoritmo interval_tree per far si che creasse una cartella bin durante il make
 -creazione del file launcher.sh, compilazione di ogni algoritmo nella cartella Algorithms o pulizia con il comando clean della cartella Algorithms
+-creazione del file configuration se non esiste e inizializzarlo. Se esiste possibile modificarlo tramite il comando configure
