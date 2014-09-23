@@ -1,30 +1,8 @@
 #!/bin/bash
 
-#regex for integer and float
-re_integer='^[0-9]+$'
-re_float='^[0-9]+([.][0-9]+)?$'
+function build {
 
-if [ ! -z "$1" ] && [ "$1" == "--help" ];
-then
-
-  echo "for build and run all algorithms:
-usage: 	./launcher.sh EXTENTS DIMENSION ALFA
-  
-for only build:
-usage:	./launcher.sh build
-
-for only run:
-usage:	./launcher.sh run
-
-for clean all builded objects:
-usage:	./launcher.sh clean
-
-for configure the run command:
-usage:	./launcher.sh configure"
-
-elif [ ! -z "$1" ] && [ "$1" == "build" ];
-then
- 
+  #Build all algorithms in Algorithms folder
   echo "build"
   cd Algorithms
   algs=($(ls -d */))
@@ -37,30 +15,15 @@ then
     cd ..
   done
   cd ..
- 
-elif [ ! -z "$1" ] && [ "$1" == "run" ];
-then
-
-  echo "run"
   
-elif [ ! -z "$1" ] && [ "$1" == "clean" ];
-then
-
-  echo "clean"
-  cd Algorithms
-  algs=($(ls -d */))
-  for i in ${algs[*]}
-  do
-    cd $i
-    
-    make clean
-    
-    cd ..
-  done
+  #Build the utils folder which there is avarage programs
+  cd utils
+  make
   cd ..
   
-elif [ ! -z "$1" ] && [ "$1" == "configure" ];
-then
+}
+
+function configure {
 
   echo "configure"
   #Creating a configure file that contains the number of extents the programs must starts,
@@ -70,7 +33,7 @@ then
   rm -f configure.sh
   touch configure.sh
   echo "creating configuration file"
-  echo "#Please don't edit this file manually." >> configure
+  echo "#Please don't edit this file manually." > configure.sh
   
   #START_EXTENTS
   while true; do
@@ -78,12 +41,12 @@ then
     if [[ $yn =~ $re_integer ]];
     then
       START_EXTENTS=$yn
-      echo "START_EXTENTS=$yn" >> configure
+      echo "START_EXTENTS=$yn" >> configure.sh
       break
     elif [ -z "$yn" ];
     then
       START_EXTENTS=50000
-      echo "START_EXTENTS=$START_EXTENTS" >> configure
+      echo "START_EXTENTS=$START_EXTENTS" >> configure.sh
       break
     else
       echo "Please insert an integer number."
@@ -96,12 +59,12 @@ then
     if [[ $yn =~ $re_integer  && $START_EXTENTS < $yn ]];
     then
       MAX_EXTENTS=$yn
-      echo "MAX_EXTENTS=$yn" >> configure
+      echo "MAX_EXTENTS=$yn" >> configure.sh
       break
     elif [ -z "$yn" ];
     then
       MAX_EXTENTS=500000
-      echo "MAX_EXTENTS=$MAX_EXTENTS" >> configure
+      echo "MAX_EXTENTS=$MAX_EXTENTS" >> configure.sh
       break
     else
       echo "Please insert an integer number."
@@ -114,12 +77,12 @@ then
     if [[ $yn =~ $re_integer  && $MAX_EXTENTS > $yn ]];
     then
       STEP_SIZE=$yn
-      echo "STEP_SIZE=$yn" >> configure
+      echo "STEP_SIZE=$yn" >> configure.sh
       break
     elif [ -z "$yn" ];
     then
       STEP_SIZE=50000
-      echo "STEP_SIZE=$STEP_SIZE" >> configure
+      echo "STEP_SIZE=$STEP_SIZE" >> configure.sh
       break
     else
       echo "Please insert an integer number."
@@ -145,7 +108,7 @@ then
       echo "Please insert a float number."
     fi
   done
-  echo "ALFAS=\"${ALFAS[@]}\"" >> configure
+  echo "ALFAS=\"${ALFAS[@]}\"" >> configure.sh
   
   #ALFAS_PAR
   index=0
@@ -166,29 +129,126 @@ then
       echo "Please insert a float number."
     fi
   done
-  echo "ALFAS_PAR=\"${ALFAS_PAR[@]}\"" >> configure
+  echo "ALFAS_PAR=\"${ALFAS_PAR[@]}\"" >> configure.sh
+  
+  #RUN
+  while true; do
+    read -p "Insert the number of RUN you want to programs will do:" yn
+    if [[ $yn =~ $re_integer  && $yn -ge 1 ]];
+    then
+      RUN=$yn
+      echo "RUN=$yn" >> configure.sh
+      break
+    elif [ -z "$yn" ];
+    then
+      RUN=30
+      echo "RUN=$RUN" >> configure.sh
+      break
+    else
+      echo "Please insert an integer number."
+    fi
+  done
+
+}
+
+function clean {
+
+  echo "clean"
+  cd Algorithms
+  algs=($(ls -d */))
+  for i in ${algs[*]}
+  do
+    cd $i
+    
+    echo -e "\n$i"
+    make clean
+    
+    cd ..
+  done
+  cd ..
+  
+  cd utils
+  echo -e "\nutils"
+  make clean
+  cd ..
+  
+  unset $START_EXTENTS
+  unset $MAX_EXTENTS
+  unset $STEP_SIZE
+  unset $ALFAS
+  unset $ALFAS_PAR
+  unset $RUN
+
+}
+
+function run {
+
+  echo "run"
+
+}
+
+function check_configure {
+  
+  #import configure.sh
+  source configure.sh
+  
+  #check if configure.sh contains values, if not contains call configure function
+  if [ -z "$START_EXTENTS" ] || [ -z "$MAX_EXTENTS" ] || [ -z "$STEP_SIZE" ] || [ -z "$ALFAS" ] || [ -z "$ALFAS_PAR" ] || [ -z "$RUN" ]
+  then
+    configure
+  fi
+  
+}
+
+#regex for integer and float
+re_integer='^[0-9]+$'
+re_float='^[0-9]+([.][0-9]+)?$'
+
+if [ ! -z "$1" ] && [ "$1" == "--help" ];
+then
+
+  echo "for build and run all algorithms:
+usage: 	./launcher.sh EXTENTS DIMENSION ALFA
+  
+for only build:
+usage:	./launcher.sh build
+
+for only run:
+usage:	./launcher.sh run
+
+for clean all builded objects:
+usage:	./launcher.sh clean
+
+for configure the run command:
+usage:	./launcher.sh configure"
+
+elif [ ! -z "$1" ] && [ "$1" == "build" ];
+then
+ 
+  build
+ 
+elif [ ! -z "$1" ] && [ "$1" == "run" ];
+then
+
+  run
+  
+elif [ ! -z "$1" ] && [ "$1" == "clean" ];
+then
+
+  clean
+  
+elif [ ! -z "$1" ] && [ "$1" == "configure" ];
+then
+
+  configure
   
 else
 
   if [[ $1 =~ $re_integer && $2 =~ $re_integer && $3 =~ $re_float ]];
   then
-  
-    echo "ok!"
-    #Go inside "Algorithms" folder and for each algorithm execute the command "make" 
-    #if the launcher has one argument and is "clean" then execute the command "make clean" for each algorithm
-    #it's better if in each algorithm there is a clean target in make file.
-    echo "Compile and create executables for all algorithms in Algorithms folder"
-    cd Algorithms
-    algs=($(ls -d */))
-    for i in ${algs[*]}
-    do
-      cd $i
-      
-      make
-      
-      cd ..
-    done
-    cd ..
+ 
+    check_configure
+    build
     
   else
   
