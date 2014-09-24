@@ -4,3 +4,5 @@
 -creazione del file configuration se non esiste e inizializzarlo. Se esiste possibile modificarlo tramite il comando configure
 -messa a punto di launcher.sh con le funzioni e inserimento della funzione check_configure per controllare se il file configure esiste e contiene dei valori,
 in caso non contenga valori viene richiamata la funzione configure.
+-messa a punto dell'algoritmo interval_tree per far si che sia per brute_force che brute_force_mp creasse un file .txt separato l'uno dall'altro.
+stessa cosa per interval_tree e interval_tree_mp.

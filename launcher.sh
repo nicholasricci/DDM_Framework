@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#import utilities functions
+source functions.sh
+
 function build {
 
   #Build all algorithms in Algorithms folder
@@ -154,6 +157,7 @@ function configure {
 function clean {
 
   echo "clean"
+  #clean all algorithms
   cd Algorithms
   algs=($(ls -d */))
   for i in ${algs[*]}
@@ -167,11 +171,13 @@ function clean {
   done
   cd ..
   
+  #clean utils
   cd utils
   echo -e "\nutils"
   make clean
   cd ..
   
+  #Unset all variable
   unset $START_EXTENTS
   unset $MAX_EXTENTS
   unset $STEP_SIZE

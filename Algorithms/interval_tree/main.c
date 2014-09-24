@@ -100,9 +100,19 @@ int main( int argc, char* argv[] )
     double total_time = timing_get_average( &timing );
 
     /* write results */
-    FILE* fout = fopen(FILENAME, "a");
+    //FILE* fout = fopen(FILENAME, "a");
+    //if ( fout == NULL ) {
+	//printf("Error creating file %s\n", FILENAME);
+	//exit(-1);
+    //}
+    
+    /* write results */
+    char str[80];
+    strcpy(str, argv[0]);
+    strcat(str, ".txt");
+    FILE* fout = fopen(str, "a");
     if ( fout == NULL ) {
-	printf("Error creating file %s\n", FILENAME);
+	printf("Error creating file %s\n", str);
 	exit(-1);
     }
 
