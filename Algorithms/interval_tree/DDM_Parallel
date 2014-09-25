@@ -1,1 +1,3 @@
 ## Insert the name of parallel executables in bin folder. One line, one executable.
+brute_force_mp
+interval_tree_mp

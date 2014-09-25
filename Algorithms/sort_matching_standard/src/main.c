@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 	
 	fclose(fout);*/
 
-	DDM_Write_Result(argc, argv, ((float)(end - start)) / CLOCKS_PER_SEC);
+	DDM_Write_Result(argv, ((float)(end - start)) / CLOCKS_PER_SEC);
 	
 #ifdef __DEBUG
 	getchar();

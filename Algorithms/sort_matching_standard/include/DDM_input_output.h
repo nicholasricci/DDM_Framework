@@ -33,4 +33,4 @@ float DDM_Get_Alfa(int argc, char* argv[]);
  * OUTPUT
  */
 
-void DDM_Write_Result(int argc, char* argv[], double total_time);
+void DDM_Write_Result(char* argv[], double total_time);

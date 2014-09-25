@@ -12,3 +12,5 @@ file .c e .h e inserirli nel makefile ed utilizzare le funzioni all'interno per 
 -durante il comando build per ogni algoritmo vengono creati due file: DDM_Parallel e DDM_Will_Execute.
 DDM_Parallel: l'utilizzatore del framework dovrà scrivere all'interno il nome degli eseguibili degli algoritmi compilati con direttive parallele.
 DDM_Will_Execute: l'utilizzatore del framework dovrà scrivere all'interno solo i nomi degli eseguibili che il framework dovrà eseguire.
+-portato avanti il comando run, ora crea tutti i risultati e li mette nella cartella _result e _graph nella root del framework.
+-fix comando run, sistemato il comando clean, si può ripulire sia i risultati che gli oggetti buildati.

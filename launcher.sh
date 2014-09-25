@@ -10,7 +10,6 @@ function build {
   echo "###########################"
 
   #Build all algorithms in Algorithms folder
-  echo "build"
   cd Algorithms
   algs=($(ls -d */))
   for i in ${algs[*]}
@@ -22,10 +21,10 @@ function build {
       touch DDM_Parallel
       echo "## Insert the name of parallel executables in bin folder. One line, one executable." > DDM_Parallel
     fi
-    if [ ! -f ./DDM_Will_Execute ];
+    if [ ! -f ./DDM_Sequential ];
     then
-      touch DDM_Will_Execute
-      echo "## Insert the name of executables you want that the DDM Framework used. One line, one executable." > DDM_Will_Execute
+      touch DDM_Sequential
+      echo "## Insert the name of sequential executables in bin folder. One line, one executable." > DDM_Sequential
     fi
     make
     
@@ -189,10 +188,10 @@ function configure {
 
 }
 
-function clean {
+function cleanalgorithms {
 
   echo "###########################"
-  echo "########## CLEAN ##########"
+  echo "##### CLEAN ALGORITHMS ####"
   echo "###########################"
   
   #clean all algorithms
@@ -219,9 +218,32 @@ function clean {
   unset $START_EXTENTS
   unset $MAX_EXTENTS
   unset $STEP_SIZE
+  unset $DIMENSION
   unset $ALFAS
   unset $ALFAS_PAR
   unset $RUN
+  
+}
+
+function cleanresults {
+
+  echo "###########################"
+  echo "###### CLEAN RESULTS ######"
+  echo "###########################"
+
+  rm -R -f _results
+  rm -R -f _graphs
+}
+
+function clean {
+
+  echo "###########################"
+  echo "######## CLEAN ALL ########"
+  echo "###########################"
+  
+  cleanalgorithms
+  
+  cleanresults
 
 }
 
@@ -230,6 +252,7 @@ function run {
   echo "###########################"
   echo "########### RUN ###########"
   echo "###########################"
+  
   
   if [[ $1 =~ $re_integer && $2 =~ $re_integer && $3 =~ $re_float && $4 =~ $re_float ]];
   then
@@ -240,12 +263,41 @@ function run {
     $DIMENSION=$2
     $ALFAS="$3"
     $ALFAS_PAR="$4"
-    
+        
   elif [ $# -eq 0 ]; 
   then
   
     check_configure
     build
+    
+    cd Algorithms
+    algs=($(ls -d */))
+    for i in ${algs[*]}
+    do
+      cd $i
+      #get the executables sequential and parallel in this directory
+      exe_sequential=$(read_file DDM_Sequential)
+      exe_parallel=$(read_file DDM_Parallel)
+      #change to bin directory
+      cd bin
+      #for each executables sequential starts program in some configuration
+      for exe in ${exe_sequential[*]}
+      do
+	run_executable $exe $ALFAS
+      done
+      #for each executables parallel starts program in some configuration
+      for exe_par in ${exe_parallel[*]}
+      do
+	run_executable $exe_par $ALFAS_PAR
+      done
+      #change to algorithm directory
+      cd ..
+      #change to Algoirthms directory
+      cd ..
+    done
+    
+    unset will_execute
+    unset algs_parallel
     
   else
   
@@ -280,7 +332,7 @@ if [ ! -z "$1" ] && [ "$1" == "--help" ];
 then
 
   echo "for build and run all algorithms:
-usage: 	./launcher.sh EXTENTS DIMENSION ALFA
+usage: 	./launcher.sh run EXTENTS DIMENSION ALFA ALFA_PARALLEL
   
 for only build:
 usage:	./launcher.sh build
@@ -288,11 +340,17 @@ usage:	./launcher.sh build
 for only run:
 usage:	./launcher.sh run
 
-for clean all builded objects:
+for clean (all builded objects and _results, _graphs folder):
 usage:	./launcher.sh clean
 
 for configure the run command:
-usage:	./launcher.sh configure"
+usage:	./launcher.sh configure
+
+for clean only algorithm:
+usage:	./launcher.sh cleanalgorithms
+
+for clean only _results and _graphs folder:
+usage:	./launcher.sh cleanresults"
 
 elif [ ! -z "$1" ] && [ "$1" == "build" ];
 then
@@ -309,7 +367,7 @@ then
 elif [ ! -z "$1" ] && [ "$1" == "clean" ];
 then
 
-  #Clean all algorithms build objects
+  #Clean all algorithms build objects and _result and _graphs folder
   clean
   
 elif [ ! -z "$1" ] && [ "$1" == "configure" ];
@@ -319,4 +377,16 @@ then
   #means the number of each algorithm must be execute with the same settings
   configure
 
+elif [ ! -z "$1" ] && [ "$1" == "cleanresults" ];
+then
+  
+  #Clean _results and _graphs folder
+  cleanresults
+  
+elif [ ! -z "$1" ] && [ "$1" == "cleanalgorithms" ];
+then
+  
+  #Clean algorithms build objects
+  cleanalgorithms
+  
 fi

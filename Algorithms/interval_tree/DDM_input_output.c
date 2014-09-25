@@ -39,12 +39,11 @@ float DDM_Get_Alfa(int argc, char* argv[]){
  * OUTPUT
  */
 
-void DDM_Write_Result(int argc, char* argv[], double total_time){
+void DDM_Write_Result(char* argv[], double total_time){
   /* write results */
   char str[100];
-  sprintf(str, "%s_%d_%d_%2.3f.txt", argv[0], DDM_Get_Extents(argc, argv), DDM_Get_Dimension(argc, argv), DDM_Get_Alfa(argc, argv));
-  //strcpy(str, argv[0]);
-  //strcat(str, ".txt");
+  strcpy(str, argv[0]);
+  strcat(str, ".txt");
   FILE* fout = fopen(str, "a");
   if ( fout == NULL ) {
       printf("Error creating file %s\n", str);

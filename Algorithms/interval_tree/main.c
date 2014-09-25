@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
 	//exit(-1);
     //}
     
-    DDM_Write_Result(argc, argv, total_time);
+    DDM_Write_Result(argv, total_time);
 
     printf("%u matches  %fs\n", nmatches, total_time );
 
