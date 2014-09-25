@@ -149,22 +149,22 @@ clean_debug: clean_x86_debug clean_x64_debug
 clean_x86_release:
 	@echo
 	@echo Cleaning $(X86) $(RELEASE) files...
-	$(RM) $(OBJDIR)/$(X86)/$(RELEASE)/*.o $(PROGDIR)/$(PROG).$(X86).$(RELEASE)
+	$(RM) $(OBJDIR)/$(X86)/$(RELEASE)/*.o $(PROGDIR)/$(PROG).$(X86).$(RELEASE) $(PROGDIR)/*.txt
 
 clean_x86_debug:
 	@echo
 	@echo Cleaning $(X86) $(DEBUG) files...
-	$(RM) $(OBJDIR)/$(X86)/$(DEBUG)/*.o $(PROGDIR)/$(PROG).$(X86).$(DEBUG)
+	$(RM) $(OBJDIR)/$(X86)/$(DEBUG)/*.o $(PROGDIR)/$(PROG).$(X86).$(DEBUG) $(PROGDIR)/*.txt
 	
 clean_x64_release:
 	@echo
 	@echo Cleaning $(X64) $(RELEASE) files...
-	$(RM) $(OBJDIR)/$(X64)/$(RELEASE)/*.o $(PROGDIR)/$(PROG).$(X64).$(RELEASE)
+	$(RM) $(OBJDIR)/$(X64)/$(RELEASE)/*.o $(PROGDIR)/$(PROG).$(X64).$(RELEASE) $(PROGDIR)/*.txt
 
 clean_x64_debug:
 	@echo
 	@echo Cleaning $(X64) $(DEBUG) files...
-	$(RM) $(OBJDIR)/$(X64)/$(DEBUG)/*.o $(PROGDIR)/$(PROG).$(X64).$(DEBUG)
+	$(RM) $(OBJDIR)/$(X64)/$(DEBUG)/*.o $(PROGDIR)/$(PROG).$(X64).$(DEBUG) $(PROGDIR)/*.txt
 	
 
 newdir:

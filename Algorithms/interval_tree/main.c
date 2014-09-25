@@ -69,19 +69,13 @@ int main( int argc, char* argv[] )
 	return -1;
     }
 
-    if ( argc >= 2 ) 
-	tot_extents = atoi(argv[1]);
-
-    if ( argc >= 3 ) {
-	d = atoi(argv[2]);
-	if ( d != 1 ) {
-	    printf("This program only supports 1 dimension\n");
-	    exit(-1);
-	}
+    tot_extents = DDM_Get_Extents(argc, argv);
+    d = DDM_Get_Dimension(argc, argv);
+    if ( d != 1 ) {
+	printf("This program only supports 1 dimension\n");
+	exit(-1);
     }
-
-    if ( argc >= 4 )
-	alpha = atof(argv[3]);
+    alpha = DDM_Get_Alfa(argc, argv);
 
     printf("%s compiled with %s\n", argv[0], CFLAGS);
     srandom(clock());
@@ -107,7 +101,7 @@ int main( int argc, char* argv[] )
 	//exit(-1);
     //}
     
-    DDM_Write_Result(argv, total_time);
+    DDM_Write_Result(argc, argv, total_time);
 
     printf("%u matches  %fs\n", nmatches, total_time );
 

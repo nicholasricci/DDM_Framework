@@ -8,3 +8,4 @@ in caso non contenga valori viene richiamata la funzione configure.
 stessa cosa per interval_tree e interval_tree_mp.
 -creazione di una libreria in c per l'input e output da utilizzare all'interno degli algoritmi inseriti dentro al framework. Basta copiare il 
 file .c e .h e inserirli nel makefile ed utilizzare le funzioni all'interno per avere un input e un output simile per tutti gli algoritmi.
+-utilizzo della libreria creata input output nei due algoritmi per renderli coerenti con il framework.

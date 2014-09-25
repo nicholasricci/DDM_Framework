@@ -75,16 +75,16 @@ int main(int argc, char *argv[])
 		return (int)err_none;
 	}
 
-	extents = atoi(argv[1]);
+	extents = (_INT)DDM_Get_Extents(argc, argv);
 	if ( (extents <= 0) || (extents %2 != 0) )
 		printf("\nNot a valid number of update extents.\n");
 	updates = (_INT) extents/2;
 	subscrs = updates;
 
-	dimensions = atoi(argv[2]);
+	dimensions = (_INT)DDM_Get_Dimension(argc, argv);
 	if (dimensions <= 0)
 		printf("\nNot a valid number of dimensions.\n");
-	alfa = atof(argv[3]);
+	alfa = DDM_Get_Alfa(argc, argv);
 	if (alfa <= 0)
 		printf("\nNot a valid alfa parameter.\n");
 	
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 	
 	fclose(fout);*/
 
-	DDM_Write_Result(argv, ((float)(end - start)) / CLOCKS_PER_SEC);
+	DDM_Write_Result(argc, argv, ((float)(end - start)) / CLOCKS_PER_SEC);
 	
 #ifdef __DEBUG
 	getchar();
