@@ -1,12 +1,12 @@
 SEQ=brute_force interval_tree
 PAR=brute_force_mp interval_tree_mp
 BIN=bin/
-OBJSSEQ=main.o interval.o brute_force.o timing.o bitmatrix.o int_tree.o
-OBJSPAR=main_mp.o interval_mp.o brute_force_mp.o timing_mp.o bitmatrix_mp.o int_tree_mp.o
-OBJSSEQBRUTE=main.o interval.o brute_force.o timing.o bitmatrix.o
-OBJSSEQINTTREE=main.o interval.o int_tree.o timing.o bitmatrix.o interval_tree.o
-OBJSPARBRUTE=main_mp.o interval_mp.o brute_force_mp.o timing_mp.o bitmatrix_mp.o
-OBJSPARINTTREE=main_mp.o interval_mp.o int_tree_mp.o timing_mp.o bitmatrix_mp.o interval_tree_mp.o
+OBJSSEQ=main.o interval.o brute_force.o timing.o bitmatrix.o int_tree.o DDM_input_output.o
+OBJSPAR=main_mp.o interval_mp.o brute_force_mp.o timing_mp.o bitmatrix_mp.o int_tree_mp.o DDM_input_output.o
+OBJSSEQBRUTE=main.o interval.o brute_force.o timing.o bitmatrix.o DDM_input_output.o
+OBJSSEQINTTREE=main.o interval.o int_tree.o timing.o bitmatrix.o interval_tree.o DDM_input_output.o
+OBJSPARBRUTE=main_mp.o interval_mp.o brute_force_mp.o timing_mp.o bitmatrix_mp.o DDM_input_output.o
+OBJSPARINTTREE=main_mp.o interval_mp.o int_tree_mp.o timing_mp.o bitmatrix_mp.o interval_tree_mp.o DDM_input_output.o
 
 
 ALL: 			mkdirs release openmp
@@ -56,6 +56,9 @@ int_tree_mp.o:		int_tree.c int_tree.h
 			
 interval_tree_mp.o:	interval_tree.c int_tree.h bitmatrix.h timing.h
 			cc $(CFLAGS) -c interval_tree.c -o interval_tree_mp.o
+
+DDM_input_output.o:	DDM_input_output.c DDM_input_output.h
+			cc $(CFLAGS) -c DDM_input_output.c -o DDM_input_output.o
 
 cflags.h:
 			@echo "const char* CFLAGS=\"$(CFLAGS)\";" > cflags.h

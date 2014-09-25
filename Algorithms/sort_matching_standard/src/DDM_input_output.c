@@ -6,7 +6,7 @@
  *The input: check if parameters contain correct value and return extents, alfa and dimension.
  */
 
-#include "DDM_input_output.h"
+#include "../include/DDM_input_output.h"
 
 /**
  * INPUT

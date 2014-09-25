@@ -191,10 +191,10 @@ out:
 
 $(PROG): newdir linker
 
-linker: error main matching test_generator utils
+linker: error main matching test_generator utils DDM_input_output
 	@echo linking $(CFGNAME) version...
 	$(CC) $(CFLAGS) $(FLAGS) -o $(PROGDIR)/$(PROG).$(PLFNAME).$(CFGNAME) $(OBJDIRFULL)/error.o $(OBJDIRFULL)/main.o \
-	$(OBJDIRFULL)/matching.o $(OBJDIRFULL)/test_generator.o $(OBJDIRFULL)/utils.o $(LFLAGS)
+	$(OBJDIRFULL)/matching.o $(OBJDIRFULL)/test_generator.o $(OBJDIRFULL)/utils.o $(OBJDIRFULL)/DDM_input_output.o $(LFLAGS)
 
 
 error: $(SRCDIR)/error.c
@@ -221,5 +221,8 @@ utils: $(SRCDIR)/utils.c
 	@echo compiling utils.c....
 	$(CC) $(CFLAGS) $(FLAGS) -o $(OBJDIRFULL)/utils.o -c $(SRCDIR)/utils.c
 
+DDM_input_output: 	$(SRCDIR)/DDM_input_output.c
+			@echo compiling DDM_input_output.c....
+			$(CC) $(CFLAGS) $(FLAGS) -o $(OBJDIRFULL)/DDM_input_output.o -c $(SRCDIR)/DDM_input_output.c
 
 error main matching test_generator utils: $(INCDIR)/types.h

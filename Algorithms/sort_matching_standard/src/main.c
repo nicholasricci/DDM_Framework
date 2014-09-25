@@ -26,6 +26,7 @@
 #include "../include/test_generator.h"
 #include "../include/utils.h"
 #include "../include/error.h"
+#include "../include/DDM_input_output.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,7 +39,7 @@
 /** \mainpage
 \author Marco Mandrioli
 
-\section Intro1 Introdction
+\section Intro1 Introduction
 
 \section Intro2 Version
 */
@@ -127,7 +128,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// open file
-	fout = fopen(fname, "a+");
+	/*fout = fopen(fname, "a+");
 	if (fout == NULL)
 	{
 		set_error(err_file, __FILE__, __FUNCTION__, __LINE__);
@@ -136,9 +137,11 @@ int main(int argc, char *argv[])
 
 	// print output to file
 	fprintf(fout, "%f\n", ((float)(end - start)) / CLOCKS_PER_SEC);
+	
+	fclose(fout);*/
 
-	fclose(fout);
-
+	DDM_Write_Result(argv, ((float)(end - start)) / CLOCKS_PER_SEC);
+	
 #ifdef __DEBUG
 	getchar();
 #endif // __DEBUG

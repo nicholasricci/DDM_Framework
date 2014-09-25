@@ -28,6 +28,7 @@
 #include "timing.h"
 #include "interval.h"
 #include "cflags.h"
+#include "DDM_input_output.h"
 
 extern const char* FILENAME;
 extern const char* CFLAGS;
@@ -106,18 +107,7 @@ int main( int argc, char* argv[] )
 	//exit(-1);
     //}
     
-    /* write results */
-    char str[80];
-    strcpy(str, argv[0]);
-    strcat(str, ".txt");
-    FILE* fout = fopen(str, "a");
-    if ( fout == NULL ) {
-	printf("Error creating file %s\n", str);
-	exit(-1);
-    }
-
-    fprintf(fout, "%f\n", total_time);
-    fclose(fout);
+    DDM_Write_Result(argv, total_time);
 
     printf("%u matches  %fs\n", nmatches, total_time );
 
