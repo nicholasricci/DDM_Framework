@@ -75,7 +75,7 @@ function configure {
   #MAX_EXTENTS
   while true; do
     read -p "Insert the number of MAX EXTENTS that programs must reach:" yn
-    if [[ $yn =~ $re_integer  && $START_EXTENTS < $yn ]];
+    if [[ $yn =~ $re_integer  && $START_EXTENTS -le $yn ]];
     then
       MAX_EXTENTS=$yn
       echo "MAX_EXTENTS=$yn" >> configure.sh
@@ -93,7 +93,7 @@ function configure {
   #STEP_SIZE
   while true; do
     read -p "Insert the number of STEP SIZE that used for increment START EXTENTS until reach MAX EXTENTS:" yn
-    if [[ $yn =~ $re_integer  && $MAX_EXTENTS > $yn ]];
+    if [[ $yn =~ $re_integer  && $MAX_EXTENTS -ge $yn ]];
     then
       STEP_SIZE=$yn
       echo "STEP_SIZE=$yn" >> configure.sh
@@ -120,6 +120,24 @@ function configure {
     then
       DIMENSION=1
       echo "DIMENSION=$DIMENSION" >> configure.sh
+      break
+    else
+      echo "Please insert an integer number."
+    fi
+  done
+  
+  #CORES
+  while true; do
+    read -p "Insert the number of max CORES you want to use (>=2):" yn
+    if [[ $yn =~ $re_integer  && $yn -ge 2 ]];
+    then
+      CORES=$yn
+      echo "CORES=$yn" >> configure.sh
+      break
+    elif [ -z "$yn" ];
+    then
+      CORES=12
+      echo "CORES=$CORES" >> configure.sh
       break
     else
       echo "Please insert an integer number."
@@ -257,12 +275,13 @@ function run {
   if [[ $1 =~ $re_integer && $2 =~ $re_integer && $3 =~ $re_float && $4 =~ $re_float ]];
   then
  
-    check_configure
-    build
-    $EXTENTS=$1
-    $DIMENSION=$2
-    $ALFAS="$3"
-    $ALFAS_PAR="$4"
+    echo "This function doesn't work yet well!"
+    #check_configure
+    #build
+    #$EXTENTS=$1
+    #$DIMENSION=$2
+    #$ALFAS="$3"
+    #$ALFAS_PAR="$4"
         
   elif [ $# -eq 0 ]; 
   then
@@ -283,12 +302,12 @@ function run {
       #for each executables sequential starts program in some configuration
       for exe in ${exe_sequential[*]}
       do
-	run_executable $exe $ALFAS
+	run_executable_sequential $exe
       done
       #for each executables parallel starts program in some configuration
       for exe_par in ${exe_parallel[*]}
       do
-	run_executable $exe_par $ALFAS_PAR
+	run_executable_parallel $exe_par
       done
       #change to algorithm directory
       cd ..
@@ -317,7 +336,8 @@ function check_configure {
   source configure.sh
   
   #check if configure.sh contains values, if not contains call configure function
-  if [ -z "$START_EXTENTS" ] || [ -z "$MAX_EXTENTS" ] || [ -z "$STEP_SIZE" ] || [ -z "$ALFAS" ] || [ -z "$ALFAS_PAR" ] || [ -z "$RUN" ] || [ -z "$DIMENSION" ]
+  if [ -z "$START_EXTENTS" ] || [ -z "$MAX_EXTENTS" ] || [ -z "$STEP_SIZE" ] || [ -z "$ALFAS" ] || [ -z "$ALFAS_PAR" ] \
+  || [ -z "$RUN" ] || [ -z "$DIMENSION" ] || [ -z "$CORES" ]
   then
     configure
   fi
@@ -388,5 +408,10 @@ then
   
   #Clean algorithms build objects
   cleanalgorithms
+  
+else
+  
+  echo "how to use this program:
+./launcher.sh --help"
   
 fi

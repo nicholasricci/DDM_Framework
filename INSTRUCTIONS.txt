@@ -1,0 +1,18 @@
+HOW TO USE THIS FRAMEWORK?
+
+1 - First of all you need to put your algorithms in Algorithms folder;
+2 - Come back and you can launch the "./launcher.sh --help" command to see what launcher can do.
+3 - Launch "./launcher.sh configure" to configure the framework with some variable like: START_EXTENTS, MAX_EXTENTS,
+STEP_SIZE, CORES, ALFAS, ALFAS_PAR, DIMENSION.
+4 - You could use the library in c inside this framework to your algorithm. Copy into your algorithm and arrange them for the
+structure of your project.
+if you don't want use that library you MUST consider that input in argv variable is in this order: 
+argv[1] = EXTENTS
+argv[2] = DIMENSION
+argv[3] = ALFA
+the output must be one file with the name with the name of executable, you can retrieve the name of executable with:
+argv[0]
+the name file must be like this executable.txt
+5 - After configure phase you can use the "./launcher.sh run" command to build and run all the algorithms with the configuration
+that you set earlier.
+6 - At the end you can find your result in the root dirctory in "_results" and "_graphs" folder.
