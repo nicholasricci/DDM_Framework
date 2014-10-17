@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 /**
  * INPUT
@@ -28,9 +29,28 @@ size_t DDM_Get_Dimension(int argc, char* argv[]);
 
 float DDM_Get_Alfa(int argc, char* argv[]);
 
+size_t DDM_Get_Updates(int argc, char* argv[]);
+
+size_t DDM_Get_Subscriptions(int argc, char* argv[]);
+
 
 /**
  * OUTPUT
  */
 
 void DDM_Write_Result(char* argv[], double total_time);
+
+/**
+ * TIMER
+ */
+
+typedef struct DDM_Timer{
+  clock_t start, end;
+  float total;
+} DDM_Timer;
+
+void DDM_Start_Timer(DDM_Timer *ddm_timer);
+
+void DDM_Stop_Timer(DDM_Timer *ddm_timer);
+
+float DDM_Get_Total_Time(DDM_Timer ddm_timer);

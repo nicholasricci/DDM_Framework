@@ -62,9 +62,10 @@ int main(int argc, char *argv[])
 	_INT dimensions;
 	float alfa;
 #ifdef __TEST
-	FILE *fout;
+	//FILE *fout;
 	char fname[FILE_NAME_SIZE];
-	clock_t start, end;
+	DDM_Timer ddm_timer;
+	//clock_t start, end;
 #endif // __TEST
 
 	if ((argc == 2 && strcmp(argv[1], "--help") == 0) || argc != 4)
@@ -78,9 +79,14 @@ int main(int argc, char *argv[])
 	extents = (_INT)DDM_Get_Extents(argc, argv);
 	if ( (extents <= 0) || (extents %2 != 0) )
 		printf("\nNot a valid number of update extents.\n");
+	
+	updates = (_INT) DDM_Get_Updates(argc, argv);
+	subscrs = (_INT) DDM_Get_Subscriptions(argc, argv);
+	/*
 	updates = (_INT) extents/2;
 	subscrs = updates;
-
+	*/
+	
 	dimensions = (_INT)DDM_Get_Dimension(argc, argv);
 	if (dimensions <= 0)
 		printf("\nNot a valid number of dimensions.\n");
@@ -105,7 +111,8 @@ int main(int argc, char *argv[])
 
 #ifdef __TEST
 	// start test timer
-	start = clock();
+	DDM_Start_Timer(&ddm_timer);
+	//start = clock();
 #endif // __TEST
 
 	// allocate the result bit matrix
@@ -118,7 +125,8 @@ int main(int argc, char *argv[])
 
 #ifdef __TEST
 	// stop test timer
-	end = clock();
+	DDM_Stop_Timer(&ddm_timer);
+	//end = clock();
 
 	// format output file name
 	if (sprintf(fname, "%s_%d_%d_%2.3f.txt", FILENAME(argv[0]), updates + subscrs, dimensions, alfa) < 0)
@@ -140,7 +148,8 @@ int main(int argc, char *argv[])
 	
 	fclose(fout);*/
 
-	DDM_Write_Result(argv, ((float)(end - start)) / CLOCKS_PER_SEC);
+	DDM_Write_Result(argv, DDM_Get_Total_Time(ddm_timer));
+	//DDM_Write_Result(argv, ((float)(end - start)) / CLOCKS_PER_SEC);
 	
 #ifdef __DEBUG
 	getchar();

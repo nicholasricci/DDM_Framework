@@ -34,6 +34,17 @@ float DDM_Get_Alfa(int argc, char* argv[]){
   return 0;
 }
 
+size_t DDM_Get_Updates(int argc, char* argv[]){
+  if ( argc >= 2)
+    return (size_t) (atoi(argv[1]) / 2);
+  return 0;
+}
+
+size_t DDM_Get_Subscriptions(int argc, char* argv[]){
+  if ( argc >= 2)
+    return (size_t) (atoi(argv[1]) / 2);
+  return 0;
+}
 
 /**
  * OUTPUT
@@ -52,4 +63,22 @@ void DDM_Write_Result(char* argv[], double total_time){
 
   fprintf(fout, "%f\n", total_time);
   fclose(fout);
+}
+
+/**
+ * TIMER
+ */
+
+void DDM_Start_Timer(DDM_Timer *ddm_timer){
+  ddm_timer->start = clock();
+  ddm_timer->total = 0;
+}
+
+void DDM_Stop_Timer(DDM_Timer *ddm_timer){
+  ddm_timer->end = clock();
+  ddm_timer->total = ((float)(ddm_timer->end - ddm_timer->start)) / CLOCKS_PER_SEC;
+}
+
+float DDM_Get_Total_Time(DDM_Timer ddm_timer){
+  return ddm_timer.total;
 }
