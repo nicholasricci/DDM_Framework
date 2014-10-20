@@ -41,13 +41,17 @@ size_t DDM_Get_Subscriptions(int argc, char* argv[]);
 void DDM_Write_Result(char* argv[], double total_time);
 
 /**
- * TIMER
+ * STRUCT
  */
 
 typedef struct DDM_Timer{
   clock_t start, end;
   float total;
 } DDM_Timer;
+
+/**
+ * TIMER
+ */
 
 void DDM_Start_Timer(DDM_Timer *ddm_timer);
 

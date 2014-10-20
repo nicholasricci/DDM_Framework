@@ -1,0 +1,205 @@
+\documentclass[a4paper,11pt]{report}
+
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xstring}
+\usepackage{color}
+
+\title{Documentation Framework DDM}
+\author{Nicholas Ricci}
+\date{25/09/2014}
+
+%format images
+\newcommand{\customfigure}[3]{
+  \begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.35, width=125mm]{#1}
+    \caption{#2}
+    \label{fig:#3}
+  \end{figure}
+}
+
+%definition of some color
+\definecolor{foldercolor}{RGB}{120, 120, 120}
+\definecolor{commandcolor}{RGB}{255, 128, 0}
+\definecolor{sourcecolor}{RGB}{96, 206, 181}
+\definecolor{headercolor}{RGB}{249, 126, 179}
+\definecolor{bashvariable}{RGB}{0, 102, 0}
+\definecolor{bashfilecolor}{RGB}{0, 0, 0}
+
+%Do capital letter in bold
+\newcommand{\majorword}[1]{
+  \textbf{\StrLeft{#1}{1}}\StrGobbleLeft{#1}{1}
+}
+
+%Do format for folders
+\newcommand{\folder}[1]{
+  \textcolor{foldercolor}{\textit{#1}}
+}
+
+%Do format for commands
+\newcommand{\command}[1]{
+  \textcolor{commandcolor}{\textit{#1}}
+}
+
+%Do format for sources
+\newcommand{\source}[1]{
+  \textcolor{sourcecolor}{\textit{#1}}
+}
+
+%Do format for headers
+\newcommand{\header}[1]{
+  \textcolor{headercolor}{\textit{#1}}
+}
+
+%Do format for c variable
+\newcommand{\variable}[1]{
+  \textcolor{blue}{\textit{#1}}
+}
+
+%Do format for bash variable
+\newcommand{\bashvariable}[1]{
+  \textcolor{bashvariable}{\textit{#1}}
+}
+
+%Do format for bash variable
+\newcommand{\bashfile}[1]{
+  \textcolor{bashfilecolor}{\textbf{#1}}
+}
+
+\lstset{language=C,
+        basicstyle=\ttfamily\scriptsize,
+        keywordstyle=\color{blue}\ttfamily,
+        stringstyle=\color{red}\ttfamily,
+        commentstyle=\color{green}\ttfamily,
+        morecomment=[l][\color{magenta}]{\#},
+        morekeywords={DDM_Timer},
+        frame={singleline}
+}
+
+\begin{document}
+ \maketitle
+ \tableofcontents
+ 
+ \chapter{Introduction}
+ 
+ This is a framework for \majorword{Data} \majorword{Distribution} \majorword{Management}.
+ Which this framework you can put your algorithms inside and you can test them with other algorithms with coherent
+ input data.
+ 
+ In this document I'll explain how to configure this framework and what to do to edit your algorithms to make sure
+ your algorithms works fine inside of it.
+ 
+ Before start you must be sure that your algorithms contain a makefile. If you haven't, do it!
+ 
+ \chapter{Fix your algorithm}
+ 
+ Before you can start to use framework you must fix your algorithm.
+ Inside the root framework there's a folder called \folder{C libraries for this framework}, within it there are
+ two files: \source{DDM\_input\_output.c} and \header{DDM\_input\_output.h}.
+ 
+ You need to copy this two files into your sources folder.
+ Remember to edit your makefile to compile also this library and to update your clean target.
+ 
+ Now you need to open your main file and include this library (for example):
+ \begin{lstlisting}
+  #include "DDM_input_output.h"
+ \end{lstlisting}
+ 
+ Another thing you must do is to declare a new \variable{DDM\_Timer}:
+ \begin{lstlisting}
+  DDM_Timer ddm_timer;
+ \end{lstlisting}
+
+ Now you can get the number of extents, updates, subscriptions, alfa, dimensions:
+ \begin{lstlisting}
+  size_t extents = DDM_Get_Extents(argc, argv);
+  size_t dimension = DDM_Get_Dimension(argc, argv);
+  size_t updates = DDM_Get_Updates(argc, argv);
+  size_t subscriptions = DDM_Get_Subscriptions(argc, argv);
+  float alfa = DDM_Get_Alfa(argc, argv);
+ \end{lstlisting}
+
+ After you've gotten parameters it's time to start the timer, execute the matching algorithm and
+ at the end stop the timer:
+ \begin{lstlisting}
+  DDM_Start_Timer(&ddm_timer);
+    //execute the matching algorithm
+  DDM_Stop_Timer(&ddm_timer);
+ \end{lstlisting}
+
+  At the end you need to write result into a file then:
+  \begin{lstlisting}
+   DDM_Write_Result(argv, DDM_Get_Total_Time(ddm_timer));
+  \end{lstlisting}
+  
+  After you've fix your algorithm you can put it inside the framework and go to the next chapter!
+ 
+ \chapter{How to use launcher}
+ 
+ The script in bash inside of the root, launcher.sh, is a launcher to execute the framework.
+ To execute the script you can open your terminal and digit this:
+ \begin{lstlisting}[language=bash]
+  ./launcher.sh <command>
+ \end{lstlisting}
+
+ Below will be indicated commands in order to execute for a proper functioning of the framework:
+ \begin{enumerate}
+  \item \command{--help}: will be shown what the framework can do and which commands can be run;
+  \item \command{configure}: will run an interactive part in which the user must configure the following 
+  parameters:
+  \begin{itemize}
+   \item \bashvariable{START\_EXTENTS}: indicating the initial number of extents by which the 
+   framework will execute the test;
+   \item \bashvariable{MAX\_EXTENTS}: indicating the maximum number of extents to which the 
+   framework will come to run tests;
+   \item \bashvariable{STEP\_SIZE}: indicating the number by which the framework will increase 
+   the number of initial extents until reaches the maximum;
+   \item \bashvariable{DIMENSION}: indicating the number of dimensions with which the framework 
+   will execute the algorithms;
+   \item \bashvariable{CORES}: in the case of parallelization in OpenMP this parameter must 
+   be set with the maximum number of cores that the user wants to use as the maximum number of cores. 
+   The initial number of cores is set to 2 by default;
+   \item \bashvariable{ALFAS}: is an array that indicates the degree of overlap of subscription extents 
+   and updates extents. You can insert multiple elements;
+   \item \bashvariable{ALFAS\_PAR}: is an array similar to ALFAS, the only difference is that 
+   this is to indicate the values to use with algorithms that use OpenMP;
+   \item \bashvariable{RUN}: indicating the number of executions that you want to perform for each algorithm.
+  \end{itemize}
+  This command will create a file in the root of the framework called \bashfile{configure.sh};
+  \item \command{build}: will be compiled all algorithms in the folder \folder{Algorithms}.
+  At the end of the process there will be two text files in the root of each algorithm:
+  \begin{itemize}
+   \item DDM\_Sequential: in this file is necessary to write all names of sequential version 
+   of executables. One for each line;
+   \item DDM\_Parallel: in this file is necessary to write all names of parallel version of
+   executables. One for each line.
+  \end{itemize}
+  Enter names of executables is a critical step, and even more fundamental is to insert only 
+  one name on each line;
+  \item \command{run}:
+  \begin{itemize}
+   \item \folder{\_results}: in this folder will be available all the runs performed with 
+   execution time;
+   \item \folder{\_graphs}: in this folder will be available files with the number 
+   of extents on the left and to the right will be the average time of the runs performed.
+   \end{itemize}
+ \end{enumerate}
+
+ Questi comandi sono stati elencati in base al loro ordine di esecuzione.
+
+ Sono presenti altri tre comandi utili per tenere pulito il framework:
+ \begin{itemize}
+  \item \command{cleanalgorithms}: for each algorithm executes command \command{make clean}, 
+  then is foundamental define a clean target in your makefile;
+  \item \command{cleanresults}: will delete \folder{\_results} and \folder{\_graphs} folders 
+  with all their files;
+  \item \command{clean}: executes both cleanalgorithms and cleanresults.
+ \end{itemize}
+ 
+\end{document}
+

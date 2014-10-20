@@ -275,7 +275,7 @@ function run {
   if [[ $1 =~ $re_integer && $2 =~ $re_integer && $3 =~ $re_float && $4 =~ $re_float ]];
   then
  
-    echo "This function doesn't work yet well!"
+    echo "This function is under construction!"
     #check_configure
     #build
     #$EXTENTS=$1
