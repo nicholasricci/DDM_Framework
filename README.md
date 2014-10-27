@@ -1,11 +1,11 @@
 
-###################################################################
+##############################################################
 		     Data Distribution Management Framework
 
 			    http://pads.cs.unibo.it
 			    
 		    https://github.com/BuruReZ/DDM_Framework
-################################################################### 
+############################################################## 
 
 This archive contains framework with various kind of test useful to
 perform your algorithms in a coherent way. You can also find some 
