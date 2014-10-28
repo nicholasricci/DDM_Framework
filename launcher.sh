@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #import utilities functions
-source functions.sh
+source functions_alfa.sh
+source functions_other_test.sh
 
 function build {
 
@@ -272,18 +273,7 @@ function run {
   echo "###########################"
   
   
-  if [[ $1 =~ $re_integer && $2 =~ $re_integer && $3 =~ $re_float && $4 =~ $re_float ]];
-  then
- 
-    echo "This function is under construction!"
-    #check_configure
-    #build
-    #$EXTENTS=$1
-    #$DIMENSION=$2
-    #$ALFAS="$3"
-    #$ALFAS_PAR="$4"
-        
-  elif [ $# -eq 0 ]; 
+  if  [ $# -eq 1 ] && [ "$1" == "alfa" ]; 
   then
   
     check_configure
@@ -302,12 +292,12 @@ function run {
       #for each executables sequential starts program in some configuration
       for exe in ${exe_sequential[*]}
       do
-	run_executable_sequential $exe
+	run_executable_sequential $exe $1
       done
       #for each executables parallel starts program in some configuration
       for exe_par in ${exe_parallel[*]}
       do
-	run_executable_parallel $exe_par
+	run_executable_parallel $exe_par $1
       done
       #change to algorithm directory
       cd ..
@@ -318,10 +308,16 @@ function run {
     unset will_execute
     unset algs_parallel
     
+  elif [ $# -eq 1 ] && [ "$1" != "alfa" ];
+  then
+  
+    echo "work in progress!"
+    
   else
   
-    echo " syntax: usage: ./launcher.sh run INTEGER INTEGER FLOAT FLOAT
-meaning: usage: ./launcher.sh run EXTENTS DIMENSION ALFA ALFA_PARALLEL"
+    echo " syntax: usage: ./launcher.sh run STRING
+meaning: usage: ./launcher.sh run TYPE_TEST
+example: usage: ./launcher.sh run alfa"
   
   fi
 }

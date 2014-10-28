@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 	//clock_t start, end;
 #endif // __TEST
 
-	if ((argc == 2 && strcmp(argv[1], "--help") == 0) || argc != 4)
+	if ((argc == 2 && strcmp(argv[1], "--help") == 0) || argc != 5)
 	{
 		printf("\nSYNOPSIS:\n\n");
 		printf("%s <extents> <dimensions> <alfa>\n\n", FILENAME(argv[0]));

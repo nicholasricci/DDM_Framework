@@ -17,32 +17,38 @@
  */
 
 size_t DDM_Get_Extents(int argc, char* argv[]){
-  if ( argc >= 2 ) 
-    return atoi(argv[1]);
+ 
+  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
+    return atoi(argv[2]);
+  
   return 0;
 }
 
 size_t DDM_Get_Dimension(int argc, char* argv[]){
-  if ( argc >= 3 )
-    return atoi(argv[2]);
+  
+  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
+    return atoi(argv[3]);
   return 0;
 }
 
 float DDM_Get_Alfa(int argc, char* argv[]){
-  if ( argc >= 4 )
-    return atof(argv[3]);
+  
+  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
+    return atof(argv[4]);
   return 0;
 }
 
 size_t DDM_Get_Updates(int argc, char* argv[]){
-  if ( argc >= 2)
-    return (size_t) (atoi(argv[1]) / 2);
+  
+  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
+    return (size_t) (atoi(argv[2]) / 2);
   return 0;
 }
 
 size_t DDM_Get_Subscriptions(int argc, char* argv[]){
-  if ( argc >= 2)
-    return (size_t) (atoi(argv[1]) / 2);
+  
+  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
+    return (size_t) (atoi(argv[2]) / 2);
   return 0;
 }
 

@@ -45,7 +45,7 @@ function run_executable_sequential {
 		  for ((R=1; R<=$RUN; R++))
 		  do
 			  echo "running >$1< $EXTENTS/$ALFA:$R"
-			  ./$1 $EXTENTS $DIMENSION $ALFA
+			  ./$1 $2 $EXTENTS $DIMENSION $ALFA 
 		  done
 		  
 		  AVERAGE=`$AVERAGER $filename`
@@ -97,7 +97,7 @@ function run_executable_parallel {
 		    for ((R=1; R<=$RUN; R++))
 		    do
 			    echo "running >$1< $EXTENTS/$ALFA:$R"
-			    ./$1 $EXTENTS $DIMENSION $ALFA
+			    ./$1 $2 $EXTENTS $DIMENSION $ALFA
 		    done
 		    
 		    AVERAGE=`$AVERAGER $filename`
