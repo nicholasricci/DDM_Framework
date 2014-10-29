@@ -32,35 +32,37 @@ if [ $# -eq 1 ]
 then
 	if [ $1 = "-purge" ]
 	then
-		#List instance names here
-		rm -R "TINIEST";
-		rm -R "TINY";
-		rm -R "TINY50";
-		rm -R "TINY50U";
-		rm -R "TINY50S";
+		cd TestsInstances
+		  #List instance names here
+		  rm -R "TINIEST";
+		  rm -R "TINY";
+		  rm -R "TINY50";
+		  rm -R "TINY50U";
+		  rm -R "TINY50S";
 
-		rm -R "SMALLEST";
-		rm -R "SMALL";
-		rm -R "SMALL30";
-		rm -R "SMALL30U";
-		rm -R "SMALL30S";
+		  rm -R "SMALLEST";
+		  rm -R "SMALL";
+		  rm -R "SMALL30";
+		  rm -R "SMALL30U";
+		  rm -R "SMALL30S";
 
-		rm -R "SPARSE";
-		rm -R "AVERAGE";
-		rm -R "MEDIUM";
-		rm -R "MEDIUM20";
-		rm -R "MEDIUM20U";
-		rm -R "MEDIUM20S";
+		  rm -R "SPARSE";
+		  rm -R "AVERAGE";
+		  rm -R "MEDIUM";
+		  rm -R "MEDIUM20";
+		  rm -R "MEDIUM20U";
+		  rm -R "MEDIUM20S";
 
-		rm -R "GRANDE";
-		rm -R "BIG";
-		rm -R "BIG10";
-		rm -R "BIG10U";
-		rm -R "BIG10S";
+		  rm -R "GRANDE";
+		  rm -R "BIG";
+		  rm -R "BIG10";
+		  rm -R "BIG10U";
+		  rm -R "BIG10S";
 
-		rm -R "HUGE";
-		rm -R "HUGER";
-		rm -R "CLUTTERED";
+		  rm -R "HUGE";
+		  rm -R "HUGER";
+		  rm -R "CLUTTERED";
+		cd ..
 	else
 		print_help
 	fi
