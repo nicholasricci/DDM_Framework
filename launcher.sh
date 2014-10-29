@@ -36,6 +36,11 @@ function build {
   #Build the utils folder which there is avarage programs
   cd utils
   make
+    #Build the InstanceMaker folder which there is a program that can create interesting tests
+    cd InstanceMaker
+    make
+    mv ./DDMInstanceMaker ../
+    cd ..
   cd ..
   
 }
@@ -207,6 +212,34 @@ function configure {
 
 }
 
+function cleantestsinstances {
+  
+  echo "###########################"
+  echo "## CLEAN TESTS INSTANCES ##"
+  echo "###########################"
+  
+  #clean testsinstances
+  rm -R -f TestsInstances
+  echo "Removed TestsInstances folder"
+}
+
+function cleanutils {
+
+  echo "###########################"
+  echo "####### CLEAN UTILS #######"
+  echo "###########################"
+  
+  #clean utils
+  cd utils
+  echo -e "\nutils"
+  make clean
+    cd InstanceMaker
+    make clean
+    cd ..
+  rm -f DDMInstanceMaker
+  cd ..
+}
+
 function cleanalgorithms {
 
   echo "###########################"
@@ -225,12 +258,6 @@ function cleanalgorithms {
     
     cd ..
   done
-  cd ..
-  
-  #clean utils
-  cd utils
-  echo -e "\nutils"
-  make clean
   cd ..
   
   #Unset all variable
@@ -252,6 +279,7 @@ function cleanresults {
 
   rm -R -f _results
   rm -R -f _graphs
+  echo "Removed _results and _graphs folders"
 }
 
 function clean {
@@ -263,7 +291,10 @@ function clean {
   cleanalgorithms
   
   cleanresults
+  
+  cleanutils
 
+  cleantestsinstances
 }
 
 function run {
@@ -366,7 +397,19 @@ for clean only algorithm:
 usage:	./launcher.sh cleanalgorithms
 
 for clean only _results and _graphs folder:
-usage:	./launcher.sh cleanresults"
+usage:	./launcher.sh cleanresults
+
+for clean only utils object files:
+usage:	./launcher.sh cleanutils
+
+for clean only tests instances folder:
+usage:	./launcher.sh cleantestsinstances
+
+for create a new DDM Test Instance:
+usage:	./launcher.sh DDMInstanceMaker
+
+for create defaults DDM Tests Instances:
+usage:	./launcher.sh DDMDefaultsTests"
 
 elif [ ! -z "$1" ] && [ "$1" == "build" ];
 then
@@ -404,6 +447,36 @@ then
   
   #Clean algorithms build objects
   cleanalgorithms
+
+elif [ ! -z "$1" ] && [ "$1" == "cleanutils" ];
+then
+  
+  #Clean utils build objects
+  cleanutils
+ 
+elif [ ! -z "$1" ] && [ "$1" == "cleantestsinstances" ];
+then
+  
+  #Clean testsinstances folder
+  cleantestsinstances 
+ 
+elif [ ! -z "$1" ] && [ "$1" == "DDMInstanceMaker" ];
+then
+  
+  #Create directory for possible future Instances Test
+  mkdir -p TestsInstances
+  #View all possible parameters 
+  ./utils/DDMInstanceMaker
+  #Read parameters
+  read -p "Insert your parameter string here: " DDMInstanceMakerParameters
+  #Executes with parameters
+  ./utils/DDMInstanceMaker $DDMInstanceMakerParameters
+  
+elif [ ! -z "$1" ] && [ "$1" == "DDMDefaultsTests" ];
+then
+
+  #use script in utils folder to create default Tests Instances
+  ./utils/create_instances.sh
   
 else
   

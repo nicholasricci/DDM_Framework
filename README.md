@@ -43,6 +43,10 @@ General Public License.
 Contains a preliminary implementation of the Interval Tree Matching (ITM) 
 DDM algorithm that is described in the paper. 
 
+Inside of this framework ther's also a DDMInstanceMaker did by 
+Francesco Bedini and i took it and fixed for this framework. This
+InstanceMaker is released under GPLv3.
+
 --------------------------------------------------------------------------
 All the resources described above are distributed under the GNU General 
 Public License version 3 (GPLv3) exept point 1) that is under GNU Affero
