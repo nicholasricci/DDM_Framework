@@ -1,8 +1,9 @@
 #!/bin/bash
 
 #import utilities functions
-source functions_alfa.sh
-source functions_other_test.sh
+source ./utils/bash/functions_alfa.sh
+source ./utils/bash/functions_other_test.sh
+source ./utils/bash/definitions.sh
 
 function build {
 
@@ -11,21 +12,21 @@ function build {
   echo "###########################"
 
   #Build all algorithms in Algorithms folder
-  cd Algorithms
+  cd $_ALGORITHMS
   algs=($(ls -d */))
   for i in ${algs[*]}
   do
     cd $i
     
-    if [ ! -f ./DDM_Parallel ];
+    if [ ! -f $_DDM_PARALLEL ];
     then
-      touch DDM_Parallel
-      echo "## Insert the name of parallel executables in bin folder. One line, one executable." > DDM_Parallel
+      touch $_DDM_PARALLEL
+      echo "## Insert the name of parallel executables in bin folder. One line, one executable." > $_DDM_PARALLEL
     fi
-    if [ ! -f ./DDM_Sequential ];
+    if [ ! -f $_DDM_SEQUENTIAL ];
     then
-      touch DDM_Sequential
-      echo "## Insert the name of sequential executables in bin folder. One line, one executable." > DDM_Sequential
+      touch $_DDM_SEQUENTIAL
+      echo "## Insert the name of sequential executables in bin folder. One line, one executable." > $_DDM_SEQUENTIAL
     fi
     make
     
@@ -34,12 +35,12 @@ function build {
   cd ..
   
   #Build the utils folder which there is avarage programs
-  cd utils
+  cd $_UTILS
   make
     #Build the InstanceMaker folder which there is a program that can create interesting tests
-    cd InstanceMaker
+    cd $_INSTANCE_MAKER
     make
-    mv ./DDMInstanceMaker ../
+    mv ./$_DDM_INSTANCE_MAKER ../
     cd ..
   cd ..
   
@@ -55,10 +56,15 @@ function configure {
   #the number of max extents that programs must reach,
   #the alfas and alfas for parallel execution
   
-  rm -f configure.sh
-  touch configure.sh
+  rm -R -f $_CONFIGURATION
+  mkdir -p $_CONFIGURATION
+  touch ./$_CONFIGURATION/$_CONFIGURATION_SHELL
+  
+  #go to configuration folder
+  cd $_CONFIGURATION
+  
   echo "creating configuration file"
-  echo "#Please don't edit this file manually." > configure.sh
+  echo "#Please don't edit this file manually." > $_CONFIGURATION_SHELL
   
   #START_EXTENTS
   while true; do
@@ -66,12 +72,12 @@ function configure {
     if [[ $yn =~ $re_integer ]];
     then
       START_EXTENTS=$yn
-      echo "START_EXTENTS=$yn" >> configure.sh
+      echo "START_EXTENTS=$yn" >> $_CONFIGURATION_SHELL
       break
     elif [ -z "$yn" ];
     then
       START_EXTENTS=50000
-      echo "START_EXTENTS=$START_EXTENTS" >> configure.sh
+      echo "START_EXTENTS=$START_EXTENTS" >> $_CONFIGURATION_SHELL
       break
     else
       echo "Please insert an integer number."
@@ -84,12 +90,12 @@ function configure {
     if [[ $yn =~ $re_integer  && $START_EXTENTS -le $yn ]];
     then
       MAX_EXTENTS=$yn
-      echo "MAX_EXTENTS=$yn" >> configure.sh
+      echo "MAX_EXTENTS=$yn" >> $_CONFIGURATION_SHELL
       break
     elif [ -z "$yn" ];
     then
       MAX_EXTENTS=500000
-      echo "MAX_EXTENTS=$MAX_EXTENTS" >> configure.sh
+      echo "MAX_EXTENTS=$MAX_EXTENTS" >> $_CONFIGURATION_SHELL
       break
     else
       echo "Please insert an integer number."
@@ -102,12 +108,12 @@ function configure {
     if [[ $yn =~ $re_integer  && $MAX_EXTENTS -ge $yn ]];
     then
       STEP_SIZE=$yn
-      echo "STEP_SIZE=$yn" >> configure.sh
+      echo "STEP_SIZE=$yn" >> $_CONFIGURATION_SHELL
       break
     elif [ -z "$yn" ];
     then
       STEP_SIZE=50000
-      echo "STEP_SIZE=$STEP_SIZE" >> configure.sh
+      echo "STEP_SIZE=$STEP_SIZE" >> $_CONFIGURATION_SHELL
       break
     else
       echo "Please insert an integer number."
@@ -120,12 +126,12 @@ function configure {
     if [[ $yn =~ $re_integer  && $yn -ge 1 ]];
     then
       DIMENSION=$yn
-      echo "DIMENSION=$yn" >> configure.sh
+      echo "DIMENSION=$yn" >> $_CONFIGURATION_SHELL
       break
     elif [ -z "$yn" ];
     then
       DIMENSION=1
-      echo "DIMENSION=$DIMENSION" >> configure.sh
+      echo "DIMENSION=$DIMENSION" >> $_CONFIGURATION_SHELL
       break
     else
       echo "Please insert an integer number."
@@ -138,12 +144,12 @@ function configure {
     if [[ $yn =~ $re_integer  && $yn -ge 2 ]];
     then
       CORES=$yn
-      echo "CORES=$yn" >> configure.sh
+      echo "CORES=$yn" >> $_CONFIGURATION_SHELL
       break
     elif [ -z "$yn" ];
     then
       CORES=12
-      echo "CORES=$CORES" >> configure.sh
+      echo "CORES=$CORES" >> $_CONFIGURATION_SHELL
       break
     else
       echo "Please insert an integer number."
@@ -169,7 +175,7 @@ function configure {
       echo "Please insert a float number."
     fi
   done
-  echo "ALFAS=\"${ALFAS[@]}\"" >> configure.sh
+  echo "ALFAS=\"${ALFAS[@]}\"" >> $_CONFIGURATION_SHELL
   
   #ALFAS_PAR
   index=0
@@ -190,7 +196,7 @@ function configure {
       echo "Please insert a float number."
     fi
   done
-  echo "ALFAS_PAR=\"${ALFAS_PAR[@]}\"" >> configure.sh
+  echo "ALFAS_PAR=\"${ALFAS_PAR[@]}\"" >> $_CONFIGURATION_SHELL
   
   #RUN
   while true; do
@@ -198,18 +204,21 @@ function configure {
     if [[ $yn =~ $re_integer  && $yn -ge 1 ]];
     then
       RUN=$yn
-      echo "RUN=$yn" >> configure.sh
+      echo "RUN=$yn" >> $_CONFIGURATION_SHELL
       break
     elif [ -z "$yn" ];
     then
       RUN=30
-      echo "RUN=$RUN" >> configure.sh
+      echo "RUN=$RUN" >> $_CONFIGURATION_SHELL
       break
     else
       echo "Please insert an integer number."
     fi
   done
 
+  #Return to root
+  cd ..
+  
 }
 
 function cleantestsinstances {
@@ -219,7 +228,7 @@ function cleantestsinstances {
   echo "###########################"
   
   #clean testsinstances
-  rm -R -f TestsInstances
+  rm -R -f $_TESTS_INSTANCES
   echo "Removed TestsInstances folder"
 }
 
@@ -230,13 +239,13 @@ function cleanutils {
   echo "###########################"
   
   #clean utils
-  cd utils
+  cd $_UTILS
   echo -e "\nutils"
   make clean
-    cd InstanceMaker
+    cd $_INSTANCE_MAKER
     make clean
     cd ..
-  rm -f DDMInstanceMaker
+  rm -f $_DDM_INSTANCE_MAKER
   cd ..
 }
 
@@ -247,7 +256,7 @@ function cleanalgorithms {
   echo "###########################"
   
   #clean all algorithms
-  cd Algorithms
+  cd $_ALGORITHMS
   algs=($(ls -d */))
   for i in ${algs[*]}
   do
@@ -277,8 +286,8 @@ function cleanresults {
   echo "###### CLEAN RESULTS ######"
   echo "###########################"
 
-  rm -R -f _results
-  rm -R -f _graphs
+  rm -R -f $_ALFA_RESULTS
+  rm -R -f $_ALFA_GRAPHS
   echo "Removed _results and _graphs folders"
 }
 
@@ -310,7 +319,7 @@ function run {
     check_configure
     build
     
-    cd Algorithms
+    cd $_ALGORITHMS
     algs=($(ls -d */))
     for i in ${algs[*]}
     do
@@ -319,7 +328,7 @@ function run {
       exe_sequential=$(read_file DDM_Sequential)
       exe_parallel=$(read_file DDM_Parallel)
       #change to bin directory
-      cd bin
+      cd $_ALGORITHM_BIN
       #for each executables sequential starts program in some configuration
       for exe in ${exe_sequential[*]}
       do
@@ -360,7 +369,7 @@ function check_configure {
   echo "###########################"
   
   #import configure.sh
-  source configure.sh
+  source $_CONFIGURATION/$_CONFIGURATION_SHELL
   
   #check if configure.sh contains values, if not contains call configure function
   if [ -z "$START_EXTENTS" ] || [ -z "$MAX_EXTENTS" ] || [ -z "$STEP_SIZE" ] || [ -z "$ALFAS" ] || [ -z "$ALFAS_PAR" ] \
@@ -464,19 +473,19 @@ elif [ ! -z "$1" ] && [ "$1" == "DDMInstanceMaker" ];
 then
   
   #Create directory for possible future Instances Test
-  mkdir -p TestsInstances
+  mkdir -p $_TESTS_INSTANCES
   #View all possible parameters 
-  ./utils/DDMInstanceMaker
+  ./$_UTILS/$_DDM_INSTANCE_MAKER
   #Read parameters
   read -p "Insert your parameter string here: " DDMInstanceMakerParameters
   #Executes with parameters
-  ./utils/DDMInstanceMaker $DDMInstanceMakerParameters
+  ./$_UTILS/$_DDM_INSTANCE_MAKER $DDMInstanceMakerParameters
   
 elif [ ! -z "$1" ] && [ "$1" == "DDMDefaultsTests" ];
 then
 
   #use script in utils folder to create default Tests Instances
-  ./utils/create_instances.sh
+  ./$_UTILS/$_BASH/$_CREATE_INSTANCES_DEFAULT
   
 else
   
