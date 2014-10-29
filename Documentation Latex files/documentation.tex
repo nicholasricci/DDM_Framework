@@ -171,7 +171,8 @@
    \item \bashvariable{RUN}: indicating the number of executions that you want to perform for each algorithm.
   \end{itemize}
   This command will create a file in the root of the framework called \bashfile{configure.sh};
-  \item \command{build}: will be compiled all algorithms in the folder \folder{Algorithms}.
+  \item \command{build}: will be compiled all algorithms in the folder \folder{Algorithms} 
+  and \folder{utils} where there are an avarager and a DDMInstanceMaker programs.
   At the end of the process there will be two text files in the root of each algorithm:
   \begin{itemize}
    \item DDM\_Sequential: in this file is necessary to write all names of sequential version 
@@ -182,24 +183,40 @@
   Enter names of executables is a critical step, and even more fundamental is to insert only 
   one name on each line;
   \item \command{run}:
-  \begin{itemize}
-   \item \folder{\_results}: in this folder will be available all the runs performed with 
-   execution time;
-   \item \folder{\_graphs}: in this folder will be available files with the number 
-   of extents on the left and to the right will be the average time of the runs performed.
-   \end{itemize}
+    \begin{itemize}
+     \item \command{alfa}: if you run this kind of test, the alfa test, you can reach some
+      goals but isn't very accurate beacause values are very random and not created with some
+      criteria, update and subscription extents are the same number:
+      \begin{itemize}
+       \item \folder{\_results}: in this folder will be available all the runs performed with 
+       execution time;
+       \item \folder{\_graphs}: in this folder will be available files with the number 
+       of extents on the left and to the right will be the average time of the runs performed.
+      \end{itemize}
+      You can use more precise tests, read below;
+     \item \command{<every elements inside TestsInstances>}: This tests are more accurate then
+     alfa test. Values are always random but with more clauses.
+    \end{itemize}
  \end{enumerate}
-
- Questi comandi sono stati elencati in base al loro ordine di esecuzione.
-
- Sono presenti altri tre comandi utili per tenere pulito il framework:
+ This commands are listed in order of their executions.
+ 
+ There are other useful commands to clean framework:
  \begin{itemize}
+  \item \command{cleanutils}: delete all objects files inside \folder{utils} folder;
+  \item \command{cleantestsinstances}: delete \folder{TestsInstances} folder;
   \item \command{cleanalgorithms}: for each algorithm executes command \command{make clean}, 
   then is foundamental define a clean target in your makefile;
   \item \command{cleanresults}: will delete \folder{\_results} and \folder{\_graphs} folders 
   with all their files;
-  \item \command{clean}: executes both cleanalgorithms and cleanresults.
+  \item \command{clean}: executes all previous clean commands.
  \end{itemize}
+ 
+ There are other useful commands to create tests instances:
+ \begin{itemize}
+  \item \command{DDMInstanceMaker}: with this you can create a test instance;
+  \item \command{DDMDefaultsTests}: with this you can create a set of default tests instances.
+ \end{itemize}
+
  
 \end{document}
 
