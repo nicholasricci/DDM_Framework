@@ -345,14 +345,84 @@ function run {
       cd ..
     done
     
-    unset will_execute
-    unset algs_parallel
+    unset exe_sequential
+    unset exe_parallel
     
   elif [ $# -eq 1 ] && [ "$1" != "alfa" ];
   then
   
     echo "work in progress!"
     
+    if [ -d "$_TESTS_INSTANCES" ];
+    then
+      
+      #Change dir to TestsInstances
+      cd $_TESTS_INSTANCES
+      if [ -d "$1" ];
+      then
+      
+	cd $1
+	
+	read_info_file "info.txt"
+	#After this function is available to use
+	#this three global variable
+	#$_TEST_DIMENSIONS, _TEST_SUBSCRIPTIONS, _TEST_UPDATES
+	
+	cd ..
+      
+      else
+      
+	echo "The Test Instance you've digit doesn't exist!"
+      
+      fi
+      #Return to root
+      cd ..
+      
+    else
+      
+      echo "Create some Tests Instances!"
+      
+    fi
+    
+    build
+    
+    if [ ! -z "$_TEST_DIMENSIONS" ] && [ ! -z "$_TEST_SUBSCRIPTIONS" ] && [ ! -z "$_TEST_UPDATES" ];
+    then
+    
+      cd $_ALGORITHMS
+      algs=($(ls -d */))
+      for i in ${algs[*]}
+      do
+	cd $i
+	#get the executables sequential and parallel in this directory
+	exe_sequential=$(read_file DDM_Sequential)
+	exe_parallel=$(read_file DDM_Parallel)
+	#change to bin directory
+	cd $_ALGORITHM_BIN
+	#for each executables sequential starts program in some configuration
+	for exe in ${exe_sequential[*]}
+	do
+	  : #TODO create the execution run of sequential with not alfa tests
+	done
+	#for each executables parallel starts program in some configuration
+	for exe_par in ${exe_parallel[*]}
+	do
+	  : #TODO create the execution run of parallel with not alfa tests
+	done
+	#change to algorithm directory
+	cd ..
+	#change to Algoirthms directory
+	cd ..
+      done
+      
+      unset exe_sequential
+      unset exe_parallel
+    
+    else
+    
+      echo "Variables for tests isn't set!"
+    
+    fi
   else
   
     echo " syntax: usage: ./launcher.sh run STRING
@@ -360,6 +430,10 @@ meaning: usage: ./launcher.sh run TYPE_TEST
 example: usage: ./launcher.sh run alfa"
   
   fi
+  
+  unset _TEST_DIMENSIONS
+  unset _TEST_SUBSCRIPTIONS
+  unset _TEST_UPDATES
 }
 
 function check_configure {
@@ -393,14 +467,15 @@ usage: 	./launcher.sh run EXTENTS DIMENSION ALFA ALFA_PARALLEL
 for only build:
 usage:	./launcher.sh build
 
-for only run:
-usage:	./launcher.sh run
-
-for clean (all builded objects and _results, _graphs folder):
-usage:	./launcher.sh clean
-
 for configure the run command:
 usage:	./launcher.sh configure
+
+for only run, you must pass a parameter that indicates the test type:
+usage:	./launcher.sh run <test_type>
+example:./launcher.sh run alfa
+
+for clean (all builded objects, _results, _graphs folder, utils and TestsInstances):
+usage:	./launcher.sh clean
 
 for clean only algorithm:
 usage:	./launcher.sh cleanalgorithms

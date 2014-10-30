@@ -8,7 +8,6 @@
 
 #ifndef _DDM_INPUT_OUTPUT
 #define _DDM_INPUT_OUTPUT
-#endif
 
 /**
  * INCLUDE
@@ -18,6 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <dirent.h>
+#include <errno.h>
 
 /**
  * DEFINITION
@@ -25,6 +26,17 @@
 
 /** \brief definition of the max dimension can be used inside algorithms */
 #define MAX_DIMENSION 5
+
+/** \brief definition of the name of info and input files in TestsInstances -> <NameTest> */
+#define TEST_INFO "info.txt"
+#define TEST_INPUT "input-0.txt"
+
+/** \brief definition of path to check folder TestsInstances instances exists and file at their inside */
+#define FOLDER_CHECK "../../../TestsInstances/%s"
+#define FILE_CHECK "../../../TestsInstances/%s/%s"
+
+/** \brief definition of max length of one line in text file */
+#define LINE_MAX_LENGTH 4000
 
 /**
  * STRUCT
@@ -49,18 +61,16 @@ typedef struct DDM_Input{
   /*variables useful for any kind of test*/
   char type_test[100];
   size_t dimensions;
-  
-  /*variables useful for alfa test*/
   size_t extents;
-  float alfa;
   size_t updates;
   size_t subscriptions;
   
+  /*variables useful for alfa test*/
+  float alfa;
+  
   /*variables useful for other kind of test*/
-  DDM_Extent *updates;
-  size_t size_updates;
-  DDM_Extent *subscriptions;
-  size_t size_subscriptions;
+  DDM_Extent *list_updates;
+  DDM_Extent *list_subscriptions;
   
 }DDM_Input;
 
@@ -71,7 +81,7 @@ typedef struct DDM_Input{
 
 //TODO finish this implementation better as you can and in a coherent way 
 //to reach a good compromise between my framework and another.
-DDM_Input Initialize_DDM_Input(int argc, char* argv[]);
+DDM_Input* Initialize_DDM_Input(int argc, char* argv[]);
 
 size_t DDM_Get_Extents(int argc, char* argv[]);
 
@@ -99,3 +109,5 @@ void DDM_Start_Timer(DDM_Timer *ddm_timer);
 void DDM_Stop_Timer(DDM_Timer *ddm_timer);
 
 float DDM_Get_Total_Time(DDM_Timer ddm_timer);
+
+#endif
