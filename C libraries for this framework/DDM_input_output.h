@@ -9,9 +9,9 @@
 #ifndef _DDM_INPUT_OUTPUT
 #define _DDM_INPUT_OUTPUT
 
-/**
- * INCLUDE
- */
+/******************************************
+ **************** INCLUDE *****************
+ ******************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,9 +20,9 @@
 #include <dirent.h>
 #include <errno.h>
 
-/**
- * DEFINITION
- */
+/******************************************
+ ************** DEFINITIONS ***************
+ ******************************************/
 
 /** \brief definition of the max dimension can be used inside algorithms */
 #define MAX_DIMENSION 5
@@ -38,9 +38,9 @@
 /** \brief definition of max length of one line in text file */
 #define LINE_MAX_LENGTH 4000
 
-/**
- * STRUCT
- */
+/******************************************
+ ***************** STRUCT *****************
+ ******************************************/
 
 /** \brief structure for keep timer of execution of algorithm */
 typedef struct DDM_Timer{
@@ -75,39 +75,109 @@ typedef struct DDM_Input{
 }DDM_Input;
 
 
-/**
- * INPUT
- */
-
-//TODO finish this implementation better as you can and in a coherent way 
-//to reach a good compromise between my framework and another.
-DDM_Input* Initialize_DDM_Input(int argc, char* argv[]);
-
-size_t DDM_Get_Extents(int argc, char* argv[]);
-
-size_t DDM_Get_Dimension(int argc, char* argv[]);
-
-float DDM_Get_Alfa(int argc, char* argv[]);
-
-size_t DDM_Get_Updates(int argc, char* argv[]);
-
-size_t DDM_Get_Subscriptions(int argc, char* argv[]);
-
+/******************************************
+ ***************** INPUT ******************
+ ******************************************/
 
 /**
- * OUTPUT
+ * \brief This function initializie the ddm_input structure. Fill in extents, updates, subscription,
+ * alfa, type_test and in case of the test is different to alfa then fill also list_updates and list_subscriptions
+ * with all ready extents.
+ * \param argc argument count
+ * \param *argv argument values
  */
+DDM_Input* DDM_Initialize_Input(int argc, char* argv[]);
 
+/** 
+ * \brief This function return 1 if is an alfa test or 0 if other kind of test
+ * It useful to check this type:
+ * - if is equal to alfa then you must used DDM_Get_Extents, DDM_Get_Dimensions, DDM_Get_Alfa, DDM_Get_Updates, DDM_Get_Subscriptions
+ * and then allocate variable for these and create random values of subscriptions and updates extents you according to alfa's values;
+ * - if is different to alfa you must used DDM_Get_List_Updates, DDM_Get_List_Subscriptions to retrieve the list of updates and
+ * subscriptions from test instance file and adopt this values with your internal structure
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+int DDM_Is_Alfa_Test(DDM_Input ddm_input);
+
+/**
+ * \brief This function returns the type of test if you're ready to execute.
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+char* DDM_Get_Test_Type(DDM_Input ddm_input);
+
+/**
+ * \brief Return the number of total extents used in this execution = updates + subscriptions
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+size_t DDM_Get_Extents(DDM_Input ddm_input);
+
+/**
+ * \brief Return the number of dimensions used in this execution
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+size_t DDM_Get_Dimensions(DDM_Input ddm_input);
+
+/**
+ * \brief Return the alfa overlapping degree used in this execution
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+float DDM_Get_Alfa(DDM_Input ddm_input);
+
+/**
+ * \brief Return the number of updates used in this execution
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+size_t DDM_Get_Updates(DDM_Input ddm_input);
+
+/**
+ * \brief Return the number of subscriptions used in this execution
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+size_t DDM_Get_Subscriptions(DDM_Input ddm_input);
+
+/**
+ * \brief Return the array of updates used in this execution
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+DDM_Extent* DDM_Get_Updates_List(DDM_Input ddm_input);
+
+/**
+ * \brief Return the array of subscriptions used in this execution
+ * \param ddm_input read-only structure variable DDM_Input
+ */
+DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input);
+
+/******************************************
+ ***************** OUTPUT *****************
+ ******************************************/
+
+/**
+ * \brief Write time of execution in a file called argv[0], name of executable
+ * \param *argv useful for the executable name
+ * \param total_time contains the total time of execution.
+ */
 void DDM_Write_Result(char* argv[], double total_time);
 
-/**
- * TIMER
- */
+/******************************************
+ ***************** TIMER ******************
+ ******************************************/
 
+/**
+ * \brief Initialize the structure DDM_Timer and start timer 
+ * \param ddm_timer structure for manage execution time
+ */
 void DDM_Start_Timer(DDM_Timer *ddm_timer);
 
+/**
+ * \brief Stop timer and calculate the total time 
+ * \param ddm_timer structure for manage execution time
+ */
 void DDM_Stop_Timer(DDM_Timer *ddm_timer);
 
+/**
+ * \brief Return the value of execution's time 
+ * \param ddm_timer structure for manage execution time
+ */
 float DDM_Get_Total_Time(DDM_Timer ddm_timer);
 
 #endif

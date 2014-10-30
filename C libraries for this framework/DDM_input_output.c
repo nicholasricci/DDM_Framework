@@ -6,21 +6,24 @@
  *The input: check if parameters contain correct value and return extents, alfa and dimension.
  */
 
-/**
- * INCLUDE
- */
+/******************************************
+ **************** INCLUDE *****************
+ ******************************************/
 
 #include "DDM_input_output.h"
 
-/**
- * INPUT
- */
+/******************************************
+ ***************** INPUT ******************
+ ******************************************/
 
-DDM_Input* Initialize_DDM_Input(int argc, char* argv[]){
+DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
   DIR *dir;
   FILE *file_input;
   char test[1000];
   DDM_Input *ddm_input = (DDM_Input *) malloc(sizeof(DDM_Input));
+  int i, j, nchar;
+  size_t len;
+  char *line;
  
   if (argc == 5){ 
     sprintf(ddm_input->type_test, "%s", argv[1]);
@@ -29,7 +32,7 @@ DDM_Input* Initialize_DDM_Input(int argc, char* argv[]){
       ddm_input->dimensions = atoi(argv[3]);
       ddm_input->alfa = atof(argv[4]);
       ddm_input->updates = (size_t) (ddm_input->extents / 2);
-      ddm_input->subscriptions = (size_t) (ddm_input-extents / 2);
+      ddm_input->subscriptions = (size_t) (ddm_input->extents / 2);
       ddm_input->list_updates = NULL;
       ddm_input->list_subscriptions = NULL;
     }else{
@@ -39,28 +42,28 @@ DDM_Input* Initialize_DDM_Input(int argc, char* argv[]){
       ddm_input->extents = ddm_input->updates + ddm_input->subscriptions;
       ddm_input->alfa = 0.0;
       sprintf(test, FOLDER_CHECK, argv[1]);
-      if (dir = opendir(test)){
+      if ((dir = opendir(test)) != NULL){
 	//Directory Exists
 	//Check if file input-0 exists
 	sprintf(test, FILE_CHECK, argv[1], TEST_INPUT);
-        if (file_input = fopen(test, "r")){
+        if ((file_input = fopen(test, "r")) != NULL){
             printf("\nFile %s exists!\n", TEST_INPUT);
             ddm_input->list_subscriptions = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->subscriptions);
             ddm_input->list_updates = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->updates);
-            read = getline(&line, &len, file_input);
+            getline(&line, &len, file_input);
             for (i = 0; i < ddm_input->subscriptions; ++i){
-                read = getline(&line, &len, file_input);
-                sscanf(line, "%d %n", &(ddm_input->list_subscriptions[i].id), &nchar);
+                getline(&line, &len, file_input);
+                sscanf(line, "%zu %n", &(ddm_input->list_subscriptions[i].id), &nchar);
                 line = line + nchar;
                 for (j = 0; j < ddm_input->dimensions; ++j){
                     sscanf(line, "%lf %lf %n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
                     line = line + nchar;
                 }
             }
-            read = getline(&line, &len, file_input);
+            getline(&line, &len, file_input);
             for (i = 0; i < ddm_input->updates; ++i){
-                read = getline(&line, &len, file_input);
-                sscanf(line, "%d %n", &(ddm_input->list_updates[i].id), &nchar);
+                getline(&line, &len, file_input);
+                sscanf(line, "%zu %n", &(ddm_input->list_updates[i].id), &nchar);
                 line = line + nchar;
                 for (j = 0; j < ddm_input->dimensions; ++j){
                     sscanf(line, "%lf %lf %n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
@@ -105,45 +108,72 @@ DDM_Input* Initialize_DDM_Input(int argc, char* argv[]){
   return ddm_input;
 }
 
-size_t DDM_Get_Extents(int argc, char* argv[]){
+int DDM_Is_Alfa_Test(DDM_Input ddm_input){
+  
+  if ((strncmp(DDM_Get_Test_Type(ddm_input), "alfa", 4)) == 0)
+    return 1;
+  return 0;
+}
+
+char* DDM_Get_Test_Type(DDM_Input ddm_input){
+  char *tmp = (char *) malloc(sizeof(char) * 100);
+  if (ddm_input.type_test != NULL){
+    sprintf(tmp, "%s", ddm_input.type_test);
+    return tmp;  
+  }
+  return NULL;
+}
+
+size_t DDM_Get_Extents(DDM_Input ddm_input){
  
-  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
-    return atoi(argv[2]);
-  
-  return 0;
+  if (ddm_input.extents != 0)
+    return ddm_input.extents;
+  return -1;
 }
 
-size_t DDM_Get_Dimension(int argc, char* argv[]){
+size_t DDM_Get_Dimensions(DDM_Input ddm_input){
   
-  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
-    return atoi(argv[3]);
-  return 0;
+  if (ddm_input.dimensions != 0)
+    return ddm_input.dimensions;
+  return -1;
 }
 
-float DDM_Get_Alfa(int argc, char* argv[]){
+float DDM_Get_Alfa(DDM_Input ddm_input){
   
-  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
-    return atof(argv[4]);
-  return 0;
+  if (ddm_input.alfa != 0)
+    return ddm_input.alfa;
+  return -1;
 }
 
-size_t DDM_Get_Updates(int argc, char* argv[]){
+size_t DDM_Get_Updates(DDM_Input ddm_input){
   
-  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
-    return (size_t) (atoi(argv[2]) / 2);
-  return 0;
+  if (ddm_input.updates != 0)
+    return ddm_input.updates;
+  return -1;
 }
 
-size_t DDM_Get_Subscriptions(int argc, char* argv[]){
+size_t DDM_Get_Subscriptions(DDM_Input ddm_input){
   
-  if (argc == 5 && strncmp(argv[1], "alfa", 4) == 0)
-    return (size_t) (atoi(argv[2]) / 2);
-  return 0;
+  if (ddm_input.subscriptions != 0)
+    return ddm_input.subscriptions;
+  return -1;
 }
 
-/**
- * OUTPUT
- */
+DDM_Extent* DDM_Get_Updates_List(DDM_Input ddm_input){
+  if (ddm_input.list_updates != NULL)
+    return ddm_input.list_updates;
+  return NULL;
+}
+
+DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input){
+  if (ddm_input.list_subscriptions != NULL)
+    return ddm_input.list_subscriptions;
+  return NULL;
+}
+
+/******************************************
+ ***************** OUTPUT *****************
+ ******************************************/
 
 void DDM_Write_Result(char* argv[], double total_time){
   /* write results */
@@ -160,9 +190,9 @@ void DDM_Write_Result(char* argv[], double total_time){
   fclose(fout);
 }
 
-/**
- * TIMER
- */
+/******************************************
+ ***************** TIMER ******************
+ ******************************************/
 
 void DDM_Start_Timer(DDM_Timer *ddm_timer){
   ddm_timer->start = clock();

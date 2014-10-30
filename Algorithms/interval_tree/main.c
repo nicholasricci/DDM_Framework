@@ -64,53 +64,61 @@ int main( int argc, char* argv[] )
     size_t s; /* subscriptions */
     float alpha = 0.01; /* overlap ratio */
     DDM_Timer ddm_timer;
+    DDM_Input *ddm_input;
 
     if ( (argc == 2 && strcmp(argv[1], "--help") == 0) ) {
 	printf("Usage: %s <tot extents> <dimensions> <alpha>\n", argv[0]);
 	return -1;
     }
-
-    tot_extents = DDM_Get_Extents(argc, argv);
-    d = DDM_Get_Dimension(argc, argv);
-    if ( d != 1 ) {
-	printf("This program only supports 1 dimension\n");
-	exit(-1);
-    }
-    alpha = DDM_Get_Alfa(argc, argv);
-
-    printf("%s compiled with %s\n", argv[0], CFLAGS);
-    srandom(clock());
-
-    u = DDM_Get_Updates(argc, argv);
-    s = DDM_Get_Subscriptions(argc, argv);
-    //u = s = tot_extents / 2;
-    float l = alpha * Lmax / (float)(u+s);
-    struct interval* upds = mk_random_interval( u, l );
-    struct interval* subs = mk_random_interval( s, l );
-    //struct timer timing;
-
-    //timing_init( &timing );
-
-    DDM_Start_Timer(&ddm_timer);
-    //timing_start( &timing );
-    uint32_t nmatches = ddm_matching( subs, s, upds, u );
-    //timing_stop( &timing );
-    DDM_Stop_Timer(&ddm_timer);
-
-    //double total_time = timing_get_average( &timing );
-
-    /* write results */
-    //FILE* fout = fopen(FILENAME, "a");
-    //if ( fout == NULL ) {
-	//printf("Error creating file %s\n", FILENAME);
-	//exit(-1);
-    //}
     
-    DDM_Write_Result(argv, DDM_Get_Total_Time(ddm_timer));
-    //DDM_Write_Result(argv, total_time);
+    ddm_input = DDM_Initialize_Input(argc, argv);
+    
+    if (DDM_Is_Alfa_Test(*ddm_input)){
+      /*Alfa Test*/
+      tot_extents = DDM_Get_Extents(*ddm_input);
+      d = DDM_Get_Dimensions(*ddm_input);
+      if ( d != 1 ) {
+	  printf("This program only supports 1 dimension\n");
+	  exit(-1);
+      }
+      alpha = DDM_Get_Alfa(*ddm_input);
 
-    printf("%u matches  %fs\n", nmatches, DDM_Get_Total_Time(ddm_timer) );
-    //printf("%u matches  %fs\n", nmatches, total_time );
+      printf("%s compiled with %s\n", argv[0], CFLAGS);
+      srandom(clock());
+
+      u = DDM_Get_Updates(*ddm_input);
+      s = DDM_Get_Subscriptions(*ddm_input);
+      //u = s = tot_extents / 2;
+      float l = alpha * Lmax / (float)(u+s);
+      struct interval* upds = mk_random_interval( u, l );
+      struct interval* subs = mk_random_interval( s, l );
+      //struct timer timing;
+
+      //timing_init( &timing );
+
+      DDM_Start_Timer(&ddm_timer);
+      //timing_start( &timing );
+      uint32_t nmatches = ddm_matching( subs, s, upds, u );
+      //timing_stop( &timing );
+      DDM_Stop_Timer(&ddm_timer);
+
+      //double total_time = timing_get_average( &timing );
+
+      /* write results */
+      //FILE* fout = fopen(FILENAME, "a");
+      //if ( fout == NULL ) {
+	  //printf("Error creating file %s\n", FILENAME);
+	  //exit(-1);
+      //}
+      
+      DDM_Write_Result(argv, DDM_Get_Total_Time(ddm_timer));
+      //DDM_Write_Result(argv, total_time);
+
+      printf("%u matches  %fs\n", nmatches, DDM_Get_Total_Time(ddm_timer) );
+      //printf("%u matches  %fs\n", nmatches, total_time );
+    }else{
+      /*Other Kind of Test*/
+    }
     
     return 0;
 }
