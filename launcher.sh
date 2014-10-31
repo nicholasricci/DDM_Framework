@@ -408,7 +408,8 @@ function run {
 	#for each executables parallel starts program in some configuration
 	for exe_par in ${exe_parallel[*]}
 	do
-	  : #TODO create the execution run of parallel with not alfa tests
+	  ./$exe_par $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  #: #TODO create the execution run of parallel with not alfa tests
 	done
 	#change to algorithm directory
 	cd ..

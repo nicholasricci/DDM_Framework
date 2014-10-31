@@ -234,6 +234,7 @@ void print_bitmatrix(const bitmatrix in, const _UINT size_update, const _UINT si
 	bitvec_elem val;
 	bitvec_elem mask;
 	_UINT line_width;
+	size_t nmatch = 0;
 
 	// number of elements on each line of the bit matrix
 	line_width = BIT_VEC_WIDTH(size_subscr);
