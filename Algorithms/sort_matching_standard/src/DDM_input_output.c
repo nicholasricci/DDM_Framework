@@ -13,6 +13,58 @@
 #include "../include/DDM_input_output.h"
 
 /******************************************
+ **************** SUPPORT *****************
+ ******************************************/
+
+/*char** str_split(char* a_str, const char a_delim)
+{
+    char** result    = 0;
+    size_t count     = 0;
+    char* tmp        = a_str;
+    char* last_comma = 0;
+    char delim[2];
+    delim[0] = a_delim;
+    delim[1] = 0;
+
+    // Count how many elements will be extracted. /
+    while (*tmp)
+    {
+        if (a_delim == *tmp)
+        {
+            count++;
+            last_comma = tmp;
+        }
+        tmp++;
+    }
+
+    // Add space for trailing token. /
+    count += last_comma < (a_str + strlen(a_str) - 1);
+
+    // Add space for terminating null string so caller
+    //  knows where the list of returned strings ends. /
+    count++;
+
+    result = malloc(sizeof(char*) * count);
+
+    if (result)
+    {
+        size_t idx  = 0;
+        char* token = strtok(a_str, delim);
+
+        while (token)
+        {
+            assert(idx < count);
+            *(result + idx++) = strdup(token);
+            token = strtok(0, delim);
+        }
+        assert(idx == count - 1);
+        *(result + idx) = 0;
+    }
+
+    return result;
+}*/
+
+/******************************************
  ***************** INPUT ******************
  ******************************************/
 
@@ -23,7 +75,9 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
   DDM_Input *ddm_input = (DDM_Input *) malloc(sizeof(DDM_Input));
   int i, j, nchar;
   size_t len;
-  char *line;
+  char line[LINE_MAX_LENGTH];
+  char *addr_line;
+  //char **tokens;
  
   if (argc == 5){ 
     sprintf(ddm_input->type_test, "%s", argv[1]);
@@ -50,24 +104,26 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
             printf("\nFile %s exists!\n", TEST_INPUT);
             ddm_input->list_subscriptions = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->subscriptions);
             ddm_input->list_updates = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->updates);
-            getline(&line, &len, file_input);
-            for (i = 0; i < ddm_input->subscriptions; ++i){
-                getline(&line, &len, file_input);
+            fgets(line, sizeof line, file_input);
+	    for (i = 0; i < ddm_input->subscriptions; ++i){
+		fgets(line, sizeof line, file_input);
                 sscanf(line, "%zu %n", &(ddm_input->list_subscriptions[i].id), &nchar);
-                line = line + nchar;
+		addr_line = line + nchar;		
                 for (j = 0; j < ddm_input->dimensions; ++j){
-                    sscanf(line, "%lf %lf %n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
-                    line = line + nchar;
+                    sscanf(addr_line, "%lf %lf %n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
+		    addr_line = line + nchar;
                 }
+                //printf("%zu\n", ddm_input->list_subscriptions[i].id);
             }
-            getline(&line, &len, file_input);
-            for (i = 0; i < ddm_input->updates; ++i){
-                getline(&line, &len, file_input);
+            
+            fgets(line, sizeof line, file_input);
+	    for (i = 0; i < ddm_input->updates; ++i){
+		fgets(line, sizeof line, file_input);
                 sscanf(line, "%zu %n", &(ddm_input->list_updates[i].id), &nchar);
-                line = line + nchar;
+		addr_line = line + nchar;
                 for (j = 0; j < ddm_input->dimensions; ++j){
-                    sscanf(line, "%lf %lf %n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
-                    line = line + nchar;
+                    sscanf(addr_line, "%lf %lf %n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
+		    addr_line = line + nchar;
                 }
             }
 

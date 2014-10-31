@@ -402,7 +402,8 @@ function run {
 	#for each executables sequential starts program in some configuration
 	for exe in ${exe_sequential[*]}
 	do
-	  : #TODO create the execution run of sequential with not alfa tests
+	  ./$exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  #: #TODO create the execution run of sequential with not alfa tests
 	done
 	#for each executables parallel starts program in some configuration
 	for exe_par in ${exe_parallel[*]}

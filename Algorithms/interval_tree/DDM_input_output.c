@@ -13,6 +13,12 @@
 #include "DDM_input_output.h"
 
 /******************************************
+ **************** SUPPORT *****************
+ ******************************************/
+
+
+
+/******************************************
  ***************** INPUT ******************
  ******************************************/
 
@@ -22,8 +28,9 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
   char test[1000];
   DDM_Input *ddm_input = (DDM_Input *) malloc(sizeof(DDM_Input));
   int i, j, nchar;
-  size_t len;
-  char *line;
+  char line[LINE_MAX_LENGTH];
+  char *addr_line;
+  //char **tokens;
  
   if (argc == 5){ 
     sprintf(ddm_input->type_test, "%s", argv[1]);
@@ -50,24 +57,26 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
             printf("\nFile %s exists!\n", TEST_INPUT);
             ddm_input->list_subscriptions = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->subscriptions);
             ddm_input->list_updates = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->updates);
-            getline(&line, &len, file_input);
-            for (i = 0; i < ddm_input->subscriptions; ++i){
-                getline(&line, &len, file_input);
+            fgets(line, sizeof line, file_input);
+	    for (i = 0; i < ddm_input->subscriptions; ++i){
+		fgets(line, sizeof line, file_input);
                 sscanf(line, "%zu %n", &(ddm_input->list_subscriptions[i].id), &nchar);
-                line = line + nchar;
+		addr_line = line + nchar;		
                 for (j = 0; j < ddm_input->dimensions; ++j){
-                    sscanf(line, "%lf %lf %n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
-                    line = line + nchar;
+                    sscanf(addr_line, "%lf %lf %n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
+		    addr_line = line + nchar;
                 }
+                //printf("%zu\n", ddm_input->list_subscriptions[i].id);
             }
-            getline(&line, &len, file_input);
-            for (i = 0; i < ddm_input->updates; ++i){
-                getline(&line, &len, file_input);
+            
+            fgets(line, sizeof line, file_input);
+	    for (i = 0; i < ddm_input->updates; ++i){
+		fgets(line, sizeof line, file_input);
                 sscanf(line, "%zu %n", &(ddm_input->list_updates[i].id), &nchar);
-                line = line + nchar;
+		addr_line = line + nchar;
                 for (j = 0; j < ddm_input->dimensions; ++j){
-                    sscanf(line, "%lf %lf %n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
-                    line = line + nchar;
+                    sscanf(addr_line, "%lf %lf %n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
+		    addr_line = line + nchar;
                 }
             }
 
