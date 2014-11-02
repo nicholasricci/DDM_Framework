@@ -349,8 +349,6 @@ function run {
     
   elif [ $# -eq 1 ] && [ "$1" != "alfa" ];
   then
-  
-    echo "work in progress!"
     
     if [ -d "$_TESTS_INSTANCES" ];
     then
@@ -453,6 +451,72 @@ function check_configure {
     configure
   fi
   
+}
+
+function plotresult {
+
+  echo "###########################"
+  echo "####### PLOT RESULT #######"
+  echo "###########################"
+  
+  cd $_RESULTS
+  
+    local test=`ls`
+    local graph="../../$_GRAPHS"
+    for t in $test
+    do
+      #for each test folder
+      cd $t
+	#for each algorithm result file in test folder
+	touch tmp
+	echo -e 'Algorithm_Name\tExecution_Time' > tmp
+	count=0
+	for a in `ls *.txt`
+	do
+	  #get the first value on text file 
+	  time_test=`head -n 1 $a`
+	  #if a value of executed time exists
+	  if [ ! -z $time_test ];
+	  then
+	    #take first character of all word in file name and create name with them
+	    IFS='_' read -a words <<< "$a"
+	    name=""
+	    for word in "${words[@]}"
+	    do
+	      firstchar=`echo $word | head -c 1`
+	      name="$name$firstchar"
+	    done
+	    echo -e "$name\t$time_test" >> tmp
+	    let count+=1
+	  fi
+	done
+	let offset=-5/$count
+	#create output file graph
+	gnuplot <<- EOF
+	  set title "`echo $t`"
+	  set xlabel "Algorithm Name"
+	  set ylabel "Execution Time"
+	  set xtics rotate by 90 offset `echo $offset`, 1
+	  set ytics out nomirror
+	  set term png
+	  set output "result.png"
+	  set style fill solid border -1
+	  # Make the histogram boxes half the width of their slots.
+	  set boxwidth 0.5 relative
+	  set grid front
+
+	  # Select histogram mode.
+	  set style data histograms
+	  # Select a row-stacked histogram.
+	  set style histogram rowstacked
+	  plot "tmp" using 2:xticlabels(1) title 'Algorithm'
+	EOF
+	rm -f tmp
+	mv result.png $graph/$t/result.png
+      cd ..
+    done
+  
+  cd ..
 }
 
 #regex for integer and float
@@ -563,6 +627,11 @@ then
   #use script in utils folder to create default Tests Instances
   ./$_UTILS/$_BASH/$_CREATE_INSTANCES_DEFAULT
   
+elif [ ! -z "$1" ] && [ "$1" == "plotresult" ];
+then
+
+  plotresult
+ 
 else
   
   echo "how to use this program:
