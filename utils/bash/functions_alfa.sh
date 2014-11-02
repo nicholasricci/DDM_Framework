@@ -17,15 +17,15 @@ function read_file {
   echo "${tmparray[@]}"
 }
 
-function run_executable_sequential {
+function run_alfa_executable_sequential {
 
   local filename
   local filename_result
   local executed_filename
   local EXTENTS
   
-  local RESULTS="../../../_results"
-  local GRAPHS="../../../_graphs"
+  local RESULTS="../../../Results/ALFA"
+  local GRAPHS="../../../Graphs/ALFA"
   local AVERAGER="../../../utils/averager"
   
   mkdir -p $RESULTS
@@ -64,14 +64,14 @@ function run_executable_sequential {
 
 }
 
-function run_executable_parallel {
+function run_alfa_executable_parallel {
   local filename
   local filename_result
   local executed_filename
   local EXTENTS
   
-  local RESULTS="../../../_results"
-  local GRAPHS="../../../_graphs"
+  local RESULTS="../../../Results/ALFA"
+  local GRAPHS="../../../Graphs/ALFA"
   local AVERAGER="../../../utils/averager"
   
   mkdir -p $RESULTS

@@ -286,9 +286,9 @@ function cleanresults {
   echo "###### CLEAN RESULTS ######"
   echo "###########################"
 
-  rm -R -f $_ALFA_RESULTS
-  rm -R -f $_ALFA_GRAPHS
-  echo "Removed _results and _graphs folders"
+  rm -R -f $_RESULTS
+  rm -R -f $_GRAPHS
+  echo "Removed $_RESULTS and $_GRAPHS folders"
 }
 
 function clean {
@@ -312,12 +312,11 @@ function run {
   echo "########### RUN ###########"
   echo "###########################"
   
+  check_configure
+  build
   
   if  [ $# -eq 1 ] && [ "$1" == "alfa" ]; 
   then
-  
-    check_configure
-    build
     
     cd $_ALGORITHMS
     algs=($(ls -d */))
@@ -332,12 +331,12 @@ function run {
       #for each executables sequential starts program in some configuration
       for exe in ${exe_sequential[*]}
       do
-	run_executable_sequential $exe $1
+	run_alfa_executable_sequential $exe $1
       done
       #for each executables parallel starts program in some configuration
       for exe_par in ${exe_parallel[*]}
       do
-	run_executable_parallel $exe_par $1
+	run_alfa_executable_parallel $exe_par $1
       done
       #change to algorithm directory
       cd ..
@@ -384,8 +383,6 @@ function run {
       
     fi
     
-    build
-    
     if [ ! -z "$_TEST_DIMENSIONS" ] && [ ! -z "$_TEST_SUBSCRIPTIONS" ] && [ ! -z "$_TEST_UPDATES" ];
     then
     
@@ -402,13 +399,15 @@ function run {
 	#for each executables sequential starts program in some configuration
 	for exe in ${exe_sequential[*]}
 	do
-	  ./$exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  run_other_executable_sequential $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  #./$exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
 	  #: #TODO create the execution run of sequential with not alfa tests
 	done
 	#for each executables parallel starts program in some configuration
 	for exe_par in ${exe_parallel[*]}
 	do
-	  ./$exe_par $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  run_other_executable_parallel $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  #./$exe_par $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
 	  #: #TODO create the execution run of parallel with not alfa tests
 	done
 	#change to algorithm directory
@@ -476,7 +475,7 @@ for only run, you must pass a parameter that indicates the test type:
 usage:	./launcher.sh run <test_type>
 example:./launcher.sh run alfa
 
-for clean (all builded objects, _results, _graphs folder, utils and TestsInstances):
+for clean (all builded objects, Results, Graphs folder, utils and TestsInstances):
 usage:	./launcher.sh clean
 
 for clean only algorithm:

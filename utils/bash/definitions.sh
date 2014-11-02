@@ -7,8 +7,8 @@ _BASH="bash"
 _INSTANCE_MAKER="InstanceMaker"
 _CONFIGURATION="Configuration"
 _TESTS_INSTANCES="TestsInstances"
-_ALFA_RESULTS="_results"
-_ALFA_GRAPHS="_graphs"
+_RESULTS="Results"
+_GRAPHS="Graphs"
 _ALGORITHM_BIN="bin"
 
 #Text Files 
