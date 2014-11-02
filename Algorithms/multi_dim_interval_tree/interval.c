@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * interval.h
+ * interval.c
  *
  * This file is part of DDM
  *
@@ -21,23 +21,26 @@
  *
  ****************************************************************************/
 
-#ifndef INTERVAL_H
-#define INTERVAL_H
+#include "interval.h"
 
-#include "DDM_input_output.h"
-
-/**
- * This struct represents the semiopen intnerval [lower, upper)
- */
-struct interval {
-    int id;		/* the ID of this interval. We assume that intervals are labeled as 0, 1, ... */
-    float lower;	/* the lower bound */
-    float upper;	/* the upper bound */
-};
-
-/**
- * Returns 1 is intervals |x| and |y| intersect, 0 otherwise.
- */
-int intersect( const struct interval* x, const struct interval* y );
-
-#endif
+int intersect( const struct interval* x, const struct interval* y, const size_t dimensions )
+{
+    int k;
+    int isValid = 1;
+    for (k = 0; k < dimensions; ++k){
+      if (
+	  (x->lower[k] <= y->lower[k] && y->lower[k] <= x->upper[k])
+	  ||
+	  (x->lower[k] <= y->upper[k] && y->upper[k] <= x->upper[k])
+	  ||
+	  (y->lower[k] <= x->lower[k] && x->lower[k] <= y->upper[k])
+	  ||
+	  (y->lower[k] <= x->upper[k] && x->upper[k] <= y->upper[k])
+	 ){
+	  continue;
+	}else{
+	  isValid = 0;
+	}
+    }
+    return isValid;
+}

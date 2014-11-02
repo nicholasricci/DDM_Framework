@@ -31,13 +31,13 @@
  */
 struct interval {
     int id;		/* the ID of this interval. We assume that intervals are labeled as 0, 1, ... */
-    float lower;	/* the lower bound */
-    float upper;	/* the upper bound */
+    float lower[MAX_DIMENSION];	/* the lower bound */
+    float upper[MAX_DIMENSION];	/* the upper bound */
 };
 
 /**
  * Returns 1 is intervals |x| and |y| intersect, 0 otherwise.
  */
-int intersect( const struct interval* x, const struct interval* y );
+int intersect( const struct interval* x, const struct interval* y, const size_t dimensions );
 
 #endif

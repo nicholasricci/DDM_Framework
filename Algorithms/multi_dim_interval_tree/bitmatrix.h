@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * interval.h
+ * bitmatrix.h
  *
  * This file is part of DDM
  *
@@ -20,24 +20,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  ****************************************************************************/
+#ifndef BITMATRIX_H
+#define BITMATRIX_H
 
-#ifndef INTERVAL_H
-#define INTERVAL_H
+#include <stdlib.h>
+#include <stdint.h>
 
-#include "DDM_input_output.h"
-
-/**
- * This struct represents the semiopen intnerval [lower, upper)
- */
-struct interval {
-    int id;		/* the ID of this interval. We assume that intervals are labeled as 0, 1, ... */
-    float lower;	/* the lower bound */
-    float upper;	/* the upper bound */
+struct bitmatrix {
+    size_t n; /* number of rows */
+    size_t m; /* number of words per row; the number of columns of the bitmatrix is therefore m*8*sizeof(uint32_t) */
+    uint32_t* data; /* array of data elements */
 };
 
 /**
- * Returns 1 is intervals |x| and |y| intersect, 0 otherwise.
+ * Creates a n*m bit matrix; all elements are initialized to 0
  */
-int intersect( const struct interval* x, const struct interval* y );
+void bitmatrix_init(struct bitmatrix* mat, size_t n, size_t m);
+
+/**
+ * Deallocates a bit matrix
+ */ 
+void bitmatrix_free(struct bitmatrix* mat);
+
+/**
+ * Set m[i,j] = 0 if val == 0, set m[i,j] = 1 otherwise
+ */ 
+void bitmatrix_set(struct bitmatrix* mat, size_t i, size_t j, int val);
+
+/**
+ * Returns the value of m[i,j]
+ */
+int bitmatrix_get(const struct bitmatrix* mat, size_t i, size_t j);
 
 #endif
