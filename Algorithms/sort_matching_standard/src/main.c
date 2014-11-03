@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	DDM_Timer ddm_timer;
 	DDM_Input *ddm_input;
 	DDM_Extent *list_updates, *list_subscriptions;
-	int i, j;
+	int i, j, k;
 	//clock_t start, end;
 #endif // __TEST
 
@@ -120,8 +120,16 @@ int main(int argc, char *argv[])
 
 	}else{
 	  /*Other Kind of Test*/
-	  list_updates = (DDM_Extent *) malloc(sizeof(DDM_Extent) * updates);
-	  list_subscriptions = (DDM_Extent *) malloc(sizeof(DDM_Extent) * subscrs);
+	  list_updates = DDM_Get_Updates_List(*ddm_input);
+	  list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
+	  
+	  /*for (i = 0; i < updates; i++)
+	      for (k = 0; k < dimensions; k++)
+		  printf("upds: id: %zu, lower[%zu]: %lf, upper[%zu]: %lf\n", list_updates[i].id, k, list_updates[i].lower[k], k, list_updates[i].upper[k]);
+	  for (i = 0; i < subscrs; i++)
+	      for (k = 0; k < dimensions; k++)
+		  printf("subs: id: %zu, lower[%zu]: %lf, upper[%zu]: %lf\n", list_subscriptions[i].id, k, list_subscriptions[i].lower[k], k, list_subscriptions[i].upper[k]);
+	  printf("\n");*/
 	  
 	  data.dimensions = dimensions;
 	  data.size_update = updates;
@@ -186,6 +194,7 @@ int main(int argc, char *argv[])
 	fclose(fout);*/
 
 	DDM_Write_Result(argv, DDM_Get_Total_Time(ddm_timer));
+	//printf("\n%d matches\n", num_matches(result, updates, subscrs));
 	//DDM_Write_Result(argv, ((float)(end - start)) / CLOCKS_PER_SEC);
 	
 #ifdef __DEBUG

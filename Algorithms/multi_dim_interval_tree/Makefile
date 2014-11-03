@@ -1,8 +1,12 @@
-SEQ=multi_dim_interval_tree
-PAR=multi_dim_interval_tree_mp
+SEQ=brute_force interval_tree
+PAR=brute_force_mp interval_tree_mp
 BIN=bin/
-OBJSSEQ=main.o interval.o bitmatrix.o int_tree.o interval_tree.o DDM_input_output.o
-OBJSPAR=main_mp.o interval_mp.o bitmatrix_mp.o int_tree_mp.o interval_tree_mp.o DDM_input_output.o
+OBJSSEQ=main.o interval.o brute_force.o timing.o bitmatrix.o int_tree.o DDM_input_output.o
+OBJSPAR=main_mp.o interval_mp.o brute_force_mp.o timing_mp.o bitmatrix_mp.o int_tree_mp.o DDM_input_output.o
+OBJSSEQBRUTE=main.o interval.o brute_force.o timing.o bitmatrix.o DDM_input_output.o
+OBJSSEQINTTREE=main.o interval.o int_tree.o timing.o bitmatrix.o interval_tree.o DDM_input_output.o
+OBJSPARBRUTE=main_mp.o interval_mp.o brute_force_mp.o timing_mp.o bitmatrix_mp.o DDM_input_output.o
+OBJSPARINTTREE=main_mp.o interval_mp.o int_tree_mp.o timing_mp.o bitmatrix_mp.o interval_tree_mp.o DDM_input_output.o
 
 
 ALL: 			mkdirs release openmp
@@ -17,12 +21,18 @@ release:		$(SEQ)
 openmp:			CFLAGS=-Wall -O3 -DNDEBUG -fopenmp 
 openmp:			LDLIBS+=-lgomp
 openmp:			$(PAR)
-		
-multi_dim_interval_tree:		$(OBJSSEQ)
-			cc $(CFLAGS) -o $(BIN)multi_dim_interval_tree $(OBJSSEQ)
 
-multi_dim_interval_tree_mp:	$(OBJSPAR)
-			cc $(CFLAGS) -o $(BIN)multi_dim_interval_tree_mp $(OBJSPAR)
+brute_force:		$(OBJSSEQBRUTE)
+			cc $(CFLAGS) -o $(BIN)brute_force $(OBJSSEQBRUTE)
+		
+interval_tree:		$(OBJSSEQINTTREE)
+			cc $(CFLAGS) -o $(BIN)interval_tree $(OBJSSEQINTTREE)
+
+brute_force_mp:		$(OBJSPARBRUTE)
+			cc $(CFLAGS) -o $(BIN)brute_force_mp $(OBJSPARBRUTE)
+
+interval_tree_mp:	$(OBJSPARINTTREE)
+			cc $(CFLAGS) -o $(BIN)interval_tree_mp $(OBJSPARINTTREE)
 
 main.o:			main.c cflags.h
 
@@ -32,13 +42,19 @@ main_mp.o:		main.c cflags.h
 interval_mp.o:		interval.c interval.h
 			cc $(CFLAGS) -c interval.c -o interval_mp.o
 
+brute_force_mp.o:	brute_force.c interval.h bitmatrix.h
+			cc $(CFLAGS) -c brute_force.c -o brute_force_mp.o
+
+timing_mp.o:		timing.c timing.h
+			cc $(CFLAGS) -c timing.c -o timing_mp.o
+
 bitmatrix_mp.o:		bitmatrix.c bitmatrix.h
 			cc $(CFLAGS) -c bitmatrix.c -o bitmatrix_mp.o
 
 int_tree_mp.o:		int_tree.c int_tree.h
 			cc $(CFLAGS) -c int_tree.c -o int_tree_mp.o
 			
-interval_tree_mp.o:	interval_tree.c int_tree.h bitmatrix.h
+interval_tree_mp.o:	interval_tree.c int_tree.h bitmatrix.h timing.h
 			cc $(CFLAGS) -c interval_tree.c -o interval_tree_mp.o
 
 DDM_input_output.o:	DDM_input_output.c DDM_input_output.h
@@ -48,5 +64,5 @@ cflags.h:
 			@echo "const char* CFLAGS=\"$(CFLAGS)\";" > cflags.h
 
 clean:
-			rm -f *.o *~ interval_tree cflags.h *.txt
+			rm -f *.o *~ brute_force interval_tree cflags.h *.txt
 			rm -f -R $(BIN)

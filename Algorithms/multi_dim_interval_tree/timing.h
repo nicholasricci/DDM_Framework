@@ -1,8 +1,8 @@
 /****************************************************************************
  *
- * interval.h
+ * timing.h
  *
- * This file is part of DDM
+ * This file is part of ddm
  *
  * Copyright (C) 2013 Moreno Marzolla
  *
@@ -20,24 +20,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  ****************************************************************************/
+#ifndef TIMING_H
+#define TIMING_H
 
-#ifndef INTERVAL_H
-#define INTERVAL_H
+#include <time.h>
 
-#include "DDM_input_output.h"
-
-/**
- * This struct represents the semiopen intnerval [lower, upper)
- */
-struct interval {
-    int id;		/* the ID of this interval. We assume that intervals are labeled as 0, 1, ... */
-    float lower;	/* the lower bound */
-    float upper;	/* the upper bound */
+struct timer {
+    struct timespec t_start, t_stop;
+    double total;
+    int n;
 };
 
 /**
- * Returns 1 is intervals |x| and |y| intersect, 0 otherwise.
+ * Initializes the timing object pointed by |t|
  */
-int intersect( const struct interval* x, const struct interval* y );
+void timing_init( struct timer* t );
+
+/**
+ * Starts a new timing measure
+ */
+void timing_start( struct timer* t );
+
+/**
+ * Stops the currently running measure
+ */
+void timing_stop( struct timer* t );
+
+/**
+ * Get the average time across all measures
+ */
+double timing_get_average( const struct timer* t );
 
 #endif

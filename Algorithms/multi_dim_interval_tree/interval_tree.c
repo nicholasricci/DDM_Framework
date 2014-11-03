@@ -27,6 +27,7 @@
 #include <string.h>
 #include <time.h>
 #include "int_tree.h"
+#include "timing.h"
 #include "bitmatrix.h"
 
 const char* FILENAME = "interval_tree.txt";
@@ -40,21 +41,21 @@ int set_matrix_callback( const struct interval* x, const struct interval* q, voi
 
 uint32_t ddm_matching( const struct interval* sub, size_t n,
 		       const struct interval* upd, size_t m,
-		       size_t dimensions )
+		       struct bitmatrix *mat)
 {
-    struct bitmatrix mat;
-    bitmatrix_init(&mat, n, m);
+    /*struct bitmatrix mat;
+    bitmatrix_init(&mat, n, m);*/
     uint32_t result = 0;
     size_t i, j;
     struct int_tree tree;
     int_tree_init( &tree );
     for (i=0; i<n; ++i) {
-	int_tree_insert( &tree, &sub[i], dimensions );
+	int_tree_insert( &tree, &sub[i] );
     }
 
 #pragma omp parallel for reduction(+:result)
     for ( j=0; j<m; ++j) {
-	result += int_tree_find_intersect( &tree, &upd[j], set_matrix_callback, &mat, dimensions );
+	result += int_tree_find_intersect( &tree, &upd[j], set_matrix_callback, mat );
     }
     /* we do not need to destroy the tree, since our test program
        exists right after this function. If this is not the case, you

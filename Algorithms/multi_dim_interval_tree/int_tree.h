@@ -42,17 +42,16 @@
 #include <stdlib.h>
 #include "interval.h"
 #include "bitmatrix.h"
-#include "DDM_input_output.h"
 
 /**
  * A node of the interval tree. 
  */
 struct int_node {
     const struct interval* in; /* The interval stored in this node */
-    float max_upper[MAX_DIMENSION]; 	/* The maximum upper bound among all intervals
-					   stored in the subtree rooted at this node */
-    float min_lower[MAX_DIMENSION]; 	/* the minimum lower bound among all intervals
-					   stored in the subtree rooted at this node */
+    float max_upper; /* The maximum upper bound among all intervals
+			stored in the subtree rooted at this node */
+    float min_lower; /* the minimum lower bound among all intervals
+			stored in the subtree rooted at this node */
     struct int_node *left, *right;
     int height; /* the maximum height of the subtree rooted at this
 		   node. If this node has no childrens, its height is
@@ -88,7 +87,7 @@ size_t int_tree_size( const struct int_tree* tree );
 /**
  * Inserts the interval |q| into tree |tree|. 
  */
-void int_tree_insert( struct int_tree* tree, const struct interval* q, size_t dimensions );
+void int_tree_insert( struct int_tree* tree, const struct interval* q );
 
 typedef int(*int_callback)(const struct interval*, const struct interval*, void*);
 
@@ -98,12 +97,12 @@ typedef int(*int_callback)(const struct interval*, const struct interval*, void*
  * user-defined callback |f(x,q,param)|. If |f| returns a nonzero
  * value, the search procedure terminates.
  */
-size_t int_tree_find_intersect( const struct int_tree* tree, const struct interval* q, int_callback f, void* param, size_t dimensions );
+size_t int_tree_find_intersect( const struct int_tree* tree, const struct interval* q, int_callback f, void* param );
 
 /**
  * For debug only
  */
-void int_tree_check( const struct int_tree* tree, size_t dimensions );
+void int_tree_check( const struct int_tree* tree );
 
 /**
  * For debug only
@@ -116,6 +115,6 @@ void int_tree_dump( const struct int_tree* tree );
  * node containing |q| is deallocated; |q| itself is not altered in
  * any way.
  */
-void int_tree_delete( struct int_tree* tree, const struct interval* q, size_t dimensions );
+void int_tree_delete( struct int_tree* tree, const struct interval* q );
 
 #endif

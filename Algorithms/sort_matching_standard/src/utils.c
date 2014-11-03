@@ -216,6 +216,21 @@ INLINE void sort_list(const list_ptr ep_list, const _UINT size)
 	qsort(ep_list, size, sizeof(list_t), compare_endpoints);
 }
 
+_INT num_matches(bitmatrix in, _UINT size_update, _UINT size_subscr){
+ 
+  _UINT i,j;
+  _INT count;
+
+  count = 0;
+  for (i = 0; i < size_update; ++i){
+    for (j = 0; j < size_subscr; ++j){
+      if (in[i][j] == -1)
+	count++;
+    }
+  }
+  
+  return count;
+}
 
 #ifdef __VERBOSE
 /** \brief Printing function.

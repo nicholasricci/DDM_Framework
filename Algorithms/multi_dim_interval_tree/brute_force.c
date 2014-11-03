@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * interval.h
+ * brute_force.c
  *
  * This file is part of DDM
  *
@@ -21,23 +21,36 @@
  *
  ****************************************************************************/
 
-#ifndef INTERVAL_H
-#define INTERVAL_H
+#include <stdlib.h>
+#include <stdint.h>
+#include "interval.h"
+#include "bitmatrix.h"
 
-#include "DDM_input_output.h"
-
-/**
- * This struct represents the semiopen intnerval [lower, upper)
- */
-struct interval {
-    int id;		/* the ID of this interval. We assume that intervals are labeled as 0, 1, ... */
-    float lower;	/* the lower bound */
-    float upper;	/* the upper bound */
-};
+const char* FILENAME = "brute_force.txt";
 
 /**
- * Returns 1 is intervals |x| and |y| intersect, 0 otherwise.
+ * Brute force approach: test each update against each subscription.
+ * Returns the number of (upd, subs) matches.
  */
-int intersect( const struct interval* x, const struct interval* y );
+uint32_t ddm_matching( const struct interval* sub, size_t n,
+		       const struct interval* upd, size_t m,
+		       struct bitmatrix *mat
+ 		    )
+{
+    uint32_t result = 0;
+    size_t i, j;
+    /*struct bitmatrix mat;
+    bitmatrix_init( &mat, n, m );*/
 
-#endif
+#pragma omp parallel for private(j) reduction(+:result)
+    for (i=0; i<n; ++i) {
+	for (j=0; j<m; ++j) {
+	    if ( intersect( &sub[i], &upd[j] ) ) {
+		bitmatrix_set(&mat, i, j, 1);
+		result++;
+	    }
+	}
+    }
+
+    return result;
+}

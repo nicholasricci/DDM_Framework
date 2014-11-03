@@ -23,24 +23,7 @@
 
 #include "interval.h"
 
-int intersect( const struct interval* x, const struct interval* y, const size_t dimensions )
+int intersect( const struct interval* x, const struct interval* y )
 {
-    int k;
-    int isValid = 1;
-    for (k = 0; k < dimensions; ++k){
-      if (
-	  (x->lower[k] <= y->lower[k] && y->lower[k] <= x->upper[k])
-	  ||
-	  (x->lower[k] <= y->upper[k] && y->upper[k] <= x->upper[k])
-	  ||
-	  (y->lower[k] <= x->lower[k] && x->lower[k] <= y->upper[k])
-	  ||
-	  (y->lower[k] <= x->upper[k] && x->upper[k] <= y->upper[k])
-	 ){
-	  continue;
-	}else{
-	  isValid = 0;
-	}
-    }
-    return isValid;
+    return ( x->lower < y->upper && x->upper > y->lower );
 }
