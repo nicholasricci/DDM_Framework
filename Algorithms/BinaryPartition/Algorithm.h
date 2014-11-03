@@ -36,6 +36,7 @@
 #include "lists.h"
 #include "ExtentMaker.h" //TODO, rendere visibile solo l'allocazione vuota di una instanza (separando i file)
 #include "execution_time.h"
+#include "DDM_input_output.h"
 
 /**
 * \brief Loads the input file in a MatchingInstance.
