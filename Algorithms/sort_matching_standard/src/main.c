@@ -60,14 +60,14 @@ int main(int argc, char *argv[])
 	_INT updates;
 	_INT subscrs;
 	_INT dimensions;
-	float alfa;
+	//float alfa;
 #ifdef __TEST
 	//FILE *fout;
-	char fname[FILE_NAME_SIZE];
+	//char fname[FILE_NAME_SIZE];
 	DDM_Timer ddm_timer;
 	DDM_Input *ddm_input;
 	DDM_Extent *list_updates, *list_subscriptions;
-	int i, j, k;
+	int i, j/*, k*/;
 	//clock_t start, end;
 #endif // __TEST
 
@@ -96,9 +96,9 @@ int main(int argc, char *argv[])
 	if (dimensions <= 0)
 	  printf("\nNot a valid number of dimensions.\n");
 	
-	if (DDM_Is_Alfa_Test(*ddm_input)){
+	/*if (DDM_Is_Alfa_Test(*ddm_input)){
 	
-	  /*Alfa Test*/
+	  //Alfa Test
 	  alfa = DDM_Get_Alfa(*ddm_input);
 	  if (alfa <= 0)
 		  printf("\nNot a valid alfa parameter.\n");
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 		  return (int)print_error_string();
 
 	}else{
-	  /*Other Kind of Test*/
+	  //Other Kind of Test */
 	  list_updates = DDM_Get_Updates_List(*ddm_input);
 	  list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
 	  
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
 	      data.update[i].endpoints[j].upper = list_updates[i].lower[j];
 	    }
 	  }
-	}
+	//}
 	
 	
 #ifdef __TEST
@@ -174,11 +174,11 @@ int main(int argc, char *argv[])
 	//end = clock();
 
 	// format output file name
-	if (sprintf(fname, "%s_%d_%d_%2.3f.txt", FILENAME(argv[0]), updates + subscrs, dimensions, alfa) < 0)
+	/*if (sprintf(fname, "%s_%d_%d_%2.3f.txt", FILENAME(argv[0]), updates + subscrs, dimensions, alfa) < 0)
 	{
 		set_error(err_file, __FILE__, __FUNCTION__, __LINE__);
 		return (int)print_error_string();
-	}
+	}*/
 	
 	// open file
 	/*fout = fopen(fname, "a+");

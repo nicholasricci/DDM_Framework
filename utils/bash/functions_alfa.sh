@@ -17,6 +17,54 @@ function read_file {
   echo "${tmparray[@]}"
 }
 
+function create_alfa_folders_and_files {
+  #$1 ALFA
+  #$2 EXTENTS
+
+  local ALFA_FOLDER="../../../TestsInstances/ALFA_$1_$2_$DIMENSION"
+  local INFO="info.txt"
+  local INPUT="input-0.txt"
+  local ALFA_INFO="$ALFA_FOLDER/$INFO"
+  local ALFA_INPUT="$ALFA_FOLDER/$INPUT"
+  local ALFA_CREATOR="../../../utils/alfa_creator"
+  
+  mkdir -p $ALFA_FOLDER
+  
+  touch $ALFA_INFO
+  touch $ALFA_INPUT
+  
+  echo "#Instance name: ALFA_$1_$2_$DIMENSION" > $ALFA_INFO
+  echo "#Instance version: 1" >> $ALFA_INFO
+  echo "#Author: Nicholas Ricci" >> $ALFA_INFO
+  echo "#Random Seed: XXXX" >> $ALFA_INFO
+  echo "#Sequence length:" >> $ALFA_INFO
+  echo "1" >> $ALFA_INFO
+  echo "#Dimensions" >> $ALFA_INFO
+  echo $DIMENSION >> $ALFA_INFO
+  SUBSCRIPTIONS=`echo "$2 / 2" | bc`
+  echo "#Subscription Regions" >> $ALFA_INFO
+  echo "$2 / 2" | bc >> $ALFA_INFO
+  UPDATES=`echo "$2 / 2" | bc`
+  echo "#Update Regions" >> $ALFA_INFO
+  echo "$2 / 2" | bc >> $ALFA_INFO
+  
+  $ALFA_CREATOR $2 $DIMENSION $1 $ALFA_INPUT
+  
+  
+}
+
+function create_all_alfa_folders_and_files {
+  for ALFA in $1
+  do
+    EXTENTS=$START_EXTENTS
+    while [ $EXTENTS -le "$MAX_EXTENTS" ]
+    do
+      create_alfa_folders_and_files $ALFA $EXTENTS
+      let EXTENTS+=$STEP_SIZE
+    done
+  done
+}
+
 function run_alfa_executable_sequential {
 
   local filename

@@ -71,12 +71,12 @@
 DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
   DIR *dir;
   FILE *file_input;
-  char test[1000];
+  char test[1000], filetest[1000];
   DDM_Input *ddm_input = (DDM_Input *) malloc(sizeof(DDM_Input));
   int i, j, nchar;
-  size_t len;
   char line[LINE_MAX_LENGTH];
   char *addr_line;
+  char alfa_name[100];
   //char **tokens;
  
   if (argc == 5){ 
@@ -87,8 +87,10 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
       ddm_input->alfa = atof(argv[4]);
       ddm_input->updates = (size_t) (ddm_input->extents / 2);
       ddm_input->subscriptions = (size_t) (ddm_input->extents / 2);
-      ddm_input->list_updates = NULL;
-      ddm_input->list_subscriptions = NULL;
+      sprintf(alfa_name, "ALFA_%s_%zu_%zu", argv[4], ddm_input->extents, ddm_input->dimensions);
+      printf("\n%s\n", alfa_name);
+      sprintf(test, FOLDER_CHECK, alfa_name);
+      sprintf(filetest, FILE_CHECK, alfa_name, TEST_INPUT);
     }else{
       ddm_input->dimensions = atoi(argv[2]);
       ddm_input->updates = atoi(argv[3]);
@@ -96,68 +98,69 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
       ddm_input->extents = ddm_input->updates + ddm_input->subscriptions;
       ddm_input->alfa = 0.0;
       sprintf(test, FOLDER_CHECK, argv[1]);
-      if ((dir = opendir(test)) != NULL){
-	//Directory Exists
-	//Check if file input-0 exists
-	sprintf(test, FILE_CHECK, argv[1], TEST_INPUT);
-        if ((file_input = fopen(test, "r")) != NULL){
-            printf("\nFile %s exists!\n", TEST_INPUT);
-            ddm_input->list_subscriptions = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->subscriptions);
-            ddm_input->list_updates = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->updates);
-            fgets(line, sizeof line, file_input);
-	    for (i = 0; i < ddm_input->subscriptions; ++i){
-		fgets(line, sizeof line, file_input);
-                sscanf(line, "%zu%n", &(ddm_input->list_subscriptions[i].id), &nchar);
-		addr_line = line + nchar;		
-                for (j = 0; j < ddm_input->dimensions; ++j){
-                    sscanf(addr_line, " %lf %lf %n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
-		    addr_line = line + nchar;
-                }
-                //printf("%zu\n", ddm_input->list_subscriptions[i].id);
-            }
-            
-            fgets(line, sizeof line, file_input);
-	    for (i = 0; i < ddm_input->updates; ++i){
-		fgets(line, sizeof line, file_input);
-                sscanf(line, "%zu%n", &(ddm_input->list_updates[i].id), &nchar);
-		addr_line = line + nchar;
-                for (j = 0; j < ddm_input->dimensions; ++j){
-                    sscanf(addr_line, " %lf %lf %n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
-		    addr_line = line + nchar;
-                }
-            }
+      sprintf(filetest, FILE_CHECK, argv[1], TEST_INPUT);
+    }
+    if ((dir = opendir(test)) != NULL){
+      //Directory Exists
+      //Check if file input-0 exists
+      if ((file_input = fopen(filetest, "r")) != NULL){
+	  printf("\nFile %s exists!\n", TEST_INPUT);
+	  ddm_input->list_subscriptions = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->subscriptions);
+	  ddm_input->list_updates = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->updates);
+	  fgets(line, sizeof line, file_input);
+	  for (i = 0; i < ddm_input->subscriptions; ++i){
+	      fgets(line, sizeof line, file_input);
+	      sscanf(line, "%zu%n", &(ddm_input->list_subscriptions[i].id), &nchar);
+	      addr_line = line + nchar;		
+	      for (j = 0; j < ddm_input->dimensions; ++j){
+		  sscanf(addr_line, " %lf %lf %n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
+		  addr_line = line + nchar;
+	      }
+	      //printf("%zu\n", ddm_input->list_subscriptions[i].id);
+	  }
+	  
+	  fgets(line, sizeof line, file_input);
+	  for (i = 0; i < ddm_input->updates; ++i){
+	      fgets(line, sizeof line, file_input);
+	      sscanf(line, "%zu%n", &(ddm_input->list_updates[i].id), &nchar);
+	      addr_line = line + nchar;
+	      for (j = 0; j < ddm_input->dimensions; ++j){
+		  sscanf(addr_line, " %lf %lf %n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
+		  addr_line = line + nchar;
+	      }
+	  }
 
-            //TEST
-            /*for (i = 0; i < ddm_input->subscriptions; ++i){
-                sprintf(test, "%d ", ddm_input->list_subscriptions[i].id);
-                for (j = 0; j < ddm_input->dimensions; ++j){
-                    sprintf(test, "%s %lf %lf ", test, ddm_input->list_subscriptions[i].lower[j], ddm_input->list_subscriptions[i].upper[j]);
-                }
-                printf("%s\n", test);
-            }
-            for (i = 0; i < ddm_input->updates; ++i){
-                sprintf(test, "%d ", ddm_input->list_updates[i].id);
-                for (j = 0; j < ddm_input->dimensions; ++j){
-                    sprintf(test, "%s %lf %lf ", test, ddm_input->list_updates[i].lower[j], ddm_input->list_updates[i].upper[j]);
-                }
-                printf("%s\n", test);
-            }*/
-        }else{
-            printf("\nFile info or input doesn't exist!\n");
-	    free(ddm_input);
-	    ddm_input = NULL;
-        }
-        //Close directory
-        closedir(dir);
-      }else if (ENOENT == errno){
-	printf("\nDirectory doesn't exists!\n");
-	free(ddm_input);
-	ddm_input = NULL;
+	  //TEST
+	  /*for (i = 0; i < ddm_input->subscriptions; ++i){
+	      sprintf(test, "%d ", ddm_input->list_subscriptions[i].id);
+	      for (j = 0; j < ddm_input->dimensions; ++j){
+		  sprintf(test, "%s %lf %lf ", test, ddm_input->list_subscriptions[i].lower[j], ddm_input->list_subscriptions[i].upper[j]);
+	      }
+	      printf("%s\n", test);
+	  }
+	  for (i = 0; i < ddm_input->updates; ++i){
+	      sprintf(test, "%d ", ddm_input->list_updates[i].id);
+	      for (j = 0; j < ddm_input->dimensions; ++j){
+		  sprintf(test, "%s %lf %lf ", test, ddm_input->list_updates[i].lower[j], ddm_input->list_updates[i].upper[j]);
+	      }
+	      printf("%s\n", test);
+	  }*/
+	  fclose(file_input);
       }else{
-	printf("\nSome error to open directory!\n");
-	free(ddm_input);
-	ddm_input = NULL;
+	  printf("\nFile info or input doesn't exist!\n");
+	  free(ddm_input);
+	  ddm_input = NULL;
       }
+      //Close directory
+      closedir(dir);
+    }else if (ENOENT == errno){
+      printf("\nDirectory doesn't exists!\n");
+      free(ddm_input);
+      ddm_input = NULL;
+    }else{
+      printf("\nSome error to open directory!\n");
+      free(ddm_input);
+      ddm_input = NULL;
     }
   }
   

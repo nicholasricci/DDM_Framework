@@ -99,11 +99,11 @@ uint32_t total_matches(struct bitmatrix mat[MAX_DIMENSION], size_t dimensions){
 
 int main( int argc, char* argv[] )
 {
-    size_t tot_extents = 100000;
+    //size_t tot_extents = 100000;
     size_t d = 1; /* number of dimensions, bust be 1 */
     size_t u; /* updates */
     size_t s; /* subscriptions */
-    float alpha = 0.01; /* overlap ratio */
+    //float alpha = 0.01; /* overlap ratio */
     //struct interval *upds, *subs; 
     DDM_Extent *list_updates, *list_subscriptions;
     DDM_Timer ddm_timer;
@@ -115,51 +115,33 @@ int main( int argc, char* argv[] )
     uint32_t tot_match;
     
     ddm_input = DDM_Initialize_Input(argc, argv);
-    tot_extents = DDM_Get_Extents(*ddm_input);
+    //tot_extents = DDM_Get_Extents(*ddm_input);
     u = DDM_Get_Updates(*ddm_input);
     s = DDM_Get_Subscriptions(*ddm_input);
     d = DDM_Get_Dimensions(*ddm_input); 
-    
-    if (DDM_Is_Alfa_Test(*ddm_input)){
-      /*Alfa Test*/
-      alpha = DDM_Get_Alfa(*ddm_input);
-
-      printf("%s compiled with %s\n", argv[0], CFLAGS);
-      srandom(clock());
       
-      //u = s = tot_extents / 2;
-      float l = alpha * Lmax / (float)(u+s);
-      list_subscriptions = mk_random_interval( s, l, d );
-      list_updates = mk_random_interval( u, l, d );
-      
-    }else{
-      /*Other Kind of Test*/
-      
-      /*subs = (struct interval*)malloc( s * sizeof(struct interval) );
-      upds = (struct interval*)malloc( u * sizeof(struct interval) );*/
-      list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
-      list_updates = DDM_Get_Updates_List(*ddm_input);
-      /*for(i = 0; i < s; i++) //For each subscription extent
-      {
-	subs[i].id = list_subscriptions[i].id;
-	subs[i].lower = list_subscriptions[i].lower[0];
-	subs[i].upper = list_subscriptions[i].upper[0];
-      }
-      for(i = 0; i < u; i++)
-      {
-	upds[i].id = list_updates[i].id;
-	upds[i].lower = list_updates[i].lower[0];
-	upds[i].upper = list_updates[i].upper[0];
-      }*/
+    list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
+    list_updates = DDM_Get_Updates_List(*ddm_input);
+    /*for(i = 0; i < s; i++) //For each subscription extent
+    {
+      subs[i].id = list_subscriptions[i].id;
+      subs[i].lower = list_subscriptions[i].lower[0];
+      subs[i].upper = list_subscriptions[i].upper[0];
     }
+    for(i = 0; i < u; i++)
+    {
+      upds[i].id = list_updates[i].id;
+      upds[i].lower = list_updates[i].lower[0];
+      upds[i].upper = list_updates[i].upper[0];
+    }*/
     
-    for (i = 0; i < u; i++)
+    /*for (i = 0; i < u; i++)
         for (k = 0; k < d; k++)
-            printf("upds: id: %zu, lower[%zu]: %lf, upper[%zu]: %lf\n", list_updates[i].id, k, list_updates[i].lower[k], k, list_updates[i].upper[k]);
+            printf("upds: id: %zu, lower[%d]: %lf, upper[%d]: %lf\n", list_updates[i].id, k, list_updates[i].lower[k], k, list_updates[i].upper[k]);
     for (i = 0; i < s; i++)
         for (k = 0; k < d; k++)
-            printf("subs: id: %zu, lower[%zu]: %lf, upper[%zu]: %lf\n", list_subscriptions[i].id, k, list_subscriptions[i].lower[k], k, list_subscriptions[i].upper[k]);
-    printf("\n");
+            printf("subs: id: %zu, lower[%d]: %lf, upper[%d]: %lf\n", list_subscriptions[i].id, k, list_subscriptions[i].lower[k], k, list_subscriptions[i].upper[k]);
+    printf("\n");*/
     
     //struct timer timing;
 
@@ -181,7 +163,7 @@ int main( int argc, char* argv[] )
 	l_upds[i][k].id = list_updates[k].id;
 	l_upds[i][k].lower = list_updates[k].lower[i];
 	l_upds[i][k].upper = list_updates[k].upper[i];
-	printf("upds, id: %d, lower: %lf, upper: %lf\n", l_upds[i][k].id, l_upds[i][k].lower, l_upds[i][k].upper);
+	//printf("upds, id: %d, lower: %lf, upper: %lf\n", l_upds[i][k].id, l_upds[i][k].lower, l_upds[i][k].upper);
 	//printf("upds, id: %d, lower: %lf, upper: %lf\n", list_updates[k].id, list_updates[k].lower[i], list_updates[k].upper[i]);
       }
       l_subs[i] = (struct interval *)malloc(sizeof(struct interval) * s);
@@ -189,7 +171,7 @@ int main( int argc, char* argv[] )
 	l_subs[i][k].id = list_subscriptions[k].id;
 	l_subs[i][k].lower = list_subscriptions[k].lower[i];
 	l_subs[i][k].upper = list_subscriptions[k].upper[i];
-	printf("subs, id: %d, lower: %lf, upper: %lf\n", l_subs[i][k].id, l_subs[i][k].lower, l_subs[i][k].upper);
+	//printf("subs, id: %d, lower: %lf, upper: %lf\n", l_subs[i][k].id, l_subs[i][k].lower, l_subs[i][k].upper);
 	//printf("subs, id: %d, lower: %lf, upper: %lf\n", list_subscriptions[k].id, list_subscriptions[k].lower[i], list_subscriptions[k].upper[i]);
       }
     }

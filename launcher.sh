@@ -328,11 +328,15 @@ function run {
       exe_parallel=$(read_file DDM_Parallel)
       #change to bin directory
       cd $_ALGORITHM_BIN
+      #prepare alfa folders and files
+      create_all_alfa_folders_and_files $ALFAS
       #for each executables sequential starts program in some configuration
       for exe in ${exe_sequential[*]}
       do
 	run_alfa_executable_sequential $exe $1
       done
+      #prepare alfa folders and files
+      create_all_alfa_folders_and_files $ALFAS_PAR
       #for each executables parallel starts program in some configuration
       for exe_par in ${exe_parallel[*]}
       do
