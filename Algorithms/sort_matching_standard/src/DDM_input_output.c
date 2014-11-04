@@ -88,7 +88,7 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
       ddm_input->updates = (size_t) (ddm_input->extents / 2);
       ddm_input->subscriptions = (size_t) (ddm_input->extents / 2);
       sprintf(alfa_name, "ALFA_%s_%zu_%zu", argv[4], ddm_input->extents, ddm_input->dimensions);
-      printf("\n%s\n", alfa_name);
+      //printf("\n%s\n", alfa_name);
       sprintf(test, FOLDER_CHECK, alfa_name);
       sprintf(filetest, FILE_CHECK, alfa_name, TEST_INPUT);
     }else{
@@ -104,7 +104,7 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
       //Directory Exists
       //Check if file input-0 exists
       if ((file_input = fopen(filetest, "r")) != NULL){
-	  printf("\nFile %s exists!\n", TEST_INPUT);
+	  //printf("\nFile %s exists!\n", TEST_INPUT);
 	  ddm_input->list_subscriptions = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->subscriptions);
 	  ddm_input->list_updates = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->updates);
 	  fgets(line, sizeof line, file_input);
