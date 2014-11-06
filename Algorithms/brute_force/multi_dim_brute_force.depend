@@ -1,0 +1,70 @@
+# depslib dependency file v1.0
+1381346182 source:/home/archieneru/github/DDM_Framework/Algorithms/brute_force/bitmatrix.c
+	"bitmatrix.h"
+
+1381346176 /home/archieneru/github/DDM_Framework/Algorithms/brute_force/bitmatrix.h
+	<stdint.h>
+	"bitvector.h"
+	<inttypes.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<omp.h>
+	"defines.h"
+	"error.h"
+
+1381346164 /home/archieneru/github/DDM_Framework/Algorithms/brute_force/bitvector.h
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<string.h>
+	"defines.h"
+
+1414498019 /home/archieneru/github/DDM_Framework/Algorithms/brute_force/defines.h
+	<stdint.h>
+	<inttypes.h>
+
+1415245631 /home/archieneru/github/DDM_Framework/Algorithms/brute_force/error.h
+	"defines.h"
+	<stdio.h>
+	<stdint.h>
+	<string.h>
+	<stdlib.h>
+
+1381346170 source:/home/archieneru/github/DDM_Framework/Algorithms/brute_force/bitvector.c
+	"bitvector.h"
+
+1415252137 source:/home/archieneru/github/DDM_Framework/Algorithms/brute_force/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415252151 /home/archieneru/github/DDM_Framework/Algorithms/brute_force/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+
+1381346107 source:/home/archieneru/github/DDM_Framework/Algorithms/brute_force/error.c
+	"error.h"
+
+1415250875 source:/home/archieneru/github/DDM_Framework/Algorithms/brute_force/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+
+1381346124 source:/home/archieneru/github/DDM_Framework/Algorithms/brute_force/DDMutils.c
+	"DDMUtils.h"
+
+1381346119 /home/archieneru/github/DDM_Framework/Algorithms/brute_force/DDMUtils.h
+	"defines.h"
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+

@@ -1,4 +1,5 @@
 #include "Algorithm.h"
+#include "DDM_input_output.h"
 
 /**
 * \brief getAlgorithmName
@@ -9,6 +10,8 @@
 static MatchingInstance * instance;
 
 extern DDM_Input *ddm_input;
+
+const float Lmax = 1.0e6; /* dimension length */
 
 char * getAlgorithmName(void)
 {
@@ -23,47 +26,74 @@ SPACE_TYPE position;
 } extent_edge;
 
 
+void Write_Result(double total_time){
+  FILE* fout = fopen("binary_partition.txt", "a");
+  if ( fout == NULL ) {
+      printf("Error creating file binary_partition_based.txt\n");
+      exit(-1);
+  }
+
+  fprintf(fout, "%f\n", total_time);
+  fclose(fout);
+}
+
 _ERR_CODE readEntireInput(MatchingInstance ** instance, const uint_fast8_t dimensions, const uint32_t subscriptions, const uint32_t updates, const char * filename)
 {
+	FILE * fp = NULL;
 	uint64_t i;
+	char line [LINE_MAX_LENGTH];
 	int j;
-
-	DDM_Extent *list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
-	DDM_Extent *list_updates = DDM_Get_Updates_List(*ddm_input);
+	int character_read;
+	char * buffer;
+	DDM_Extent *list_updates, *list_subscriptions;
+	float alfa, l;
 	
-	if(generate_empty_extent_set(instance,subscriptions, updates, dimensions) != err_none)
-	{
-	  return print_error_string();
-        }
-        
-        (*instance)->dimensions = dimensions;
-	(*instance)->updates = updates;
-	(*instance)->subscriptions = subscriptions;
-	(*instance)->extent_number = updates + subscriptions;
-        
-	//fgets(rigan, LINE_MAX_LENGTH, fp); //Skip #line //TODO Solve
-	for(i=0; i<subscriptions; i++)
-	{
-	  (*instance)->extents[i].id = (_INT)list_subscriptions[i].id;
-	  (*instance)->extents[i].dirtyBit = false;
-	  for(j=0; j<dimensions; j++){
-	    (*instance)->extents[i].bounds[j].lower = (SPACE_TYPE)list_subscriptions[i].lower[j];
-	    (*instance)->extents[i].bounds[j].upper = (SPACE_TYPE)list_subscriptions[i].upper[j];
-	  }
-	}
-	//fgetc(fp); //Skips \n
-	//fgets(rigan, LINE_MAX_LENGTH, fp); //Skip #line
-	for(i = subscriptions; i < subscriptions + updates; i++)
-	{
-	  (*instance)->extents[i].id = (_INT)list_updates[i - subscriptions].id; //TODO control if is right
-	  (*instance)->extents[i].dirtyBit = false;
-	  for(j=0; j<dimensions; j++)
-	  {
-	    (*instance)->extents[i].bounds[j].lower = (SPACE_TYPE)list_updates[i - subscriptions].lower[j];
-	    (*instance)->extents[i].bounds[j].upper = (SPACE_TYPE)list_updates[i - subscriptions].upper[j];
-	  }
-	}
-		
+	generate_empty_extent_set(instance,subscriptions, updates, dimensions);
+	
+	  list_updates = DDM_Get_Updates_List(*ddm_input);
+	  list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
+	  
+		//fgets(rigan, LINE_MAX_LENGTH, fp); //Skip #line //TODO Solve
+		for(i=0; i<subscriptions; i++)
+		{
+			//Reading subscription extents
+            /*ReadNextString(line, fp);
+			if((sscanf(line,"%"PRIu64"%n",&((*instance)->extents[i].id),&character_read)) != 1)
+                return set_error(err_invalid_input, __FILE__, __FUNCTION__, __LINE__);*/
+			(*instance)->extents[i].id = (_INT)list_subscriptions[i].id;
+			(*instance)->extents[i].dirtyBit = false;
+            //buffer=line+ character_read;
+			for(j=0; j<dimensions; j++){
+				//if(sscanf(buffer, "%"PRId64" %"PRId64"%n",&((*instance)->extents[i].bounds[j].lower),&((*instance)->extents[i].bounds[j].upper), &character_read)!=2)
+                    //return set_error(err_invalid_input, __FILE__, __FUNCTION__, __LINE__);
+                //buffer+= character_read;
+			  (*instance)->extents[i].bounds[j].lower = (SPACE_TYPE)list_subscriptions[i].lower[j];
+			  (*instance)->extents[i].bounds[j].upper = (SPACE_TYPE)list_subscriptions[i].upper[j];
+				//printf("\nLETTO: %"PRId64" %"PRId64"\n",(*instance)->extents[i].bounds[j].lower, (*instance)->extents[i].bounds[j].upper);
+			}
+		}
+		//fgetc(fp); //Skips \n
+		//fgets(rigan, LINE_MAX_LENGTH, fp); //Skip #line
+		for(i = subscriptions; i < (subscriptions + updates); i++)
+		{
+            /*ReadNextString(line, fp);
+			//Reading update extents
+			if(sscanf(line,"%"PRIu64"%n",&((*instance)->extents[i].id), &character_read) != 1)
+                return set_error(err_invalid_input, __FILE__, __FUNCTION__, __LINE__);*/
+				(*instance)->extents[i].id = (_INT)list_updates[i - subscriptions].id; //TODO control if is right
+				(*instance)->extents[i].dirtyBit = false;
+				//buffer=line+character_read;
+				for(j=0; j<dimensions; j++)
+				{
+                    /*if (sscanf(buffer, "%"PRId64" %"PRId64"%n",&((*instance)->extents[i].bounds[j].lower),&((*instance)->extents[i].bounds[j].upper), &character_read) != 2)
+                        return set_error(err_invalid_input, __FILE__, __FUNCTION__, __LINE__);
+                    buffer += character_read;*/
+				  (*instance)->extents[i].bounds[j].lower = (SPACE_TYPE)list_updates[i - subscriptions].lower[j];
+				  (*instance)->extents[i].bounds[j].upper = (SPACE_TYPE)list_updates[i - subscriptions].upper[j];
+				}
+		}
+	
+	
 	return err_none;
 }
 
@@ -167,8 +197,10 @@ void check_matched (list S, list U, uint_fast8_t current_dim, bitmatrix * partit
                 if (((UpdateExtent->lower <= SubscrExtent->lower) &&  (SubscrExtent->lower <= UpdateExtent->upper))
                 || ((UpdateExtent->lower <= SubscrExtent->upper) &&  (SubscrExtent->upper <= UpdateExtent->upper))
                 || ((SubscrExtent->lower <= UpdateExtent->upper) &&  (UpdateExtent->upper <= SubscrExtent->upper))
-                || ((SubscrExtent->lower <= UpdateExtent->lower) &&  (UpdateExtent->lower <= SubscrExtent->upper)))
-                    set_bit_mat(*partition_result, tempU->id, tempS->id);
+                || ((SubscrExtent->lower <= UpdateExtent->lower) &&  (UpdateExtent->lower <= SubscrExtent->upper))){
+                  //printf("\nu_id: %d, lower: %d, upper: %d - s_id: %d, lower: %d, upper: %d\n", tempU->id, UpdateExtent->lower, UpdateExtent->upper, tempS->id, SubscrExtent->lower, SubscrExtent->upper);  
+		  set_bit_mat(*partition_result, tempU->id, tempS->id);
+		}
                 tempU = tempU->next;
             }
             tempS = tempS->next;
@@ -367,8 +399,9 @@ void Partition (extent_edge * edges, const uint64_t edges_count, const double lo
         tempS = tempS->next;
     }
 
-    printf("\n%d\n", edges_count);
     //Order the two vectors:
+    //TODO Error here something goes wrong
+    printf("\n%d\n", edges_count);
     qsort (EdgesRight, (Cur+Csr)*2, sizeof(extent_edge), &compar);
     qsort (EdgesLeft, (Cul+Csl)*2, sizeof(extent_edge), &compar);
 
@@ -409,52 +442,43 @@ _ERR_CODE ExecuteAlgorithm(const char * InstanceName, const uint_fast8_t dimensi
 	uint64_t edge_count=0;
 	uint_fast8_t k;
 	char filename [1000];
-	
-	//TEST
-	char test[1000];
 
     static extent_edge ** edges;
+    DDM_Timer ddm_timer;
 
-    sprintf(filename,"%s/"INPUT_FILE_NAME, InstanceName, iteration); //N.B. INPUT_FILE_NAME cointains a %d
+	sprintf(filename,"%s/"INPUT_FILE_NAME, InstanceName, iteration); //N.B. INPUT_FILE_NAME cointains a %d
 
-    if(iteration == 0)
-    { //Initialization of static variables
-      if(readEntireInput(&instance, dimensions, subscriptions, updates, filename) != err_none)
-      {
-	return print_error_string();
-      }
-      //TEST print the matrix input
-      /*for (i = 0; i < (subscriptions + updates); ++i){
-	sprintf(test, "%d", instance->extents[i].id);
-	for (k = 0; k < dimensions; ++k){
-	  sprintf(test, "%s %d %d", test, instance->extents[i].bounds[k].lower, instance->extents[i].bounds[k].upper);
+	if(iteration == 0)
+	{ //Initialization of static variables
+		if(readEntireInput(&instance, dimensions, subscriptions, updates, filename) != err_none)
+		{
+		    return print_error_string();
+		}
+		//"List" initialization
+        edges = (extent_edge**) malloc(sizeof(extent_edge*) * dimensions);
+        if(edges == NULL)
+            return set_error(err_alloc, __FILE__,__FUNCTION__, __LINE__);
+		for(k = 0; k< dimensions; k++)
+		{
+            edges[k] = (extent_edge*) malloc(sizeof(extent_edge) * (subscriptions + updates) * 2);
+            if(edges[k] == NULL)
+                return set_error(err_alloc, __FILE__,__FUNCTION__, __LINE__);
+		}
+		set_whole_bit_mat(*(instance->matching_result), updates, subscriptions);
+    }
+	else
+	{
+		if(readChangelogInput(instance, dimensions, subscriptions, updates, filename) != err_none)
+		{
+		    return print_error_string();
+		}
+		//Remember to clear the result bitmatrix!
+		set_whole_bit_mat(*(instance->matching_result),updates, subscriptions);
 	}
-	printf("%s\n",test);
-      }*/
-      //"List" initialization
-      edges = (extent_edge**) malloc(sizeof(extent_edge*) * dimensions);
-      if(edges == NULL)
-	return set_error(err_alloc, __FILE__,__FUNCTION__, __LINE__);
-      for(k = 0; k< dimensions; k++)
-      {
-	edges[k] = (extent_edge*) malloc(sizeof(extent_edge) * (subscriptions + updates) * 2);
-	if(edges[k] == NULL)
-	  return set_error(err_alloc, __FILE__,__FUNCTION__, __LINE__);
-      }
-      set_whole_bit_mat(*(instance->matching_result), updates, subscriptions);
-    }
-    else
-    {
-      if(readChangelogInput(instance, dimensions, subscriptions, updates, filename) != err_none)
-      {
-	return print_error_string();
-      }
-      //Remember to clear the result bitmatrix!
-      set_whole_bit_mat(*(instance->matching_result),updates, subscriptions);
-    }
 
     //Start the timer
     start_time(iteration);
+    DDM_Start_Timer(&ddm_timer);
        for(i=0; i<subscriptions; i++) //For each subscription extent
         {
             for(k=0; k<dimensions; k++)
@@ -527,7 +551,7 @@ _ERR_CODE ExecuteAlgorithm(const char * InstanceName, const uint_fast8_t dimensi
         {
             for(i = edge_count-1; i+1 != 0; i-=2)
             {
-	    // printf("i: %"PRIu64"\n", i);
+           // printf("i: %"PRIu64"\n", i);
                 if(edges[k][i].position == edges[k][i-1].position)
                 {
                 //printf("\a\a\a\aDue edge sono nella stessa posizione!\n");
@@ -598,7 +622,11 @@ _ERR_CODE ExecuteAlgorithm(const char * InstanceName, const uint_fast8_t dimensi
         }
 
     *result = instance->matching_result;
+    DDM_Stop_Timer(&ddm_timer);
     stop_time(iteration);
+    
+    /*instead DDM_Write_Result(argv, total_time);*/
+    Write_Result(DDM_Get_Total_Time(ddm_timer));
 	//free_matching_instance(&instance,false);
 
 	//Return err_none if everything went well

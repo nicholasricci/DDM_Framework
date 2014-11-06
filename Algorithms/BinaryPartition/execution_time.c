@@ -35,7 +35,7 @@ void start_time(int iteration)
 {
     if(iteration < elapsed_times.size)
     {
-        elapsed_times.clocks[iteration] = omp_get_wtime();
+//        elapsed_times.clocks[iteration] = omp_get_wtime();
     }
 }
 
@@ -44,7 +44,7 @@ void stop_time(int iteration)
 {
     if(iteration < elapsed_times.size)
     {
-        elapsed_times.clocks[iteration] = omp_get_wtime() - elapsed_times.clocks[iteration];
+//        elapsed_times.clocks[iteration] = omp_get_wtime() - elapsed_times.clocks[iteration];
         elapsed_times.total_time += elapsed_times.clocks[iteration];
         elapsed_times.total_time_2 = elapsed_times.total_time_2 + (elapsed_times.clocks[iteration] * elapsed_times.clocks[iteration] );
     }

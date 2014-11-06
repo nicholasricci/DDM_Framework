@@ -1,0 +1,173 @@
+# depslib dependency file v1.0
+1415219729 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415219732 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+
+1415241597 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+	"binary_partition.h"
+	"bitmatrix.h"
+	"limits.h"
+
+1415241499 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition/binary_partition.c
+	"binary_partition.h"
+
+1415240623 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition/binary_partition.h
+	<float.h>
+	"DDM_input_output.h"
+	"bitmatrix.h"
+	"lists.h"
+
+1381346182 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition/bitmatrix.c
+	"bitmatrix.h"
+
+1381346176 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition/bitmatrix.h
+	<stdint.h>
+	"bitvector.h"
+	<inttypes.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<omp.h>
+	"defines.h"
+	"error.h"
+
+1381346164 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition/bitvector.h
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<string.h>
+	"defines.h"
+
+1414498019 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition/defines.h
+	<stdint.h>
+	<inttypes.h>
+
+1381346101 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition/error.h
+	"defines.h"
+	"DDMUtils.h"
+	<stdio.h>
+	<stdint.h>
+	<string.h>
+	<stdlib.h>
+
+1381346119 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition/DDMUtils.h
+	"defines.h"
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
+1381346170 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition/bitvector.c
+	"bitvector.h"
+
+1381346124 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition/DDMutils.c
+	"DDMUtils.h"
+
+1381346107 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition/error.c
+	"error.h"
+
+1415198009 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition/lists.h
+	<stdlib.h>
+	<stdio.h>
+
+1415198032 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition/lists.c
+	"lists.h"
+
+1415203222 source:/home/archieneru/Documents/binary_partition/binary_partition.c
+	"binary_partition.h"
+
+1415201029 /home/archieneru/Documents/binary_partition/binary_partition.h
+	<float.h>
+	"DDM_input_output.h"
+	"bitmatrix.h"
+	"lists.h"
+
+1414671827 /home/archieneru/Documents/binary_partition/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+
+1381346176 /home/archieneru/Documents/binary_partition/bitmatrix.h
+	<stdint.h>
+	"bitvector.h"
+	<inttypes.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<omp.h>
+	"defines.h"
+	"error.h"
+
+1381346164 /home/archieneru/Documents/binary_partition/bitvector.h
+	<stdio.h>
+	<stdlib.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<string.h>
+	"defines.h"
+
+1414498019 /home/archieneru/Documents/binary_partition/defines.h
+	<stdint.h>
+	<inttypes.h>
+
+1381346101 /home/archieneru/Documents/binary_partition/error.h
+	"defines.h"
+	"DDMUtils.h"
+	<stdio.h>
+	<stdint.h>
+	<string.h>
+	<stdlib.h>
+
+1381346119 /home/archieneru/Documents/binary_partition/DDMUtils.h
+	"defines.h"
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
+1415198009 /home/archieneru/Documents/binary_partition/lists.h
+	<stdlib.h>
+	<stdio.h>
+
+1381346182 source:/home/archieneru/Documents/binary_partition/bitmatrix.c
+	"bitmatrix.h"
+
+1381346170 source:/home/archieneru/Documents/binary_partition/bitvector.c
+	"bitvector.h"
+
+1415194568 source:/home/archieneru/Documents/binary_partition/DDM_input_output.c
+	"DDM_input_output.h"
+
+1381346124 source:/home/archieneru/Documents/binary_partition/DDMutils.c
+	"DDMUtils.h"
+
+1381346107 source:/home/archieneru/Documents/binary_partition/error.c
+	"error.h"
+
+1415198032 source:/home/archieneru/Documents/binary_partition/lists.c
+	"lists.h"
+
+1415203819 source:/home/archieneru/Documents/binary_partition/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+	"binary_partition.h"
+	"bitmatrix.h"
+	"limits.h"
+
