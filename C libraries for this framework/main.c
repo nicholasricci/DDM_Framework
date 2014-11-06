@@ -10,7 +10,6 @@ int main(int argc, char *argv[])
 
     //DDM's variables
     DDM_Input *ddm_input;
-    DDM_Timer ddm_timer;
 
     //Indexes
     size_t k;

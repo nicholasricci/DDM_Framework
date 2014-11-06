@@ -65,4 +65,4 @@ cflags.h:
 
 clean:
 			rm -f *.o *~ brute_force interval_tree cflags.h *.txt
-			rm -f -R $(BIN)
+			rm -f -R $(BIN) 

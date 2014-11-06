@@ -4,7 +4,7 @@
 #include "DDM_input_output.h"
 #include "int_tree.h"
 
-size_t ddm_matching( bitmatrix result,
+size_t ddm_matching( uint_fast8_t **result,
                    const struct interval* sub, size_t n,
                    const struct interval* upd, size_t m )
 {
@@ -28,6 +28,44 @@ size_t ddm_matching( bitmatrix result,
     return count;
 }
 
+int count_ones_matrix(uint_fast8_t **result, size_t updates, size_t subscriptions){
+    int count = 0;
+    size_t i, j;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            if (result[i][j] == 1)
+                count++;
+
+    return count;
+}
+
+void reset_matrix_zero(uint_fast8_t **result, size_t updates, size_t subscriptions){
+    size_t i, j;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            result[i][j] = 0;
+}
+
+void reset_matrix_one(uint_fast8_t **result, size_t updates, size_t subscriptions){
+    size_t i, j;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            result[i][j] = 1;
+}
+
+void print_matrix(uint_fast8_t **result, size_t updates, size_t subscriptions){
+    size_t i, j;
+
+    for (i = 0; i < updates; ++i){
+        for (j = 0; j < subscriptions; ++j)
+            printf("%d ", result[i][j]);
+        printf("\n");
+    }
+}
+
 int main(int argc, char *argv[])
 {
     size_t updates, subscriptions, dimensions;
@@ -44,7 +82,7 @@ int main(int argc, char *argv[])
     size_t count = 0;
 
     //TEST
-    uint_fast8_t **matrix;
+    uint_fast8_t **matrix, **temp;
 
     //Initialize variable of DDM
     ddm_input = DDM_Initialize_Input(argc, argv);
@@ -63,17 +101,22 @@ int main(int argc, char *argv[])
     upds = (struct interval *) malloc(sizeof(struct interval) * updates);
 
     matrix = (uint_fast8_t **) malloc(sizeof(uint_fast8_t *) * updates);
-    for (i = 0; i < updates; ++i)
+    temp = (uint_fast8_t **) malloc(sizeof(uint_fast8_t *) * updates);
+    for (i = 0; i < updates; ++i){
         matrix[i] = (uint_fast8_t *) malloc(sizeof(uint_fast8_t) * subscriptions);
+        temp[i] = (uint_fast8_t *) malloc(sizeof(uint_fast8_t) * subscriptions);
+    }
+
+    for (i = 0; i < updates; ++i){
+        for (j = 0; j < subscriptions; ++j){
+            matrix[i][j] = 1;
+        }
+    }
 
     DDM_Start_Timer(ddm_input);
 
     //Execute Algorithm Here
 
-    bitmatrix temp;
-    //initialize bitmatrix
-    init_bit_matrix(&temp, updates, subscriptions, uninitialized);
-    //print_readable_bitmatrix(temp, 0, updates, subscriptions);
     for (k = 0; k < dimensions; ++k){
         //fill the current dimension
         for (i = 0; i < updates; ++i){
@@ -86,22 +129,24 @@ int main(int argc, char *argv[])
             subs[i].lower = list_subscriptions[i].lower[k];
             subs[i].upper = list_subscriptions[i].upper[k];
         }
-        //reset the temp matrix
-        reset_whole_bit_mat(temp, updates, subscriptions);
         //execute algorithm in one dimension and set the bitmatrix with update row and subscription column and set
         //bit to one with this function
         //set_bit_mat(temp, update_id, subscription_id);
         //to do and with temporaneous matrix result and the final matrix result do this
 
+        reset_matrix_zero(temp, updates, subscriptions);
+
         count = ddm_matching(temp, subs, subscriptions, upds, updates);
         //print_readable_bitmatrix(temp, 0, updates, subscriptions);
-        DDM_AND_Op_With_Bitmatrix(ddm_input, temp);
-        //printf("\n nmatches for dimension n.%zu: %zu\n", k, (size_t)count_ones(ddm_input->result, updates, subscriptions));
+        for (i = 0; i < updates; ++i)
+            for (j = 0; j < subscriptions; ++j)
+                matrix[i][j] *= temp[i][j];
+        printf("\n nmatches for dimension n.%zu: %zu\n", k, count_ones_matrix(temp, updates, subscriptions));
     }
 
     DDM_Stop_Timer(ddm_input);
 
-    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input, updates, subscriptions));
+    printf("\nnmatches: %"PRIu64"\n", count_ones_matrix(matrix, updates, subscriptions));
     //Write result
     DDM_Write_Result(*ddm_input);
 

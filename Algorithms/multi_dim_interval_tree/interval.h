@@ -24,8 +24,6 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
-#include "DDM_input_output.h"
-
 /**
  * This struct represents the semiopen intnerval [lower, upper)
  */

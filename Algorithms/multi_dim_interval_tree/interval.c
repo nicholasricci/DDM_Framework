@@ -25,5 +25,14 @@
 
 int intersect( const struct interval* x, const struct interval* y )
 {
-    return ( x->lower < y->upper && x->upper > y->lower );
+    //return ( x->lower < y->upper && x->upper > y->lower );
+    return ( 
+	     ( x->lower <= y->lower && y->lower <= x->upper )
+	      ||
+	     ( x->lower <= y->upper && y->upper <= x->upper )
+	      ||
+	     ( y->lower <= x->lower && x->lower <= y->upper )
+	      ||
+	     ( y->lower <= x->upper && x->upper <= y->upper )
+	   );
 }

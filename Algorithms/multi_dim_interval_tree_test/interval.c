@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- * brute_force.c
+ * interval.c
  *
  * This file is part of DDM
  *
@@ -21,36 +21,18 @@
  *
  ****************************************************************************/
 
-#include <stdlib.h>
-#include <stdint.h>
 #include "interval.h"
-#include "bitmatrix.h"
 
-const char* FILENAME = "brute_force.txt";
-
-/**
- * Brute force approach: test each update against each subscription.
- * Returns the number of (upd, subs) matches.
- */
-uint32_t ddm_matching( const struct interval* sub, size_t n,
-		       const struct interval* upd, size_t m,
-		       struct bitmatrix *mat
- 		    )
+int intersect( const struct interval* x, const struct interval* y )
 {
-    uint32_t result = 0;
-    size_t i, j;
-    /*struct bitmatrix mat;
-    bitmatrix_init( &mat, n, m );*/
-
-#pragma omp parallel for private(j) reduction(+:result)
-    for (i=0; i<n; ++i) {
-	for (j=0; j<m; ++j) {
-	    if ( intersect( &sub[i], &upd[j] ) ) {
-		bitmatrix_set(&mat, i, j, 1);
-		result++;
-	    }
-	}
-    }
-
-    return result;
+    //return ( x->lower < y->upper && x->upper > y->lower );
+    return ( 
+	     ( x->lower <= y->lower && y->lower <= x->upper )
+	      ||
+	     ( x->lower <= y->upper && y->upper <= x->upper )
+	      ||
+	     ( y->lower <= x->lower && x->lower <= y->upper )
+	      ||
+	     ( y->lower <= x->upper && x->upper <= y->upper )
+	   );
 }

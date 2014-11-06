@@ -233,27 +233,27 @@ size_t int_tree_size( const struct int_tree* tree )
 
 static struct int_node* int_tree_insert_rec( struct int_node* n, const struct interval* interv )
 {
-    struct int_node* result = n;
+    struct int_node* new_node = n;
     if ( n == NULL ) {
 	/* Create and initialize new node */
-        result = (struct int_node*)malloc( sizeof( struct int_node) );
-        assert( result );
-        result->in = interv;
-        result->left = result->right = NULL;
-        result->max_upper = interv->upper;
-        result->min_lower = interv->lower;
-        result->height = result->unbalance = 0;
+        new_node = (struct int_node*)malloc( sizeof( struct int_node) );
+        assert( new_node );
+        new_node->in = interv;
+        new_node->left = new_node->right = NULL;
+        new_node->max_upper = interv->upper;
+        new_node->min_lower = interv->lower;
+        new_node->height = new_node->unbalance = 0;
     } else {
 	if ( int_compare( interv, n->in ) < 0 )
-	    result->left = int_tree_insert_rec( result->left, interv );
+	    new_node->left = int_tree_insert_rec( new_node->left, interv );
 	else
-	    result->right = int_tree_insert_rec( result->right, interv );
+	    new_node->right = int_tree_insert_rec( new_node->right, interv );
 
 	/* rebalance if necessary */
-	if ( int_node_update( result ) )
-	    result = int_node_balance( result );
+	if ( int_node_update( new_node ) )
+	    new_node = int_node_balance( new_node );
     }
-    return result;
+    return new_node;
 }
 
 /* inserts the interval |interv| into tree |tree| */
@@ -270,14 +270,14 @@ void int_tree_insert( struct int_tree* tree, const struct interval* q )
    present, return NULL */
 struct int_node* int_tree_find( struct int_tree* tree, const struct interval* q )
 {
-    struct int_node* result = tree->root;
-    while ( result && int_compare(result->in, q ) ) {
-	if ( int_compare(q, result->in ) > 0 )
-	    result = result->right;
+    struct int_node* new_node = tree->root;
+    while ( new_node && int_compare(new_node->in, q ) ) {
+	if ( int_compare(q, new_node->in ) > 0 )
+	    new_node = new_node->right;
 	else
-	    result = result->left;
+	    new_node = new_node->left;
     }
-    return result;
+    return new_node;
 }
 
 /* recursively delete the node containing interval |q| from the
@@ -289,19 +289,19 @@ static struct int_node* int_tree_delete_rec( struct int_node* n, const struct in
     if ( n == NULL )
 	return n;
 
-    struct int_node* result = n;
+    struct int_node* new_node = n;
     int c = int_compare( q, n->in );
     switch(c) {
     case 0:
 	*found = 1;
 	if ( n->left == NULL ) {
 	    /* Case 1: empty left subtree */
-	    result = n->right;
+	    new_node = n->right;
 	    free( n );
 	} else {
 	    if ( n->right == NULL ) {
 		/* Case 2: empty right subtree */
-		result = n->left;
+		new_node = n->left;
 		free( n );
 	    } else {
 		/* Case 3: both the right and left subtrees are not
@@ -311,8 +311,8 @@ static struct int_node* int_tree_delete_rec( struct int_node* n, const struct in
 		while ( max->right )
 		    max = max->right;
 
-		result->in = max->in;
-		result->left = int_tree_delete_rec( n->left, max->in, found );
+		new_node->in = max->in;
+		new_node->left = int_tree_delete_rec( n->left, max->in, found );
 	    }
 	}
 	break;
@@ -325,10 +325,10 @@ static struct int_node* int_tree_delete_rec( struct int_node* n, const struct in
     }
 
     /* rebalance if necessary */
-    if ( int_node_update( result ) )
-	result = int_node_balance( result );
+    if ( int_node_update( new_node ) )
+	new_node = int_node_balance( new_node );
 
-    return result;
+    return new_node;
 }
 
 /* removes the interval |interv| from the tree |tree|. Note that
@@ -341,13 +341,13 @@ void int_tree_delete( struct int_tree* tree, const struct interval* interv )
     if ( found ) tree->size--;
 }
 
-int set_result(bitmatrix result, const struct interval* x, const struct interval* q){
+int set_result(uint_fast8_t **result, const struct interval* x, const struct interval* q){
 
-    set_bit_mat(result, x->id, q->id);
+    result[x->id][q->id] = 1;
     return 0;
 }
 
-static size_t find_intersect_rec( bitmatrix result_matrix, const struct int_node* n, const struct interval* q )
+static size_t find_intersect_rec( uint_fast8_t **result_matrix, const struct int_node* n, const struct interval* q )
 {
     if ( ! n )
 	return 0;
@@ -371,7 +371,7 @@ static size_t find_intersect_rec( bitmatrix result_matrix, const struct int_node
     return result;
 }
 
-size_t int_tree_find_intersect( bitmatrix result, const struct int_tree* tree, const struct interval* interv )
+size_t int_tree_find_intersect( uint_fast8_t **result, const struct int_tree* tree, const struct interval* interv )
 {
     return find_intersect_rec( result, tree->root, interv );
 }

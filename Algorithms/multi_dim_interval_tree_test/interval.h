@@ -1,8 +1,8 @@
 /****************************************************************************
  *
- * timing.c
+ * interval.h
  *
- * This file is part of ddm
+ * This file is part of DDM
  *
  * Copyright (C) 2013 Moreno Marzolla
  *
@@ -21,31 +21,21 @@
  *
  ****************************************************************************/
 
-#include "timing.h"
-#include <assert.h>
+#ifndef INTERVAL_H
+#define INTERVAL_H
 
-void timing_init( struct timer* t )
-{
-    t->total = 0;
-    t->n = 0;
-}
+/**
+ * This struct represents the semiopen intnerval [lower, upper)
+ */
+struct interval {
+    int id;		/* the ID of this interval. We assume that intervals are labeled as 0, 1, ... */
+    float lower;	/* the lower bound */
+    float upper;	/* the upper bound */
+};
 
-void timing_start( struct timer* t )
-{
-    clock_gettime(CLOCK_MONOTONIC, &(t->t_start) );
-}
+/**
+ * Returns 1 is intervals |x| and |y| intersect, 0 otherwise.
+ */
+int intersect( const struct interval* x, const struct interval* y );
 
-void timing_stop( struct timer* t )
-{
-    clock_gettime(CLOCK_MONOTONIC, &(t->t_stop) );
-    t->n++;
-    t->total += \
-	(t->t_stop).tv_sec + (double)((t->t_stop).tv_nsec) / 1.0e9 - 
-	((t->t_start).tv_sec + (double)((t->t_start).tv_nsec) / 1.0e9);
-}
-
-double timing_get_average( const struct timer* t )
-{
-    assert( t->n > 0 );
-    return (t->total / t->n );
-}
+#endif
