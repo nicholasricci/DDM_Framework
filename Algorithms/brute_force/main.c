@@ -150,7 +150,7 @@ int main(int argc, char *argv[]){
     DDM_Write_Result(*ddm_input);
 
     //write on screen nmatches and total time
-    printf("%zu matches  %fs\n", nmatch, DDM_Get_Total_Time(*ddm_input) );
+    printf("\ntotal_time  %fs\n", DDM_Get_Total_Time(*ddm_input) );
 
 
     return 0;
