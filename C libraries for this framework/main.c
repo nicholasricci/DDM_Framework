@@ -5,14 +5,18 @@
 
 int main(int argc, char *argv[])
 {
-    size_t updates, subscriptions, dimensions;
+    uint64_t updates, subscriptions;
+    uint16_t dimensions;
     DDM_Extent *list_updates, *list_subscriptions;
 
     //DDM's variables
     DDM_Input *ddm_input;
 
     //Indexes
-    size_t k;
+    uint16_t k;
+
+    //temporaneous result matrix
+    uint_fast8_t **temp;
 
     //Initialize variable of DDM
     ddm_input = DDM_Initialize_Input(argc, argv);
@@ -27,27 +31,31 @@ int main(int argc, char *argv[])
     list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
     list_updates = DDM_Get_Updates_List(*ddm_input);
 
+    //create temporaneous matrix
+    temp = create_result_matrix(updates, subscriptions);
+    //reset ddm_input->result_mat to one, so you can do the and operation between
+    //temp(init 0) and ddm_input->result_mat(init 1)
+    reset_mat(ddm_input->result_mat, updates, subscriptions, one);
+
     DDM_Start_Timer(ddm_input);
 
-    //Execute Algorithm Here
-
-    bitmatrix temp;
-    //initialize bitmatrix
-    init_bit_matrix(&temp, updates, subscriptions, uninitialized);
     for (k = 0; k < dimensions; ++k){
+        //each time execute different dimension
         //reset the temp matrix
-        reset_whole_bit_mat(temp, updates, subscriptions);
-        //execute algorithm in one dimension and set the bitmatrix with update row and subscription column and set
-        //bit to one with this function
-        //set_bit_mat(temp, update_id, subscription_id);
-        //to do and with temporaneous matrix result and the final matrix result do this
-        DDM_AND_Op_With_Bitmatrix(ddm_input, temp);
+        reset_mat(temp, updates, subscriptions, zero);
+
+        //Execute Algorithm Here
+
+        //Intersect temp matrix and ddm_input->result_mat and store result in ddm_input->result_mat
+        DDM_And_Operation_Between_Matrices(ddm_input, temp, updates, subscriptions);
     }
 
     DDM_Stop_Timer(ddm_input);
 
     //Write result
     DDM_Write_Result(*ddm_input);
+
+    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
 
     return 0;
 }

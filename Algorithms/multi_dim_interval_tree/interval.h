@@ -24,18 +24,20 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
+#include "DDM_input_output.h"
+
 /**
  * This struct represents the semiopen intnerval [lower, upper)
  */
 struct interval {
     int id;		/* the ID of this interval. We assume that intervals are labeled as 0, 1, ... */
-    float lower;	/* the lower bound */
-    float upper;	/* the upper bound */
+    float lower[MAX_DIMENSIONS];	/* the lower bound */
+    float upper[MAX_DIMENSIONS];	/* the upper bound */
 };
 
 /**
  * Returns 1 is intervals |x| and |y| intersect, 0 otherwise.
  */
-int intersect( const struct interval* x, const struct interval* y );
+int intersect( const struct interval* x, const struct interval* y, size_t current_dim );
 
 #endif

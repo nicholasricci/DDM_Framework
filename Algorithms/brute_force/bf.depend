@@ -1,0 +1,39 @@
+# depslib dependency file v1.0
+1415335279 source:/home/archieneru/github/DDM_Framework/Algorithms/bf/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415336274 /home/archieneru/github/DDM_Framework/Algorithms/bf/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+
+1415336365 source:/home/archieneru/github/DDM_Framework/Algorithms/bf/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+
+1415335279 source:/home/archieneru/github/DDM_Framework/Algorithms/brute_force/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415336274 /home/archieneru/github/DDM_Framework/Algorithms/brute_force/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+
+1415337627 source:/home/archieneru/github/DDM_Framework/Algorithms/brute_force/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+

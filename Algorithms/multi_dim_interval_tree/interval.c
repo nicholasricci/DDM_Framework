@@ -23,16 +23,16 @@
 
 #include "interval.h"
 
-int intersect( const struct interval* x, const struct interval* y )
+int intersect( const struct interval* x, const struct interval* y, size_t current_dim )
 {
     //return ( x->lower < y->upper && x->upper > y->lower );
-    return ( 
-	     ( x->lower <= y->lower && y->lower <= x->upper )
+    return (
+	     ( x->lower[current_dim] <= y->lower[current_dim] && y->lower[current_dim] <= x->upper[current_dim] )
 	      ||
-	     ( x->lower <= y->upper && y->upper <= x->upper )
+	     ( x->lower[current_dim] <= y->upper[current_dim] && y->upper[current_dim] <= x->upper[current_dim] )
 	      ||
-	     ( y->lower <= x->lower && x->lower <= y->upper )
+	     ( y->lower[current_dim] <= x->lower[current_dim] && x->lower[current_dim] <= y->upper[current_dim] )
 	      ||
-	     ( y->lower <= x->upper && x->upper <= y->upper )
+	     ( y->lower[current_dim] <= x->upper[current_dim] && x->upper[current_dim] <= y->upper[current_dim] )
 	   );
 }

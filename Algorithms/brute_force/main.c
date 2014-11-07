@@ -3,155 +3,87 @@
 
 #include "DDM_input_output.h"
 
-const float Lmax = 1.0e6; /* dimension length */
-
-int count_ones_matrix(uint_fast8_t **result, size_t updates, size_t subscriptions){
-    int count = 0;
-    size_t i, j;
-
-    for (i = 0; i < updates; ++i)
-        for (j = 0; j < subscriptions; ++j)
-            if (result[i][j] == 1)
-                count++;
-
-    return count;
-}
-
-void reset_matrix_zero(uint_fast8_t **result, size_t updates, size_t subscriptions){
-    size_t i, j;
-
-    for (i = 0; i < updates; ++i)
-        for (j = 0; j < subscriptions; ++j)
-            result[i][j] = 0;
-}
-
-void reset_matrix_one(uint_fast8_t **result, size_t updates, size_t subscriptions){
-    size_t i, j;
-
-    for (i = 0; i < updates; ++i)
-        for (j = 0; j < subscriptions; ++j)
-            result[i][j] = 1;
-}
-
-void print_matrix(uint_fast8_t **result, size_t updates, size_t subscriptions){
-    size_t i, j;
+void bruteforce1D(uint_fast8_t **result, DDM_Extent *upds, uint64_t updates, DDM_Extent *subs, uint64_t subscriptions, uint16_t current_dim){
+    uint64_t i, j;
 
     for (i = 0; i < updates; ++i){
-        for (j = 0; j < subscriptions; ++j)
-            printf("%d ", result[i][j]);
-        printf("\n");
+        for (j = 0; j < subscriptions; ++j){
+            if (
+                (upds[i].lower[current_dim] <= subs[j].lower[current_dim]
+                && subs[j].lower[current_dim] <= upds[i].upper[current_dim])
+                ||
+                (upds[i].lower[current_dim] <= subs[j].upper[current_dim]
+                && subs[j].upper[current_dim] <= upds[i].upper[current_dim])
+                ||
+                (subs[j].lower[current_dim] <= upds[i].lower[current_dim]
+                && upds[i].lower[current_dim] <= subs[j].upper[current_dim])
+                ||
+                (subs[j].lower[current_dim] <= upds[i].upper[current_dim]
+                && upds[i].upper[current_dim] <= subs[j].upper[current_dim])
+                ){
+                set_value_mat(result, i, j, one);
+            }
+        }
     }
 }
 
-int main(int argc, char *argv[]){
-    size_t dimensions;
-    size_t updates;
-    size_t subscriptions;
-    DDM_Extent *list_updates;
-    DDM_Extent *list_subscriptions;
-    DDM_Input *ddm_input;
-    /*Index variables*/
-    size_t i, j, k;
-    /*Result variable*/
-    size_t nmatch;
-    int isValid;
-    
-    uint_fast8_t **matrix, **temp;
+int main(int argc, char *argv[])
+{
+    uint64_t updates, subscriptions;
+    uint16_t dimensions;
+    DDM_Extent *list_updates, *list_subscriptions;
 
+    //DDM's variables
+    DDM_Input *ddm_input;
+
+    //Indexes
+    uint16_t k;
+
+    //temporaneous result matrix
+    uint_fast8_t **temp;
+
+    //Initialize variable of DDM
     ddm_input = DDM_Initialize_Input(argc, argv);
-    dimensions = DDM_Get_Dimensions(*ddm_input);
+
+    //Check if the initialization of input was succesfully
+    if (ddm_input == NULL)
+        exit(-1);
+
     updates = DDM_Get_Updates(*ddm_input);
     subscriptions = DDM_Get_Subscriptions(*ddm_input);
-    list_updates = DDM_Get_Updates_List(*ddm_input);
+    dimensions = DDM_Get_Dimensions(*ddm_input);
     list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
+    list_updates = DDM_Get_Updates_List(*ddm_input);
 
-    //print_list_updates_and_subscriptions(*ddm_input);
-    //TEST
-    matrix = (uint_fast8_t **) malloc(sizeof(uint_fast8_t *) * updates);
-    temp = (uint_fast8_t **) malloc(sizeof(uint_fast8_t *) * updates);
-    for (i = 0; i < updates; ++i){
-        matrix[i] = (uint_fast8_t *) malloc(sizeof(uint_fast8_t) * subscriptions);
-        temp[i] = (uint_fast8_t *) malloc(sizeof(uint_fast8_t) * subscriptions);
-    }
+    //create temporaneous matrix
+    temp = create_result_matrix(updates, subscriptions);
+    //reset ddm_input->result_mat to one, so you can do the and operation between
+    //temp(init 0) and ddm_input->result_mat(init 1)
+    reset_mat(ddm_input->result_mat, updates, subscriptions, one);
 
-    for (i = 0; i < updates; ++i){
-        for (j = 0; j < subscriptions; ++j){
-            matrix[i][j] = 1;
-        }
-    }
-    
-    nmatch = 0;
     DDM_Start_Timer(ddm_input);
 
-    //Execute algorithm
-    /*for (i = 0; i < updates; ++i){
-    #pragma omp parallel for private(j, isValid, k) reduction(+:nmatch)
-        for (j = 0; j < subscriptions; ++j){
-            isValid = 1;
-            for (k = 0; k < dimensions; ++k){
-                if (
-                  (list_updates[i].lower[k] <= list_subscriptions[j].lower[k]
-                  && list_subscriptions[j].lower[k] <= list_updates[i].upper[k])
-                  ||
-                  (list_updates[i].lower[k] <= list_subscriptions[j].upper[k]
-                  && list_subscriptions[j].upper[k] <= list_updates[i].upper[k])
-                  ||
-                  (list_subscriptions[j].lower[k] <= list_updates[i].lower[k]
-                  && list_updates[i].lower[k] <= list_subscriptions[j].upper[k])
-                  ||
-                  (list_subscriptions[j].lower[k] <= list_updates[i].upper[k]
-                  && list_updates[i].upper[k] <= list_subscriptions[j].upper[k])
-                  ){
-                  continue;
-                }else{
-                  isValid = 0;
-                }
-            }
-            if (isValid){
-                DDM_Set_Bit_Mat_Result(ddm_input, i, j);
-                //printf("\nU%zu, S%zu\n", list_updates[i].id, list_subscriptions[j].id);
-            }
-        }
-    }*/
-    
-    
     for (k = 0; k < dimensions; ++k){
-      reset_matrix_zero(temp, updates, subscriptions);
-      for (i = 0; i < updates; ++i){
-	for (j = 0; j < subscriptions; ++j){
-	  if (
-	    (list_updates[i].lower[k] <= list_subscriptions[j].lower[k]
-	    && list_subscriptions[j].lower[k] <= list_updates[i].upper[k])
-	    ||
-	    (list_updates[i].lower[k] <= list_subscriptions[j].upper[k]
-	    && list_subscriptions[j].upper[k] <= list_updates[i].upper[k])
-	    ||
-	    (list_subscriptions[j].lower[k] <= list_updates[i].lower[k]
-	    && list_updates[i].lower[k] <= list_subscriptions[j].upper[k])
-	    ||
-	    (list_subscriptions[j].lower[k] <= list_updates[i].upper[k]
-	    && list_updates[i].upper[k] <= list_subscriptions[j].upper[k])
-	    ){
-	    temp[i][j] = 1;
-	  }
-	}
-      }
-      for (i = 0; i < updates; ++i)
-            for (j = 0; j < subscriptions; ++j)
-                matrix[i][j] *= temp[i][j];
-      printf("\n nmatches for dimension n.%zu: %zu\n", k, count_ones_matrix(temp, updates, subscriptions));
+        //each time execute different dimension
+        //reset the temp matrix
+        reset_mat(temp, updates, subscriptions, zero);
+
+        //Execute Algorithm Here
+        //BruteForce
+        bruteforce1D(temp, list_updates, updates, list_subscriptions, subscriptions, k);
+
+        printf("\nd: %d, nmatches: %"PRIu64"\n", k, count_ones_matrix(temp, updates, subscriptions));
+
+        //Intersect temp matrix and ddm_input->result_mat and store result in ddm_input->result_mat
+        DDM_And_Operation_Between_Matrices(ddm_input, temp, updates, subscriptions);
     }
 
     DDM_Stop_Timer(ddm_input);
 
-    printf("\nnmatches: %"PRIu64"\n", count_ones_matrix(matrix, updates, subscriptions));
-    //nmatch = (size_t)DDM_Count_Matches(ddm_input, updates, subscriptions);
-    //Write result on file
+    //Write result
     DDM_Write_Result(*ddm_input);
 
-    //write on screen nmatches and total time
-    printf("\ntotal_time  %fs\n", DDM_Get_Total_Time(*ddm_input) );
-
+    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
 
     return 0;
 }

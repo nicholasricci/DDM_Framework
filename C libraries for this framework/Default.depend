@@ -1,0 +1,17 @@
+# depslib dependency file v1.0
+1415334632 source:/home/archieneru/github/DDM_Framework/C libraries for this framework/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+
+1415335268 /home/archieneru/github/DDM_Framework/C libraries for this framework/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+

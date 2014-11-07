@@ -49,12 +49,12 @@
  * otherwise. Therefore, if this function returns 1, the caller MUST
  * update the information stored at the parent of |p|, if it exists.
  */
-static int int_node_update( struct int_node* p )
+static int int_node_update( struct int_node* p, uint16_t current_dim )
 {
     assert( p );
     int result = 0;
-    float new_max_upper = p->in->upper;
-    float new_min_lower = p->in->lower;
+    float new_max_upper = p->in->upper[current_dim];
+    float new_min_lower = p->in->lower[current_dim];
     int new_height = 0;
     int new_unbalance = 0; /* height(left subtree) - height(right subtree) */
 
@@ -98,7 +98,7 @@ static int int_node_update( struct int_node* p )
  * Returns the new root |w| of the subtree.
  *
  */
-static struct int_node* int_node_rotate_right( struct int_node* n )
+static struct int_node* int_node_rotate_right( struct int_node* n, uint16_t current_dim )
 {
     assert( n );
     struct int_node* w = n->left;
@@ -107,8 +107,8 @@ static struct int_node* int_node_rotate_right( struct int_node* n )
     n->left = T2;
     w->right = n;
     /* update ancillary node information */
-    int_node_update( n );
-    int_node_update( w );
+    int_node_update( n, current_dim );
+    int_node_update( w, current_dim );
     return w;
 }
 
@@ -124,7 +124,7 @@ static struct int_node* int_node_rotate_right( struct int_node* n )
  * This function also updates the local information stored at |n| and |w|.
  * Returns the new root |w| of the subtree.
  */
-static struct int_node* int_node_rotate_left( struct int_node* n )
+static struct int_node* int_node_rotate_left( struct int_node* n, uint16_t current_dim )
 {
     assert( n );
     struct int_node* w = n->right;
@@ -133,8 +133,8 @@ static struct int_node* int_node_rotate_left( struct int_node* n )
     n->right = T2;
     w->left = n;
     /* update ancillary node information */
-    int_node_update( n );
-    int_node_update( w );
+    int_node_update( n, current_dim );
+    int_node_update( w, current_dim );
     return w;
 }
 
@@ -146,7 +146,7 @@ static struct int_node* int_node_rotate_left( struct int_node* n )
  * Returns a pointer to the (possibly new) root |r| of the subtree
  * previously rooted at |n|.
  */
-static struct int_node* int_node_balance( struct int_node* n )
+static struct int_node* int_node_balance( struct int_node* n, uint16_t current_dim )
 {
     if ( abs(n->unbalance) <= 1 )
 	return n; /* already balanced */
@@ -160,12 +160,12 @@ static struct int_node* int_node_balance( struct int_node* n )
 	assert( l->unbalance == -1 || l->unbalance == +1 );
 	if ( l->unbalance == +1 ) {
 	    /* single rotation */
-	    result = int_node_rotate_right(n);
+	    result = int_node_rotate_right(n, current_dim);
 	    assert( result == l );
 	} else {
 	    /* double rotation */
-	    n->left = int_node_rotate_left(l);
-	    result = int_node_rotate_right(n);
+	    n->left = int_node_rotate_left(l, current_dim);
+	    result = int_node_rotate_right(n, current_dim);
 	}
     } else { /* right leaning case */
 	struct int_node* r = n->right; /* right child */
@@ -173,12 +173,12 @@ static struct int_node* int_node_balance( struct int_node* n )
 	assert( r->unbalance == -1 || r->unbalance == +1 );
 	if ( r->unbalance == -1 ) {
 	    /* single rotation */
-	    result = int_node_rotate_left(n);
+	    result = int_node_rotate_left(n, current_dim);
 	    assert( result == r );
 	} else {
 	    /* double rotation */
-	    n->right = int_node_rotate_right(r);
-	    result = int_node_rotate_left(n);
+	    n->right = int_node_rotate_right(r, current_dim);
+	    result = int_node_rotate_left(n, current_dim);
 	}
     }
     return result;
@@ -231,38 +231,38 @@ size_t int_tree_size( const struct int_tree* tree )
     return tree->size;
 }
 
-static struct int_node* int_tree_insert_rec( struct int_node* n, const struct interval* interv )
+static struct int_node* int_tree_insert_rec( struct int_node* n, const struct interval* interv, size_t current_dim )
 {
-    struct int_node* result = n;
+    struct int_node* new_node = n;
     if ( n == NULL ) {
 	/* Create and initialize new node */
-        result = (struct int_node*)malloc( sizeof( struct int_node) );
-        assert( result );
-        result->in = interv;
-        result->left = result->right = NULL;
-        result->max_upper = interv->upper;
-        result->min_lower = interv->lower;
-        result->height = result->unbalance = 0;
+        new_node = (struct int_node*)malloc( sizeof( struct int_node) );
+        assert( new_node );
+        new_node->in = interv;
+        new_node->left = new_node->right = NULL;
+        new_node->max_upper = interv->upper[current_dim];
+        new_node->min_lower = interv->lower[current_dim];
+        new_node->height = new_node->unbalance = 0;
     } else {
 	if ( int_compare( interv, n->in ) < 0 )
-	    result->left = int_tree_insert_rec( result->left, interv );
+	    new_node->left = int_tree_insert_rec( new_node->left, interv, current_dim );
 	else
-	    result->right = int_tree_insert_rec( result->right, interv );
+	    new_node->right = int_tree_insert_rec( new_node->right, interv, current_dim );
 
 	/* rebalance if necessary */
-	if ( int_node_update( result ) )
-	    result = int_node_balance( result );
+	if ( int_node_update( new_node, current_dim ) )
+	    new_node = int_node_balance( new_node, current_dim );
     }
-    return result;
+    return new_node;
 }
 
 /* inserts the interval |interv| into tree |tree| */
-void int_tree_insert( struct int_tree* tree, const struct interval* q )
+void int_tree_insert( struct int_tree* tree, const struct interval* q, size_t current_dim )
 {
     assert( tree );
     assert( q );
 
-    tree->root = int_tree_insert_rec( tree->root, q );
+    tree->root = int_tree_insert_rec( tree->root, q, current_dim );
     tree->size++;
 }
 
@@ -270,38 +270,38 @@ void int_tree_insert( struct int_tree* tree, const struct interval* q )
    present, return NULL */
 struct int_node* int_tree_find( struct int_tree* tree, const struct interval* q )
 {
-    struct int_node* result = tree->root;
-    while ( result && int_compare(result->in, q ) ) {
-	if ( int_compare(q, result->in ) > 0 )
-	    result = result->right;
+    struct int_node* new_node = tree->root;
+    while ( new_node && int_compare(new_node->in, q ) ) {
+	if ( int_compare(q, new_node->in ) > 0 )
+	    new_node = new_node->right;
 	else
-	    result = result->left;
+	    new_node = new_node->left;
     }
-    return result;
+    return new_node;
 }
 
 /* recursively delete the node containing interval |q| from the
    subtree rooted at |n|; returns the (possibly new) root of the tree
    previously rooted at |n|. If interval |q| is found and deleted, set
    |*found| to 1; otherwise |*found| is left unchanged. */
-static struct int_node* int_tree_delete_rec( struct int_node* n, const struct interval* q, int *found )
+static struct int_node* int_tree_delete_rec( struct int_node* n, const struct interval* q, int *found, uint16_t current_dim )
 {
     if ( n == NULL )
 	return n;
 
-    struct int_node* result = n;
+    struct int_node* new_node = n;
     int c = int_compare( q, n->in );
     switch(c) {
     case 0:
 	*found = 1;
 	if ( n->left == NULL ) {
 	    /* Case 1: empty left subtree */
-	    result = n->right;
+	    new_node = n->right;
 	    free( n );
 	} else {
 	    if ( n->right == NULL ) {
 		/* Case 2: empty right subtree */
-		result = n->left;
+		new_node = n->left;
 		free( n );
 	    } else {
 		/* Case 3: both the right and left subtrees are not
@@ -311,93 +311,93 @@ static struct int_node* int_tree_delete_rec( struct int_node* n, const struct in
 		while ( max->right )
 		    max = max->right;
 
-		result->in = max->in;
-		result->left = int_tree_delete_rec( n->left, max->in, found );
+		new_node->in = max->in;
+		new_node->left = int_tree_delete_rec( n->left, max->in, found, current_dim );
 	    }
 	}
 	break;
     case 1:
-	n->right = int_tree_delete_rec( n->right, q, found );
+	n->right = int_tree_delete_rec( n->right, q, found, current_dim );
 	break;
     case -1:
-	n->left = int_tree_delete_rec( n->left, q, found );
+	n->left = int_tree_delete_rec( n->left, q, found, current_dim );
 	break;
     }
 
     /* rebalance if necessary */
-    if ( int_node_update( result ) )
-	result = int_node_balance( result );
+    if ( int_node_update( new_node, current_dim ) )
+	new_node = int_node_balance( new_node, current_dim );
 
-    return result;
+    return new_node;
 }
 
 /* removes the interval |interv| from the tree |tree|. Note that
    |interv| is not deallocated. If |interv| is not present, nothing is
    done. */
-void int_tree_delete( struct int_tree* tree, const struct interval* interv )
+void int_tree_delete( struct int_tree* tree, const struct interval* interv, uint16_t current_dim )
 {
     int found = 0;
-    tree->root = int_tree_delete_rec( tree->root, interv, &found );
+    tree->root = int_tree_delete_rec( tree->root, interv, &found, current_dim );
     if ( found ) tree->size--;
 }
 
-int set_result(bitmatrix result, const struct interval* x, const struct interval* q){
+int set_result(uint_fast8_t **result, const struct interval* x, const struct interval* q){
 
-    set_bit_mat(result, x->id, q->id);
+    result[x->id][q->id] = 1;
     return 0;
 }
 
-static size_t find_intersect_rec( bitmatrix result_matrix, const struct int_node* n, const struct interval* q )
+static size_t find_intersect_rec( uint_fast8_t **result_matrix, const struct int_node* n, const struct interval* q, uint16_t current_dim )
 {
     if ( ! n )
 	return 0;
 
     /* If the lower bound of |q| is larger than the upper bound of any
        node in the subtree rooted at |n|, then there can't be any match */
-    if ( q->lower >= n->max_upper || q->upper < n->min_lower )
+    if ( q->lower[current_dim] >= n->max_upper || q->upper[current_dim] < n->min_lower )
 	return 0;
 
     /* Check left children */
-    size_t result = find_intersect_rec( result_matrix, n->left, q );
+    size_t result = find_intersect_rec( result_matrix, n->left, q, current_dim );
 
-    if ( intersect( n->in, q ) ) {
+    if ( intersect( n->in, q, current_dim ) ) {
 	result++;
 	if ( set_result(result_matrix, q, n->in) ) return result;
     }
 
     if ( q->upper > n->in->lower )
-	result += find_intersect_rec( result_matrix, n->right, q );
+	result += find_intersect_rec( result_matrix, n->right, q, current_dim );
 
     return result;
 }
 
-size_t int_tree_find_intersect( bitmatrix result, const struct int_tree* tree, const struct interval* interv )
+size_t int_tree_find_intersect( uint_fast8_t **result, const struct int_tree* tree, const struct interval* interv, uint16_t current_dim )
 {
-    return find_intersect_rec( result, tree->root, interv );
+    return find_intersect_rec( result, tree->root, interv, current_dim );
 }
 
-static void int_tree_check_rec( const struct int_node* n, float max_upper )
+static void int_tree_check_rec( const struct int_node* n, float max_upper, uint16_t current_dim )
 {
     if ( ! n )
 	return;
 
-    assert( n->in->upper <= max_upper );
+    assert( n->in->upper[current_dim] <= max_upper );
 
     if ( n->left ) {
-	int_tree_check_rec( n->left, n->max_upper );
+	int_tree_check_rec( n->left, n->max_upper, current_dim );
     }
     if ( n->right ) {
-	int_tree_check_rec( n->right, n->max_upper );
+	int_tree_check_rec( n->right, n->max_upper, current_dim );
     }
 }
 
-void int_tree_check( const struct int_tree* tree )
+void int_tree_check( const struct int_tree* tree, uint16_t current_dim )
 {
     if ( tree->root )
-	int_tree_check_rec( tree->root, tree->root->max_upper );
+	int_tree_check_rec( tree->root, tree->root->max_upper, current_dim );
 }
 
-static int int_tree_dump_rec( const struct int_node* n, int l )
+static int int_tree_dump_rec( const struct int_node* n, int l, uint16_t current_dim )
 {
     int i;
     int c = 0;
@@ -407,18 +407,18 @@ static int int_tree_dump_rec( const struct int_node* n, int l )
     if ( !n ) {
 	printf("()\n");
     } else {
-	printf("%d:(%f, %f) max_upper=%f h=%d unb=%d\n",n->in->id, n->in->lower, n->in->upper, n->max_upper, n->height, n->unbalance);
+	printf("%d:(%f, %f) max_upper=%f h=%d unb=%d\n",n->in->id, n->in->lower[current_dim], n->in->upper[current_dim], n->max_upper, n->height, n->unbalance);
 	c = 1;
-	c += int_tree_dump_rec(n->left,l+1);
-	c += int_tree_dump_rec(n->right,l+1);
+	c += int_tree_dump_rec(n->left,l+1, current_dim);
+	c += int_tree_dump_rec(n->right,l+1, current_dim);
     }
 
     return c;
 }
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
-void int_tree_dump( const struct int_tree* tree )
+void int_tree_dump( const struct int_tree* tree, uint16_t current_dim )
 {
-    int c = int_tree_dump_rec( tree->root, 0 );
+    int c = int_tree_dump_rec( tree->root, 0, current_dim );
     assert( c == tree->size );
 }

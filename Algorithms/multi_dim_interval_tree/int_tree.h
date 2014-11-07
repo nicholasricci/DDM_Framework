@@ -87,7 +87,7 @@ size_t int_tree_size( const struct int_tree* tree );
 /**
  * Inserts the interval |q| into tree |tree|.
  */
-void int_tree_insert( struct int_tree* tree, const struct interval* q );
+void int_tree_insert( struct int_tree* tree, const struct interval* q, size_t current_dim );
 
 typedef int(*int_callback)(const struct interval*, const struct interval*, void*);
 
@@ -97,17 +97,17 @@ typedef int(*int_callback)(const struct interval*, const struct interval*, void*
  * user-defined callback |f(x,q,param)|. If |f| returns a nonzero
  * value, the search procedure terminates.
  */
-size_t int_tree_find_intersect( bitmatrix result, const struct int_tree* tree, const struct interval* q );
+size_t int_tree_find_intersect( uint_fast8_t **result, const struct int_tree* tree, const struct interval* q, uint16_t current_dim );
 
 /**
  * For debug only
  */
-void int_tree_check( const struct int_tree* tree );
+void int_tree_check( const struct int_tree* tree, uint16_t current_dim );
 
 /**
  * For debug only
  */
-void int_tree_dump( const struct int_tree* tree );
+void int_tree_dump( const struct int_tree* tree, uint16_t current_dim );
 
 /**
  * Removes the node containing interval |q| from the tree. If |q| is
@@ -115,6 +115,6 @@ void int_tree_dump( const struct int_tree* tree );
  * node containing |q| is deallocated; |q| itself is not altered in
  * any way.
  */
-void int_tree_delete( struct int_tree* tree, const struct interval* q );
+void int_tree_delete( struct int_tree* tree, const struct interval* q, uint16_t current_dim );
 
 #endif
