@@ -215,6 +215,24 @@ function configure {
       echo "Please insert an integer number."
     fi
   done
+  
+  #VALGRIND
+  while true; do
+    read -p "Do you want run your algorithms with valgrind command (slower then normal). Keep memory usage and plot graphics (yes/no):" yn
+    if [ "$yn" = "yes" ];
+    then
+      VALGRIND=$yn
+      echo "VALGRIND=$yn" >> $_CONFIGURATION_SHELL
+      break
+    elif [ -z "$yn" ] || [ "$yn" = "no" ];
+    then
+      VALGRIND="no"
+      echo "VALGRIND=$VALGRIND" >> $_CONFIGURATION_SHELL
+      break
+    else
+      echo "Please insert yes or no."
+    fi
+  done
 
   #Return to root
   cd ..
@@ -471,6 +489,7 @@ function plotresult {
     do
       #for each test folder
       cd $t
+	#TIME
 	#for each algorithm result file in test folder
 	touch tmp
 	echo -e 'Algorithm_Name\tExecution_Time' > tmp
@@ -494,29 +513,83 @@ function plotresult {
 	    let count+=1
 	  fi
 	done
-	let offset=-5/$count
-	#create output file graph
-	gnuplot <<- EOF
-	  set title "`echo $t`"
-	  set xlabel "Algorithm Name"
-	  set ylabel "Execution Time"
-	  set xtics rotate by 90 offset `echo $offset`, 1
-	  set ytics out nomirror
-	  set term png
-	  set output "result.png"
-	  set style fill solid border -1
-	  # Make the histogram boxes half the width of their slots.
-	  set boxwidth 0.5 relative
-	  set grid front
+	if [ $count != 0 ];
+	then
+	  let offset=-5/$count
+	  #create output file graph
+	  gnuplot <<- EOF
+	    set title "`echo $t`"
+	    set xlabel "Algorithm Name"
+	    set ylabel "Execution Time"
+	    set xtics rotate by 90 offset `echo $offset`, 1
+	    set ytics out nomirror
+	    set term png
+	    set output "result.png"
+	    set style fill solid border -1
+	    # Make the histogram boxes half the width of their slots.
+	    set boxwidth 0.5 relative
+	    set grid front
 
-	  # Select histogram mode.
-	  set style data histograms
-	  # Select a row-stacked histogram.
-	  set style histogram rowstacked
-	  plot "tmp" using 2:xticlabels(1) title 'Algorithm'
-	EOF
+	    # Select histogram mode.
+	    set style data histograms
+	    # Select a row-stacked histogram.
+	    set style histogram rowstacked
+	    plot "tmp" using 2:xticlabels(1) title 'Algorithm'
+		EOF
+	fi
 	rm -f tmp
 	mv result.png $graph/$t/result.png
+	
+	#MEMORY
+	#for each algorithm result file in test folder
+	touch tmp
+	echo -e 'Algorithm_Name\tMemory_Usage' > tmp
+	count=0
+	for a in `ls *.mem`
+	do
+	  #get the first value on text file 
+	  time_test=`head -n 1 $a`
+	  #if a value of executed time exists
+	  if [ ! -z "$time_test" ];
+	  then
+	    #take first character of all word in file name and create name with them
+	    IFS='_' read -a words <<< "$a"
+	    name=""
+	    for word in "${words[@]}"
+	    do
+	      firstchar=`echo $word | head -c 1`
+	      name="$name$firstchar"
+	    done
+	    echo -e "$name\t$time_test" >> tmp
+	    let count+=1
+	  fi
+	done
+	if [ $count != 0 ];
+	then
+	  let offset=-5/$count
+	  #create output file graph
+	  gnuplot <<- EOF
+	    set title "`echo $t`"
+	    set xlabel "Algorithm Name"
+	    set ylabel "Usage Memory (byte)"
+	    set xtics rotate by 90 offset `echo $offset`, 1
+	    set ytics out nomirror
+	    set term png
+	    set output "result_memory.png"
+	    set style fill solid border -1
+	    # Make the histogram boxes half the width of their slots.
+	    set boxwidth 0.5 relative
+	    set grid front
+
+	    # Select histogram mode.
+	    set style data histograms
+	    # Select a row-stacked histogram.
+	    set style histogram rowstacked
+	    plot "tmp" using 2:xticlabels(1) title 'Algorithm'
+		EOF
+	fi
+	rm -f tmp
+	mv result_memory.png $graph/$t/result_memory.png
       cd ..
     done
   

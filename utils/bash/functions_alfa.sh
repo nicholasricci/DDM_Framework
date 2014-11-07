@@ -85,6 +85,7 @@ function run_alfa_executable_sequential {
 	  EXTENTS=$START_EXTENTS
 	  filename="$1.txt"
 	  executed_filename="exec_time_$1_alfa_$ALFA.txt"
+	  executed_filename_memory="exec_memory_$1_alfa_${ALFA}_$_VALGRIND_FINAL_FILE"
 	  
 	  while [ $EXTENTS -le "$MAX_EXTENTS" ]
 	  do
@@ -93,21 +94,42 @@ function run_alfa_executable_sequential {
 		  for ((R=1; R<=$RUN; R++))
 		  do
 			  echo "running >$1< $EXTENTS/$ALFA:$R"
-			  ./$1 $2 $EXTENTS $DIMENSION $ALFA 
+			  
+			  #If VALGRIND VARIABLE IS USED RUN WITH DIFFERENT COMMAND
+			  if [ "$VALGRIND" = "yes" ];
+			  then
+			  
+			    valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $EXTENTS $DIMENSION $ALFA 
+			    ms_print $_VALGRIND_OUT_FILE > $_VALGRIND_OUT_FILE
+			    cat $_VALGRIND_OUT_FILE | tail -1 | awk '{print $3}'
+			  
+			  else
+			  
+			    ./$1 $2 $EXTENTS $DIMENSION $ALFA 
+			  
+			  fi
 		  done
 		  
+		  #average of time
 		  AVERAGE=`$AVERAGER $filename`
 		  echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
 		  
+		  #average of memory usage
+		  AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+		  echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
+		  
 		  filename_result="${1}_${EXTENTS}_${DIMENSION}_${ALFA}.txt"
+		  filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_OUT_FILE"
 		  
 		  mv $filename $RESULTS/$filename_result
+		  mv $executed_filename_memory $RESULTS/$filename_memory
 
 		  let EXTENTS+=$STEP_SIZE
 		  
 	  done
 
-	  mv $executed_filename $GRAPHS
+	  #mv $executed_filename $GRAPHS
+	  #mv $executed_filename_memory $GRAPHS
   done
 
 }
@@ -137,6 +159,7 @@ function run_alfa_executable_parallel {
 	    EXTENTS=$START_EXTENTS
 	    filename="$1.txt"
 	    executed_filename="exec_time_${1}_cores_${CORE}_alfa_${ALFA}.txt"
+	    executed_filename_memory="exec_memory_$1_alfa_${ALFA}_$_VALGRIND_FINAL_FILE"
 	    
 	    while [ $EXTENTS -le "$MAX_EXTENTS" ]
 	    do
@@ -145,21 +168,40 @@ function run_alfa_executable_parallel {
 		    for ((R=1; R<=$RUN; R++))
 		    do
 			    echo "running >$1< $EXTENTS/$ALFA:$R"
-			    ./$1 $2 $EXTENTS $DIMENSION $ALFA
+			    #If VALGRIND VARIABLE IS USED RUN WITH DIFFERENT COMMAND
+			    if [ "$VALGRIND" = "yes" ];
+			    then
+			    
+			      valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $EXTENTS $DIMENSION $ALFA 
+			      ms_print $_VALGRIND_OUT_FILE > $_VALGRIND_OUT_FILE
+			      cat $_VALGRIND_OUT_FILE | tail -1 | awk '{print $3}'
+			    
+			    else
+			    
+			      ./$1 $2 $EXTENTS $DIMENSION $ALFA
+			    
+			    fi
 		    done
 		    
 		    AVERAGE=`$AVERAGER $filename`
 		    echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
+		  
+		    #average of memory usage
+		    AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+		    echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
 		    
 		    filename_result="${1}_${EXTENTS}_${DIMENSION}_${CORE}_${ALFA}.txt"
+		    filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_OUT_FILE"
 		    
 		    mv $filename $RESULTS/$filename_result
+		    mv $executed_filename_memory $RESULTS/$filename_memory
 
 		    let EXTENTS+=$STEP_SIZE
 		    
 	    done
 
 	    mv $executed_filename $GRAPHS
+	    mv $executed_filename_memory $GRAPHS
     done
     
   done

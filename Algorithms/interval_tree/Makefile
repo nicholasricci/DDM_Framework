@@ -14,11 +14,11 @@ ALL: 			mkdirs release openmp
 mkdirs:		
 			mkdir -p $(BIN)
 
-release:		CFLAGS=-Wall -O3 -DNDEBUG -Wno-unknown-pragmas
+release:		CFLAGS=-Wall -O3 -DNDEBUG -Wno-unknown-pragmas -g
 release:		LDLIBS+=-lrt
 release:		$(SEQ)
 
-openmp:			CFLAGS=-Wall -O3 -DNDEBUG -fopenmp 
+openmp:			CFLAGS=-Wall -O3 -DNDEBUG -fopenmp -g
 openmp:			LDLIBS+=-lgomp
 openmp:			$(PAR)
 

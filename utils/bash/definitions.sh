@@ -21,3 +21,7 @@ _DDM_INSTANCE_MAKER="DDMInstanceMaker"
 #Shell Files
 _CONFIGURATION_SHELL="configure.sh"
 _CREATE_INSTANCES_DEFAULT="create_instances.sh"
+
+#Valgrind options
+_VALGRIND_OUT_FILE="massif.txt"
+_VALGRIND_FINAL_FILE="memoryusage.mem"

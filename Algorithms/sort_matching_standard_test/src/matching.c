@@ -24,7 +24,9 @@
 
 #include "../include/utils.h"
 #include "../include/error.h"
+#include "../include/DDM_input_output.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -45,7 +47,7 @@ This function performs the sort matching on a single dimension.
 \param size_update the number of update extents
 \param size_subscr the number of subscription extents
 */
-void sort_matching_1D(const list_ptr ep_list, const bitmatrix out, const bitvector subscr_set_before, const bitvector subscr_set_after, const _UINT size_update, const _UINT size_subscr)
+void sort_matching_1D(const list_ptr ep_list,  uint_fast8_t **out, uint_fast8_t *subscr_set_before, uint_fast8_t *subscr_set_after, const _UINT size_update, const _UINT size_subscr)
 {
 	_UINT i;
 	_UINT bit_pos;
@@ -124,7 +126,7 @@ This function performs all the operations needed to feed the data one dimension 
 
 \retval error code
 */
-_ERR_CODE sort_matching(const match_data_t data, const uint_fast8_t **out)
+_ERR_CODE sort_matching(const match_data_t data, uint_fast8_t **out)
 {
 	_UINT i;
 	_UINT list_size;
@@ -133,8 +135,8 @@ _ERR_CODE sort_matching(const match_data_t data, const uint_fast8_t **out)
 	list_ptr ep_list;
 	uint_fast8_t *subscr_set_before;
     uint_fast8_t *subscr_set_after;
-#ifndef __LOWMEM
 	uint_fast8_t **result_tmp;
+#ifndef __LOWMEM
 	_ERR_CODE err;
 #endif // __LOWMEM
 
@@ -148,14 +150,23 @@ _ERR_CODE sort_matching(const match_data_t data, const uint_fast8_t **out)
 		return set_error(err_too_many_dim, __FILE__, __FUNCTION__, __LINE__);
 
 #ifndef __LOWMEM
-	if (data.dimensions > 1)
+	/*if (data.dimensions > 1)
 	{
 		// if more than one dimension, a temporary bit matrix is needed to store the single dimensions results
 		err = create_bit_matrix(result_tmp, data.size_update, data.size_subscr);
 		if (err != err_none)
 			return err;
-	}
+	}*/
 #endif // __LOWMEM
+
+    if (data.dimensions > 1)
+	{
+		result_tmp = create_result_matrix(data.size_update, data.size_subscr);
+		if (result_tmp == NULL){
+            printf("\nError to create temporaneous result matrix\n");
+            exit(-1);
+		}
+	}
 
 	// two endpoints for each extent
 	list_size = (data.size_update + data.size_subscr) * 2;
@@ -193,6 +204,7 @@ _ERR_CODE sort_matching(const match_data_t data, const uint_fast8_t **out)
 			vector_bitwise_and(out[0], result_tmp[0], matrix_size);
 		}
 #endif // __LOWMEM
+        printf("\nd: %d, nmatches: %"PRIu64"\n", i, count_ones_matrix(out, data.size_update, data.size_subscr));
 	}
 
 #ifndef __NOFREE

@@ -49,24 +49,11 @@
 \brief File containing the main function.
 */
 
-int count_ones_matrix(uint_fast8_t **result, size_t updates, size_t subscriptions){
-    int count = 0;
-    size_t i, j;
-
-    for (i = 0; i < updates; ++i)
-        for (j = 0; j < subscriptions; ++j)
-            if (result[i][j] == 1)
-                count++;
-
-    return count;
-}
-
 /** \brief Main function.
 */
 int main(int argc, char *argv[])
 {
 	//bitmatrix result;
-	uint_fast8_t **matrix;
 	match_data_t data;
 	_INT extents;
 	_INT updates;
@@ -77,7 +64,6 @@ int main(int argc, char *argv[])
 #ifdef __TEST
 	//FILE *fout;
 	//char fname[FILE_NAME_SIZE];
-	DDM_Timer ddm_timer;
 	DDM_Input *ddm_input;
 	DDM_Extent *list_updates, *list_subscriptions;
 	int i, j/*, k*/;
@@ -93,6 +79,11 @@ int main(int argc, char *argv[])
 	}
 
 	ddm_input = DDM_Initialize_Input(argc, argv);
+
+    if (ddm_input == NULL){
+        printf("ddm_input isn't initialized");
+        exit(-1);
+    }
 
 	extents = (_INT)DDM_Get_Extents(*ddm_input);
 	if ( (extents <= 0) || (extents %2 != 0) )
@@ -166,22 +157,14 @@ int main(int argc, char *argv[])
 	  }
 	//}
 
-	//TEST
-    matrix = (uint_fast8_t **) malloc(sizeof(uint_fast8_t *) * data.size_update);
-    for (i = 0; i < data.size_update; ++i){
-        matrix[i] = (uint_fast8_t *) malloc(sizeof(uint_fast8_t) * data.size_subscr);
-    }
-
-    for (i = 0; i < data.size_update; ++i){
-        for (j = 0; j < data.size_subscr; ++j){
-            matrix[i][j] = 1;
-        }
-    }
+    //reset ddm_input->result_mat to one, so you can do the and operation between
+    //temp(init 0) and ddm_input->result_mat(init 1)
+    reset_mat(ddm_input->result_mat, data.size_update, data.size_subscr, one);
 
 
 #ifdef __TEST
 	// start test timer
-	DDM_Start_Timer(&ddm_timer);
+	DDM_Start_Timer(ddm_input);
 	//start = clock();
 #endif // __TEST
 
@@ -190,12 +173,12 @@ int main(int argc, char *argv[])
 		return (int)print_error_string();*/
 
 	// main algorithm
-	if (sort_matching(data, matrix) != err_none)
+	if (sort_matching(data, ddm_input->result_mat) != err_none)
 		return (int)print_error_string();
 
 #ifdef __TEST
 	// stop test timer
-	DDM_Stop_Timer(&ddm_timer);
+	DDM_Stop_Timer(ddm_input);
 	//end = clock();
 
 	// format output file name
@@ -218,11 +201,9 @@ int main(int argc, char *argv[])
 
 	fclose(fout);*/
 
-	//printf("\n%zu\n",count_one(result, data.size_update, data.size_subscr));
-	printf("\n%d\n", count_ones_matrix(matrix, data.size_update, data.size_subscr));
-	DDM_Write_Result(argv, DDM_Get_Total_Time(ddm_timer));
-	//printf("\n%d matches\n", num_matches(result, updates, subscrs));
-	//DDM_Write_Result(argv, ((float)(end - start)) / CLOCKS_PER_SEC);
+	DDM_Write_Result(*ddm_input);
+    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
+
     scanf("%d", &dimensions);
 
 #ifdef __DEBUG
