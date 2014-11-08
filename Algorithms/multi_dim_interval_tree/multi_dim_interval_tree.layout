@@ -6,19 +6,9 @@
 			<Cursor1 position="1422" topLine="4" />
 		</Cursor>
 	</File>
-	<File name="DDM_input_output.c" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="interval.c" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="12140" topLine="314" />
-		</Cursor>
-	</File>
-	<File name="DDM_input_output.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="9730" topLine="250" />
-		</Cursor>
-	</File>
-	<File name="main.c" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3032" topLine="70" />
+			<Cursor1 position="922" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="int_tree.c" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -31,9 +21,19 @@
 			<Cursor1 position="3727" topLine="83" />
 		</Cursor>
 	</File>
-	<File name="interval.c" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="main.c" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="922" topLine="0" />
+			<Cursor1 position="1434" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="DDM_input_output.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1131" topLine="15" />
+		</Cursor>
+	</File>
+	<File name="DDM_input_output.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="9829" topLine="231" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

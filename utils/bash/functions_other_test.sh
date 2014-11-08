@@ -56,6 +56,7 @@ function run_other_executable_sequential {
       temporaneous_variable=`cat "temp" | head -9 | tail -1 | awk '{print $1}'`
       echo "${temporaneous_variable//^}" > $_VALGRIND_OUT_FILE
       rm -f "temp"
+      
     else
 			    
       ./$1 $2 $3 $4 $5

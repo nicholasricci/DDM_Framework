@@ -100,8 +100,10 @@ function run_alfa_executable_sequential {
 			  then
 			  
 			    valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $EXTENTS $DIMENSION $ALFA 
-			    ms_print $_VALGRIND_OUT_FILE > $_VALGRIND_OUT_FILE
-			    cat $_VALGRIND_OUT_FILE | tail -1 | awk '{print $3}'
+			    ms_print $_VALGRIND_OUT_FILE > "temp"
+			    temporaneous_variable=`cat "temp" | head -9 | tail -1 | awk '{print $1}'`
+			    echo "${temporaneous_variable//^}" > $_VALGRIND_OUT_FILE
+			    rm -f "temp"
 			  
 			  else
 			  
@@ -119,7 +121,7 @@ function run_alfa_executable_sequential {
 		  echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
 		  
 		  filename_result="${1}_${EXTENTS}_${DIMENSION}_${ALFA}.txt"
-		  filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_OUT_FILE"
+		  filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_FINAL_FILE"
 		  
 		  mv $filename $RESULTS/$filename_result
 		  mv $executed_filename_memory $RESULTS/$filename_memory
@@ -173,8 +175,10 @@ function run_alfa_executable_parallel {
 			    then
 			    
 			      valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $EXTENTS $DIMENSION $ALFA 
-			      ms_print $_VALGRIND_OUT_FILE > $_VALGRIND_OUT_FILE
-			      cat $_VALGRIND_OUT_FILE | tail -1 | awk '{print $3}'
+			      ms_print $_VALGRIND_OUT_FILE > "temp"
+			      temporaneous_variable=`cat "temp" | head -9 | tail -1 | awk '{print $1}'`
+			      echo "${temporaneous_variable//^}" > $_VALGRIND_OUT_FILE
+			      rm -f "temp"
 			    
 			    else
 			    

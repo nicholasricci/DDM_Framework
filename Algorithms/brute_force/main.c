@@ -27,6 +27,36 @@ void bruteforce1D(uint_fast8_t **result, DDM_Extent *upds, uint64_t updates, DDM
     }
 }
 
+void write_test(DDM_Extent *upds, uint64_t updates, DDM_Extent *subs, uint64_t subscriptions, uint16_t dim){
+    FILE *f;
+    uint64_t i;
+    uint16_t j;
+    char test[1000];
+
+    f = fopen("test.txt", "w+");
+    sprintf(test, "#Subscriptions <id> <D1 edges> [<D2 edges>]...\n");
+    fprintf(f, test);
+    for (i = 0; i < subscriptions; ++i){
+        sprintf(test, "%"PRIu64"", subs[i].id);
+        for (j = 0; j < dim; ++j){
+            sprintf(test, "%s %"PRId64" %"PRId64"", test, subs[i].lower[j], subs[i].upper[j]);
+        }
+        sprintf(test, "%s\n", test);
+        fprintf(f, test);
+    }
+    sprintf(test, "#Updates <id> <D1 edges> [<D2 edges>]...\n");
+    fprintf(f, test);
+    for (i = 0; i < updates; ++i){
+        sprintf(test, "%"PRIu64"", upds[i].id);
+        for (j = 0; j < dim; ++j){
+            sprintf(test, "%s %"PRId64" %"PRId64"", test, upds[i].lower[j], upds[i].upper[j]);
+        }
+        sprintf(test, "%s\n", test);
+        fprintf(f, test);
+    }
+    fclose(f);
+}
+
 int main(int argc, char *argv[])
 {
     uint64_t updates, subscriptions;
@@ -54,6 +84,8 @@ int main(int argc, char *argv[])
     dimensions = DDM_Get_Dimensions(*ddm_input);
     list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
     list_updates = DDM_Get_Updates_List(*ddm_input);
+
+    write_test(list_updates, updates, list_subscriptions, subscriptions, dimensions);
 
     //create temporaneous matrix
     temp = create_result_matrix(updates, subscriptions);

@@ -499,7 +499,7 @@ function plotresult {
 	  #get the first value on text file 
 	  time_test=`head -n 1 $a`
 	  #if a value of executed time exists
-	  if [ ! -z $time_test ];
+	  if [ ! -z "$time_test" ];
 	  then
 	    #take first character of all word in file name and create name with them
 	    IFS='_' read -a words <<< "$a"

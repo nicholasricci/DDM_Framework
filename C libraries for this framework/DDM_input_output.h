@@ -59,8 +59,8 @@ typedef struct DDM_Timer{
 /** \brief structure for an extent */
 typedef struct DDM_Extent{
   uint64_t id;
-  double lower[MAX_DIMENSIONS];
-  double upper[MAX_DIMENSIONS];
+  int64_t lower[MAX_DIMENSIONS];
+  int64_t upper[MAX_DIMENSIONS];
 }DDM_Extent;
 
 /** \brief structure for manage input in algorithm */
