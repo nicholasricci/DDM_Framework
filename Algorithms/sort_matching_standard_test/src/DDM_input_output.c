@@ -56,26 +56,26 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
                 //printf("\nFile %s exists!\n", TEST_INPUT);
                 ddm_input->list_subscriptions = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->subscriptions);
                 ddm_input->list_updates = (DDM_Extent *) malloc(sizeof(DDM_Extent) * ddm_input->updates);
-                fgets(line, sizeof line, file_input);
+                fgets(line, LINE_MAX_LENGTH, file_input);
                 for (i = 0; i < ddm_input->subscriptions; ++i){
-                    fgets(line, sizeof line, file_input);
-                    sscanf(line, "%zu%n", &(ddm_input->list_subscriptions[i].id), &nchar);
+                    fgets(line, LINE_MAX_LENGTH, file_input);
+                    sscanf(line, "%"PRIu64"%n", &(ddm_input->list_subscriptions[i].id), &nchar);
                     addr_line = line + nchar;
                     for (j = 0; j < ddm_input->dimensions; ++j){
-                        sscanf(addr_line, " %lf %lf %n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
-                        addr_line = line + nchar;
+                        sscanf(addr_line, " %"PRId64" %"PRId64"%n", &(ddm_input->list_subscriptions[i].lower[j]), &(ddm_input->list_subscriptions[i].upper[j]), &nchar);
+                        addr_line += nchar;
                     }
                     //printf("%zu\n", ddm_input->list_subscriptions[i].id);
                 }
 
-                fgets(line, sizeof line, file_input);
+                fgets(line, LINE_MAX_LENGTH, file_input);
                 for (i = 0; i < ddm_input->updates; ++i){
-                    fgets(line, sizeof line, file_input);
-                    sscanf(line, "%zu%n", &(ddm_input->list_updates[i].id), &nchar);
+                    fgets(line, LINE_MAX_LENGTH, file_input);
+                    sscanf(line, "%"PRIu64"%n", &(ddm_input->list_updates[i].id), &nchar);
                     addr_line = line + nchar;
                     for (j = 0; j < ddm_input->dimensions; ++j){
-                        sscanf(addr_line, " %lf %lf %n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
-                        addr_line = line + nchar;
+                        sscanf(addr_line, " %"PRId64" %"PRId64"%n", &(ddm_input->list_updates[i].lower[j]), &(ddm_input->list_updates[i].upper[j]), &nchar);
+                        addr_line += nchar;
                     }
                 }
 
@@ -264,17 +264,17 @@ void print_list_updates_and_subscriptions(DDM_Input ddm_input){
 
   printf("subscriptions\n");
   for (i = 0; i < ddm_input.subscriptions; ++i){
-      sprintf(test, "%zu ", ddm_input.list_subscriptions[i].id);
+      sprintf(test, "%"PRIu64"", ddm_input.list_subscriptions[i].id);
       for (j = 0; j < ddm_input.dimensions; ++j){
-	  sprintf(test, "%s %lf %lf ", test, ddm_input.list_subscriptions[i].lower[j], ddm_input.list_subscriptions[i].upper[j]);
+	  sprintf(test, "%s %"PRId64" %"PRId64"", test, ddm_input.list_subscriptions[i].lower[j], ddm_input.list_subscriptions[i].upper[j]);
       }
       printf("%s\n", test);
   }
   printf("\nupdates\n");
   for (i = 0; i < ddm_input.updates; ++i){
-      sprintf(test, "%zu ", ddm_input.list_updates[i].id);
+      sprintf(test, "%"PRIu64"", ddm_input.list_updates[i].id);
       for (j = 0; j < ddm_input.dimensions; ++j){
-	  sprintf(test, "%s %lf %lf ", test, ddm_input.list_updates[i].lower[j], ddm_input.list_updates[i].upper[j]);
+	  sprintf(test, "%s %"PRId64" %"PRId64"", test, ddm_input.list_updates[i].lower[j], ddm_input.list_updates[i].upper[j]);
       }
       printf("%s\n", test);
   }

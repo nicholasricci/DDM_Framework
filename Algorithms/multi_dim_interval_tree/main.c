@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     list_updates = DDM_Get_Updates_List(*ddm_input);
 
 
-    write_test(list_updates, updates, list_subscriptions, subscriptions, dimensions);
+    //write_test(list_updates, updates, list_subscriptions, subscriptions, dimensions);
 
     subs = (struct interval *) malloc(sizeof(struct interval) * subscriptions);
     upds = (struct interval *) malloc(sizeof(struct interval) * updates);
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
         //Execute Algorithm Here
         count = ddm_matching(temp, subs, subscriptions, upds, updates, k);
 
-        printf("\nd: %d, nmatches: %"PRIu64"\n", k, count_ones_matrix(temp, updates, subscriptions));
+        //printf("\nd: %d, nmatches: %"PRIu64"\n", k, count_ones_matrix(temp, updates, subscriptions));
 
         //Intersect temp matrix and ddm_input->result_mat and store result in ddm_input->result_mat
         DDM_And_Operation_Between_Matrices(ddm_input, temp, updates, subscriptions);
@@ -138,10 +138,12 @@ int main(int argc, char *argv[])
 
     DDM_Stop_Timer(ddm_input);
 
+    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
+
     //Write result
+    printf("\nWriting matrix result on a file\n");
     DDM_Write_Result(*ddm_input);
 
-    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
 
     return 0;
 }

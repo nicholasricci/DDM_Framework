@@ -349,3 +349,7 @@ uint64_t count_ones_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscr
 
     return count;
 }
+
+void set_value_mat_as_AND(uint_fast8_t **mat, uint64_t update, uint64_t subscription, mat_value value){
+    mat[update][subscription] = mat[update][subscription] * (value == zero) ? 0 : 1;
+}

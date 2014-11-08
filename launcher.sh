@@ -520,7 +520,7 @@ function plotresult {
 	  gnuplot <<- EOF
 	    set title "`echo $t`"
 	    set xlabel "Algorithm Name"
-	    set ylabel "Execution Time"
+	    set ylabel "Execution Time (s)"
 	    set xtics rotate by 90 offset `echo $offset`, 1
 	    set ytics out nomirror
 	    set term png
@@ -571,7 +571,7 @@ function plotresult {
 	  gnuplot <<- EOF
 	    set title "`echo $t`"
 	    set xlabel "Algorithm Name"
-	    set ylabel "Usage Memory (byte)"
+	    set ylabel "Usage Memory (MB)"
 	    set xtics rotate by 90 offset `echo $offset`, 1
 	    set ytics out nomirror
 	    set term png

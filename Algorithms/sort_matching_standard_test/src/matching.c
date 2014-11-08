@@ -24,9 +24,7 @@
 
 #include "../include/utils.h"
 #include "../include/error.h"
-#include "../include/DDM_input_output.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -47,7 +45,7 @@ This function performs the sort matching on a single dimension.
 \param size_update the number of update extents
 \param size_subscr the number of subscription extents
 */
-void sort_matching_1D(const list_ptr ep_list,  uint_fast8_t **out, uint_fast8_t *subscr_set_before, uint_fast8_t *subscr_set_after, const _UINT size_update, const _UINT size_subscr)
+void sort_matching_1D(const list_ptr ep_list, const bitmatrix out, const bitvector subscr_set_before, const bitvector subscr_set_after, const _UINT size_update, const _UINT size_subscr)
 {
 	_UINT i;
 	_UINT bit_pos;
@@ -79,7 +77,7 @@ void sort_matching_1D(const list_ptr ep_list,  uint_fast8_t **out, uint_fast8_t 
 		{
 			// calculate the element in the bit vector that contains the bit
 			bit_pos = BIT_TO_POS(ep_list[i].id);
-
+			
 			// if it's the lower endpoint
 			if (ep_list[i].is_lower_point)
 			{
@@ -126,21 +124,21 @@ This function performs all the operations needed to feed the data one dimension 
 
 \retval error code
 */
-_ERR_CODE sort_matching(const match_data_t data, uint_fast8_t **out)
+_ERR_CODE sort_matching(const match_data_t data, const bitmatrix out)
 {
 	_UINT i;
 	_UINT list_size;
 	_UINT line_width;
 	_UINT matrix_size;
 	list_ptr ep_list;
-	uint_fast8_t *subscr_set_before;
-    uint_fast8_t *subscr_set_after;
-	uint_fast8_t **result_tmp;
+	bitvector subscr_set_before;
+	bitvector subscr_set_after;
 #ifndef __LOWMEM
+	bitmatrix result_tmp;
 	_ERR_CODE err;
 #endif // __LOWMEM
 
-	line_width = data.size_subscr;
+	line_width = BIT_VEC_WIDTH(data.size_subscr);
 	matrix_size = data.size_update * line_width;
 
 	if (data.dimensions < 1)
@@ -150,37 +148,28 @@ _ERR_CODE sort_matching(const match_data_t data, uint_fast8_t **out)
 		return set_error(err_too_many_dim, __FILE__, __FUNCTION__, __LINE__);
 
 #ifndef __LOWMEM
-	/*if (data.dimensions > 1)
+	if (data.dimensions > 1)
 	{
 		// if more than one dimension, a temporary bit matrix is needed to store the single dimensions results
-		err = create_bit_matrix(result_tmp, data.size_update, data.size_subscr);
+		err = create_bit_matrix(&result_tmp, data.size_update, data.size_subscr);
 		if (err != err_none)
 			return err;
-	}*/
-#endif // __LOWMEM
-
-    if (data.dimensions > 1)
-	{
-		result_tmp = create_result_matrix(data.size_update, data.size_subscr);
-		if (result_tmp == NULL){
-            printf("\nError to create temporaneous result matrix\n");
-            exit(-1);
-		}
 	}
+#endif // __LOWMEM
 
 	// two endpoints for each extent
 	list_size = (data.size_update + data.size_subscr) * 2;
 
 	// allocate the "list"
 	ep_list = (list_ptr)malloc(list_size * sizeof(list_t));
-
+	
 	// allocate the two subscription extents sets
-	subscr_set_before = (uint_fast8_t *)malloc(line_width * sizeof(uint_fast8_t));
-	subscr_set_after = (uint_fast8_t *)malloc(line_width * sizeof(uint_fast8_t));
-
+	subscr_set_before = (bitvector)malloc(line_width * sizeof(bitvec_elem));
+	subscr_set_after = (bitvector)malloc(line_width * sizeof(bitvec_elem));
+	
 	if (ep_list == NULL || subscr_set_before == NULL || subscr_set_after == NULL)
 		return set_error(err_alloc, __FILE__, __FUNCTION__, __LINE__);
-
+	
 	// for each dimension
 	for (i = 0; i < data.dimensions; i++)
 	{
@@ -196,7 +185,7 @@ _ERR_CODE sort_matching(const match_data_t data, uint_fast8_t **out)
 		// bitwise NOT of the non-matching table to obtain the matching table
 		// directly on matrix 'out' for the first dimension, following times on 'result_tmp'
 		vector_bitwise_not((i > 0) ? result_tmp[0] : out[0], matrix_size);
-
+			
 		// if it's not the first dimension
 		if (i > 0)
 		{
@@ -204,7 +193,6 @@ _ERR_CODE sort_matching(const match_data_t data, uint_fast8_t **out)
 			vector_bitwise_and(out[0], result_tmp[0], matrix_size);
 		}
 #endif // __LOWMEM
-        printf("\nd: %d, nmatches: %"PRIu64"\n", i, count_ones_matrix(out, data.size_update, data.size_subscr));
 	}
 
 #ifndef __NOFREE
@@ -222,6 +210,6 @@ _ERR_CODE sort_matching(const match_data_t data, uint_fast8_t **out)
 	// bitwise NOT of the non-matching table to obtain the matching table
 	vector_bitwise_not(out[0], matrix_size);
 #endif // __LOWMEM
-
+	
 	return err_none;
 }

@@ -40,28 +40,28 @@
 
 \retval error code
 */
-_ERR_CODE create_bit_matrix(uint_fast8_t **out, const _UINT size_update, const _UINT size_subscr)
+_ERR_CODE create_bit_matrix(bitmatrix *out, const _UINT size_update, const _UINT size_subscr)
 {
 	_UINT i;
-	uint_fast8_t *vec;
+	bitvector vec;
 	_UINT line_width;
 
 	// number of elements on each line of the bit matrix
-	line_width = size_subscr;
+	line_width = BIT_VEC_WIDTH(size_subscr);
 
 	// allocate one big vector and a column vector
 #ifdef __LOWMEM
-	vec = (uint_fast8_t *)calloc(line_width * size_update, sizeof(uint_fast8_t));
+	vec = (bitvector)calloc(line_width * size_update, sizeof(bitvec_elem));
 #else // __LOWMEM
-	vec = (uint_fast8_t *)malloc(line_width * size_update * sizeof(uint_fast8_t));
+	vec = (bitvector)malloc(line_width * size_update * sizeof(bitvec_elem));
 #endif // __LOWMEM
-	out = (uint_fast8_t **)malloc(size_update * sizeof(uint_fast8_t *));
-	if (vec == NULL || out == NULL)
+	*out = (bitmatrix)malloc(size_update * sizeof(bitvector));
+	if (vec == NULL || *out == NULL)
 		return set_error(err_alloc, __FILE__, __FUNCTION__, __LINE__);
 
 	// set each element of the column vector to point to the first element of each line in the big vector
 	for (i = 0; i < size_update; i++)
-		out[i] = &vec[i * line_width];
+		(*out)[i] = &vec[i * line_width];
 
 	return err_none;
 }
@@ -74,12 +74,12 @@ It can also be used to do the bitwise NOT of the matrix, since it's allocated as
 \param mat bit vector to be inverted
 \param size number of elements of the bit vector
 */
-void vector_bitwise_not(uint_fast8_t *vec, const _UINT size)
+void vector_bitwise_not(const bitvector vec, const _UINT size)
 {
 	_UINT i;
 
 	for (i = 0; i < size; i++)
-        vec[i] = (vec[i] == 1) ? 0 : 1;
+		vec[i] = ~vec[i];
 }
 
 
@@ -91,12 +91,12 @@ It can also be used to do the bitwise AND of the matrix, since it's allocated as
 \param mask second vector
 \param size number of elements in the bit vectors
 */
-void vector_bitwise_and( uint_fast8_t *result,  uint_fast8_t *mask, const _UINT size)
+void vector_bitwise_and(const bitvector result, const bitvector mask, const _UINT size)
 {
 	_UINT i;
 
 	for (i = 0; i < size; i++)
-        result[i] *= mask[i];
+		result[i] &= mask[i];
 }
 
 
@@ -108,12 +108,12 @@ It can also be used to do the bitwise OR of the matrix, since it's allocated as 
 \param mask second vector
 \param size number of elements in the bit vectors
 */
-void vector_bitwise_or( uint_fast8_t *result,  uint_fast8_t *mask, const _UINT size)
+void vector_bitwise_or(const bitvector result, const bitvector mask, const _UINT size)
 {
 	_UINT i;
 
 	for (i = 0; i < size; i++)
-        result[i] = (result[i] == mask[i]) ? mask[i] : 1;
+		result[i] |= mask[i];
 }
 
 
@@ -216,6 +216,7 @@ INLINE void sort_list(const list_ptr ep_list, const _UINT size)
 	qsort(ep_list, size, sizeof(list_t), compare_endpoints);
 }
 
+
 #ifdef __VERBOSE
 /** \brief Printing function.
 
@@ -233,7 +234,6 @@ void print_bitmatrix(const bitmatrix in, const _UINT size_update, const _UINT si
 	bitvec_elem val;
 	bitvec_elem mask;
 	_UINT line_width;
-	size_t nmatch = 0;
 
 	// number of elements on each line of the bit matrix
 	line_width = BIT_VEC_WIDTH(size_subscr);

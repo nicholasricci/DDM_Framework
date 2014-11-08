@@ -23,7 +23,6 @@
 #ifndef __UTILS_H
 #define __UTILS_H
 
-#include <stdlib.h>
 
 /** \file utils.h
 \brief Header of the file utils.c
@@ -34,9 +33,9 @@ The file utils.c contains various utilities functions.
 
 _ERR_CODE create_bit_matrix(bitmatrix *out, const _UINT size_update, const _UINT size_subscr);
 
-void vector_bitwise_not(uint_fast8_t *vec, const _UINT size);
-void vector_bitwise_and(uint_fast8_t *result, uint_fast8_t *mask, const _UINT size);
-void vector_bitwise_or(uint_fast8_t *result, uint_fast8_t *mask, const _UINT size);
+void vector_bitwise_not(const bitvector vec, const _UINT size);
+void vector_bitwise_and(const bitvector result, const bitvector mask, const _UINT size);
+void vector_bitwise_or(const bitvector result, const bitvector mask, const _UINT size);
 
 void set_endpoints_list(const match_data_t data, const list_ptr out, const _UINT dimension);
 

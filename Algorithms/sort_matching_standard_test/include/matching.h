@@ -30,9 +30,9 @@
 The file matching.c contains the main matching algorithm functions.
 */
 
-_ERR_CODE sort_matching(const match_data_t data, uint_fast8_t **out);
-void sort_matching_1D(const list_ptr ep_list, uint_fast8_t **out, uint_fast8_t *subscr_set_before, uint_fast8_t *subscr_set_after, const _UINT size_update, const _UINT size_subscr);
 
+_ERR_CODE sort_matching(const match_data_t data, const bitmatrix out);
+void sort_matching_1D(const list_ptr ep_list, const bitmatrix out, const bitvector subscr_set_before, const bitvector subscr_set_after, const _UINT size_update, const _UINT size_subscr);
 
 
 #endif // __MATCHING_H

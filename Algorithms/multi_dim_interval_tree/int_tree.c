@@ -189,14 +189,14 @@ static struct int_node* int_node_balance( struct int_node* n, uint16_t current_d
  * lower bound; ties are broken by considering also the upper
  * bound.
  */
-static int int_compare( const struct interval* x, const struct interval* y )
+static int int_compare( const struct interval* x, const struct interval* y, uint16_t current_dim )
 {
     if ( x == y ) return 0;
 
-    if ( x->lower != y->lower)
-	return SGN(x->lower - y->lower);
+    if ( x->lower[current_dim] != y->lower[current_dim])
+	return SGN(x->lower[current_dim] - y->lower[current_dim]);
     else
-	return SGN(x->upper - y->upper);
+	return SGN(x->upper[current_dim] - y->upper[current_dim]);
 }
 
 void int_tree_init( struct int_tree* tree )
@@ -231,7 +231,7 @@ size_t int_tree_size( const struct int_tree* tree )
     return tree->size;
 }
 
-static struct int_node* int_tree_insert_rec( struct int_node* n, const struct interval* interv, size_t current_dim )
+static struct int_node* int_tree_insert_rec( struct int_node* n, const struct interval* interv, uint16_t current_dim )
 {
     struct int_node* new_node = n;
     if ( n == NULL ) {
@@ -244,7 +244,7 @@ static struct int_node* int_tree_insert_rec( struct int_node* n, const struct in
         new_node->min_lower = interv->lower[current_dim];
         new_node->height = new_node->unbalance = 0;
     } else {
-	if ( int_compare( interv, n->in ) < 0 )
+	if ( int_compare( interv, n->in, current_dim ) < 0 )
 	    new_node->left = int_tree_insert_rec( new_node->left, interv, current_dim );
 	else
 	    new_node->right = int_tree_insert_rec( new_node->right, interv, current_dim );
@@ -268,11 +268,11 @@ void int_tree_insert( struct int_tree* tree, const struct interval* q, size_t cu
 
 /* returns a pointer to the node containing interval |q|; if not
    present, return NULL */
-struct int_node* int_tree_find( struct int_tree* tree, const struct interval* q )
+struct int_node* int_tree_find( struct int_tree* tree, const struct interval* q, uint16_t current_dim )
 {
     struct int_node* new_node = tree->root;
-    while ( new_node && int_compare(new_node->in, q ) ) {
-	if ( int_compare(q, new_node->in ) > 0 )
+    while ( new_node && int_compare(new_node->in, q, current_dim ) ) {
+	if ( int_compare(q, new_node->in, current_dim ) > 0 )
 	    new_node = new_node->right;
 	else
 	    new_node = new_node->left;
@@ -290,7 +290,7 @@ static struct int_node* int_tree_delete_rec( struct int_node* n, const struct in
 	return n;
 
     struct int_node* new_node = n;
-    int c = int_compare( q, n->in );
+    int c = int_compare( q, n->in, current_dim );
     switch(c) {
     case 0:
 	*found = 1;
@@ -341,12 +341,6 @@ void int_tree_delete( struct int_tree* tree, const struct interval* interv, uint
     if ( found ) tree->size--;
 }
 
-int set_result(uint_fast8_t **result, const struct interval* x, const struct interval* q){
-
-    result[x->id][q->id] = 1;
-    return 0;
-}
-
 static size_t find_intersect_rec( uint_fast8_t **result_matrix, const struct int_node* n, const struct interval* q, uint16_t current_dim )
 {
     if ( ! n )
@@ -361,11 +355,11 @@ static size_t find_intersect_rec( uint_fast8_t **result_matrix, const struct int
     size_t result = find_intersect_rec( result_matrix, n->left, q, current_dim );
 
     if ( intersect( n->in, q, current_dim ) ) {
-	result++;
-	if ( set_result(result_matrix, q, n->in) ) return result;
+        result++;
+        set_value_mat(result_matrix, q->id, n->in->id, one);
     }
 
-    if ( q->upper > n->in->lower )
+    if ( q->upper[current_dim] > n->in->lower[current_dim] )
 	result += find_intersect_rec( result_matrix, n->right, q, current_dim );
 
     return result;

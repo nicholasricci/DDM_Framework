@@ -282,4 +282,13 @@ void print_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscriptions);
  */
 uint64_t count_ones_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscriptions);
 
+/**
+ *  \brief set value of matrix cell with zero or one as and operation between value existent in row update and column subscription
+ *  \param mat: matrix variable
+ *  \param update: row to set
+ *  \param subscription: column to set
+ *  \param value: value to set, zero or one
+ */
+void set_value_mat_as_AND(uint_fast8_t **mat, uint64_t update, uint64_t subscription, mat_value value);
+
 #endif

@@ -39,7 +39,7 @@
 /** \mainpage
 \author Marco Mandrioli
 
-\section Intro1 Introduction
+\section Intro1 Introdction
 
 \section Intro2 Version
 */
@@ -49,131 +49,90 @@
 \brief File containing the main function.
 */
 
+
 /** \brief Main function.
 */
 int main(int argc, char *argv[])
 {
-	//bitmatrix result;
+	bitmatrix result;
 	match_data_t data;
-	_INT extents;
-	_INT updates;
-	_INT subscrs;
-	_INT dimensions;
-
-	//float alfa;
+	float alfa;
 #ifdef __TEST
-	//FILE *fout;
-	//char fname[FILE_NAME_SIZE];
-	DDM_Input *ddm_input;
-	DDM_Extent *list_updates, *list_subscriptions;
-	int i, j/*, k*/;
-	//clock_t start, end;
+	FILE *fout;
+	char fname[FILE_NAME_SIZE];
+	clock_t start, end;
 #endif // __TEST
+	uint64_t updates, subscriptions;
+    uint16_t dimensions;
+    DDM_Extent *list_updates, *list_subscriptions;
 
-	if ((argc == 2 && strcmp(argv[1], "--help") == 0) || argc != 5)
+	//Indexes
+    uint16_t k;
+    uint64_t i;
+    
+    //DDM's variables
+    DDM_Input *ddm_input;
+
+	//Initialize variable of DDM
+    ddm_input = DDM_Initialize_Input(argc, argv);
+
+    //Check if the initialization of input was succesfully
+    if (ddm_input == NULL)
+        exit(-1);
+
+	if ((argc == 2 && strcmp(argv[1], "--help") == 0))
 	{
 		printf("\nSYNOPSIS:\n\n");
 		printf("%s <extents> <dimensions> <alfa>\n\n", FILENAME(argv[0]));
-
+		
 		return (int)err_none;
 	}
 
-	ddm_input = DDM_Initialize_Input(argc, argv);
+	updates = DDM_Get_Updates(*ddm_input);
+	subscriptions = DDM_Get_Subscriptions(*ddm_input);
+    dimensions = DDM_Get_Dimensions(*ddm_input);
+    list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
+    list_updates = DDM_Get_Updates_List(*ddm_input);
+    alfa = DDM_Get_Alfa(*ddm_input);
+	
+#ifdef __RANDOM_SET
+	// generate a random data set
+	if (test_generator_random(&data, updates, subscriptions, dimensions, alfa) != err_none)
+#else // __RANDOM_SET
+	// generate a fixed data set
+	if (test_generator(&data, updates, subscrs, dimensions) != err_none)
+#endif // __RANDOM_SET
+		return (int)print_error_string();
 
-    if (ddm_input == NULL){
-        printf("ddm_input isn't initialized");
-        exit(-1);
-    }
+	data.size_update = updates;
+	data.size_subscr = subscriptions;
+	data.dimensions = dimensions;
 
-	extents = (_INT)DDM_Get_Extents(*ddm_input);
-	if ( (extents <= 0) || (extents %2 != 0) )
-		printf("\nNot a valid number of update extents.\n");
-
-	updates = (_INT) DDM_Get_Updates(*ddm_input);
-	subscrs = (_INT) DDM_Get_Subscriptions(*ddm_input);
-	/*
-	updates = (_INT) extents/2;
-	subscrs = updates;
-	*/
-
-	dimensions = (_INT) DDM_Get_Dimensions(*ddm_input);
-	if (dimensions <= 0)
-	  printf("\nNot a valid number of dimensions.\n");
-
-	/*if (DDM_Is_Alfa_Test(*ddm_input)){
-
-	  //Alfa Test
-	  alfa = DDM_Get_Alfa(*ddm_input);
-	  if (alfa <= 0)
-		  printf("\nNot a valid alfa parameter.\n");
-
-	  if (extents <= 0 || dimensions <= 0 || alfa <= 0 || (extents %2 != 0))
-	  {
-		  set_error(err_invalid_input, __FILE__, __FUNCTION__, __LINE__);
-		  return (int)print_error_string();
-	  }
-
-  #ifdef __RANDOM_SET
-	  // generate a random data set
-	  if (test_generator_random(&data, updates, subscrs, dimensions, alfa) != err_none)
-  #else // __RANDOM_SET
-	  // generate a fixed data set
-	  if (test_generator(&data, updates, subscrs, dimensions) != err_none)
-  #endif // __RANDOM_SET
-		  return (int)print_error_string();
-
-	}else{
-	  //Other Kind of Test */
-	  list_updates = DDM_Get_Updates_List(*ddm_input);
-	  list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
-
-	  /*for (i = 0; i < updates; i++)
-	      for (k = 0; k < dimensions; k++)
-		  printf("upds: id: %zu, lower[%zu]: %lf, upper[%zu]: %lf\n", list_updates[i].id, k, list_updates[i].lower[k], k, list_updates[i].upper[k]);
-	  for (i = 0; i < subscrs; i++)
-	      for (k = 0; k < dimensions; k++)
-		  printf("subs: id: %zu, lower[%zu]: %lf, upper[%zu]: %lf\n", list_subscriptions[i].id, k, list_subscriptions[i].lower[k], k, list_subscriptions[i].upper[k]);
-	  printf("\n");*/
-
-	  data.dimensions = dimensions;
-	  data.size_update = updates;
-	  data.size_subscr = subscrs;
-	  data.update = (extent_t *)malloc(updates * sizeof(extent_t));
-	  data.subscr = (extent_t *)malloc(subscrs * sizeof(extent_t));
-
-	  for (i = 0; i < subscrs; i++){
-	    data.subscr[i].id = list_subscriptions[i].id;
-	    for (j = 0; j < dimensions; j++){
-	      data.subscr[i].endpoints[j].lower = list_subscriptions[i].lower[j];
-	      data.subscr[i].endpoints[j].upper = list_subscriptions[i].upper[j];
-	    }
-	  }
-	  for (i = 0; i < updates; i++){
-	    data.update[i].id = list_updates[i].id;
-	    for (j = 0; j < dimensions; j++){
-	      data.update[i].endpoints[j].lower = list_updates[i].lower[j];
-	      data.update[i].endpoints[j].upper = list_updates[i].lower[j];
-	    }
-	  }
-	//}
-
-    //reset ddm_input->result_mat to one, so you can do the and operation between
-    //temp(init 0) and ddm_input->result_mat(init 1)
-    reset_mat(ddm_input->result_mat, data.size_update, data.size_subscr, one);
-
+	for (k = 0; k < dimensions; ++k){
+		for (i = 0; i < updates; ++i){
+			data.update[i].id = list_updates[i].id;
+			data.update[i].endpoints[k].lower = list_updates[i].lower[k];
+			data.update[i].endpoints[k].upper = list_updates[i].upper[k];
+		}
+		for (i = 0; i < subscriptions; ++i){
+			data.subscr[i].id = list_subscriptions[i].id;
+			data.subscr[i].endpoints[k].lower = list_subscriptions[i].lower[k];
+			data.subscr[i].endpoints[k].upper = list_subscriptions[i].upper[k];
+		}
+	}
 
 #ifdef __TEST
 	// start test timer
-	DDM_Start_Timer(ddm_input);
 	//start = clock();
+	DDM_Start_Timer(ddm_input);
 #endif // __TEST
 
 	// allocate the result bit matrix
-	/*if (create_bit_matrix(&result, data.size_update, data.size_subscr) != err_none)
-		return (int)print_error_string();*/
+	if (create_bit_matrix(&result, data.size_update, data.size_subscr) != err_none)
+		return (int)print_error_string();
 
 	// main algorithm
-	if (sort_matching(data, ddm_input->result_mat) != err_none)
+	if (sort_matching(data, result) != err_none)
 		return (int)print_error_string();
 
 #ifdef __TEST
@@ -181,30 +140,7 @@ int main(int argc, char *argv[])
 	DDM_Stop_Timer(ddm_input);
 	//end = clock();
 
-	// format output file name
-	/*if (sprintf(fname, "%s_%d_%d_%2.3f.txt", FILENAME(argv[0]), updates + subscrs, dimensions, alfa) < 0)
-	{
-		set_error(err_file, __FILE__, __FUNCTION__, __LINE__);
-		return (int)print_error_string();
-	}*/
-
-	// open file
-	/*fout = fopen(fname, "a+");
-	if (fout == NULL)
-	{
-		set_error(err_file, __FILE__, __FUNCTION__, __LINE__);
-		return (int)print_error_string();
-	}
-
-	// print output to file
-	fprintf(fout, "%f\n", ((float)(end - start)) / CLOCKS_PER_SEC);
-
-	fclose(fout);*/
-
 	DDM_Write_Result(*ddm_input);
-    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
-
-    scanf("%d", &dimensions);
 
 #ifdef __DEBUG
 	getchar();

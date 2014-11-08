@@ -21,7 +21,9 @@ void bruteforce1D(uint_fast8_t **result, DDM_Extent *upds, uint64_t updates, DDM
                 (subs[j].lower[current_dim] <= upds[i].upper[current_dim]
                 && upds[i].upper[current_dim] <= subs[j].upper[current_dim])
                 ){
-                set_value_mat(result, i, j, one);
+                continue;
+            }else{
+                set_value_mat(result, i, j, zero);
             }
         }
     }
@@ -69,9 +71,6 @@ int main(int argc, char *argv[])
     //Indexes
     uint16_t k;
 
-    //temporaneous result matrix
-    uint_fast8_t **temp;
-
     //Initialize variable of DDM
     ddm_input = DDM_Initialize_Input(argc, argv);
 
@@ -85,10 +84,8 @@ int main(int argc, char *argv[])
     list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
     list_updates = DDM_Get_Updates_List(*ddm_input);
 
-    write_test(list_updates, updates, list_subscriptions, subscriptions, dimensions);
+    //write_test(list_updates, updates, list_subscriptions, subscriptions, dimensions);
 
-    //create temporaneous matrix
-    temp = create_result_matrix(updates, subscriptions);
     //reset ddm_input->result_mat to one, so you can do the and operation between
     //temp(init 0) and ddm_input->result_mat(init 1)
     reset_mat(ddm_input->result_mat, updates, subscriptions, one);
@@ -96,26 +93,21 @@ int main(int argc, char *argv[])
     DDM_Start_Timer(ddm_input);
 
     for (k = 0; k < dimensions; ++k){
-        //each time execute different dimension
-        //reset the temp matrix
-        reset_mat(temp, updates, subscriptions, zero);
 
         //Execute Algorithm Here
         //BruteForce
-        bruteforce1D(temp, list_updates, updates, list_subscriptions, subscriptions, k);
+        bruteforce1D(ddm_input->result_mat, list_updates, updates, list_subscriptions, subscriptions, k);
 
-        printf("\nd: %d, nmatches: %"PRIu64"\n", k, count_ones_matrix(temp, updates, subscriptions));
-
-        //Intersect temp matrix and ddm_input->result_mat and store result in ddm_input->result_mat
-        DDM_And_Operation_Between_Matrices(ddm_input, temp, updates, subscriptions);
+        //printf("\nd: %d, nmatches: %"PRIu64"\n", k, count_ones_matrix(ddm_input->result_mat, updates, subscriptions));
     }
 
     DDM_Stop_Timer(ddm_input);
 
-    //Write result
-    DDM_Write_Result(*ddm_input);
-
     printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
+
+    //Write result
+    printf("\nWriting matrix result on a file\n");
+    DDM_Write_Result(*ddm_input);
 
     return 0;
 }
