@@ -171,3 +171,40 @@
 	"bitmatrix.h"
 	"limits.h"
 
+1415663180 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/binary_partition.c
+	"binary_partition.h"
+
+1415659394 /home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/binary_partition.h
+	<float.h>
+	"DDM_input_output.h"
+	"lists.h"
+
+1415662009 /home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<assert.h>
+
+1415473701 /home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/lists.h
+	<stdlib.h>
+	<stdio.h>
+
+1415661925 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415473701 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/lists.c
+	"lists.h"
+
+1415661935 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+	"binary_partition.h"
+	"limits.h"
+

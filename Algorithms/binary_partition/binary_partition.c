@@ -1,6 +1,6 @@
 #include "binary_partition.h"
 
-void IntersectionCalculation(DDM_Extent_Partition *list_extents, size_t current_dim, list S, list U, bitmatrix *result_mat, size_t subscriptions, int isUpdate){
+void IntersectionCalculation(DDM_Extent_Partition *list_extents, size_t current_dim, list S, list U, bitmatrix result_mat, size_t subscriptions, int isUpdate){
     list_element *tempS;
     list_element *tempU;
 
@@ -11,10 +11,11 @@ void IntersectionCalculation(DDM_Extent_Partition *list_extents, size_t current_
             while (tempU != NULL){
                 if (isUpdate){
                     if (list_extents[tempS->id + subscriptions].upper[current_dim] > list_extents[tempU->id].lower[current_dim])
-                        set_bit_mat(*result_mat, tempU->id, tempS->id);
+
+                        bitmatrix_set_value(result_mat, tempS->id, tempU->id, one);
                 }else
                     if (list_extents[tempS->id].upper[current_dim] > list_extents[tempU->id + subscriptions].lower[current_dim])
-                        set_bit_mat(*result_mat, tempU->id, tempS->id);
+                        bitmatrix_set_value(result_mat, tempU->id, tempS->id, one);
                 tempU = tempU->next;
             }
             tempS = tempS->next;
@@ -22,7 +23,7 @@ void IntersectionCalculation(DDM_Extent_Partition *list_extents, size_t current_
     }
 }
 
-void Partition(DDM_Extent_Partition *list_extents, size_t extents_count, size_t current_dim, double lower_bound, double upper_bound, bitmatrix *result_mat, size_t subscriptions, DDM_Extent_Partition *list_extents_full, size_t subscriptions_full){
+void Partition(DDM_Extent_Partition *list_extents, size_t extents_count, size_t current_dim, double lower_bound, double upper_bound, bitmatrix result_mat, size_t subscriptions, DDM_Extent_Partition *list_extents_full, size_t subscriptions_full){
     DDM_Extent_Partition *list_right_extents, *list_left_extents;
     double p;
     list Ul, Sl, Ur, Sr, Up, Sp;
@@ -85,7 +86,8 @@ void Partition(DDM_Extent_Partition *list_extents, size_t extents_count, size_t 
             tempU = Up;
             while(tempU != NULL)
             {
-                set_bit_mat(*result_mat, tempU->id, tempS->id);
+                bitmatrix_set_value(result_mat, tempU->id, tempS->id, one);
+                //set_bit_mat(*result_mat, tempU->id, tempS->id);
                 tempU = tempU->next;
             }
             tempS = tempS->next;

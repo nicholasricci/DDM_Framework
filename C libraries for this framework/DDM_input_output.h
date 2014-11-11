@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <math.h>
+#include <assert.h>
 
 /******************************************
  ************** DEFINITIONS ***************
@@ -45,6 +46,12 @@
 * \brief the maximum number of dimensions that can be stored (this is done to avoid a further malloc for each extent).
 */
 #define MAX_DIMENSIONS 4
+
+/**
+ *  Utils definition for bit vector and bit matrix
+ */
+
+#define BITS_PER_WORD (8*sizeof(uint32_t))
 
 /******************************************
  ***************** STRUCT *****************
@@ -88,6 +95,12 @@ typedef struct DDM_Input{
   uint_fast8_t **result_mat;
 
 }DDM_Input;
+
+typedef struct bitmatrix {
+    size_t updates; /* number of rows */
+    size_t subscriptions; /* number of words per row; the number of columns of the bitmatrix is therefore m*8*sizeof(uint32_t) */
+    uint32_t* data; /* array of data elements */
+} bitmatrix;
 
 /******************************************
  ****************** ENUM ******************
@@ -232,7 +245,7 @@ float DDM_Get_Total_Time(DDM_Input ddm_input);
 void print_list_updates_and_subscriptions(DDM_Input ddm_input);
 
 /******************************************
- ************* RESULT MATRIX **************
+ ********** uint_fast8_t MATRIX ***********
  ******************************************/
 
 /**
@@ -283,5 +296,39 @@ void print_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscriptions);
  */
 
 uint64_t count_ones_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscriptions);
+
+/******************************************
+ *************** BIT MATRIX ***************
+ ******************************************/
+
+/**
+ * Creates a n*m bit matrix; all elements are initialized to 0
+ */
+void bitmatrix_init(bitmatrix *mat, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * Deallocates a bit matrix
+ */
+void bitmatrix_free(bitmatrix *mat);
+
+/**
+ * Set m[i,j] = 0 if val == 0, set m[i,j] = 1 otherwise
+ */
+void bitmatrix_set(bitmatrix *mat, uint64_t i, uint64_t j, int val);
+
+/**
+ * Returns the value of m[i,j]
+ */
+int bitmatrix_get(const bitmatrix *mat, uint64_t i, uint64_t j);
+
+/**
+ * Set the result of AND operation in bitmatrix *mat
+ */
+void bitmatrix_and(bitmatrix *mat, const bitmatrix *mask);
+
+/**
+ * Count ones in matrix
+ */
+uint64_t bitmatrix_count_ones(const bitmatrix *mat);
 
 #endif

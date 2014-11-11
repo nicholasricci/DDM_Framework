@@ -3,7 +3,6 @@
 
 #include "DDM_input_output.h"
 #include "binary_partition.h"
-#include "bitmatrix.h"
 #include "limits.h"
 
 #define LOWER_BOUND INT_MIN
@@ -36,15 +35,15 @@ DDM_Extent_Partition* create_and_fill_updates_and_subscriptions(DDM_Extent *list
 int main(int argc, char *argv[])
 {
     //Binary Partition Variables
-    size_t updates, subscriptions, dimensions;
+    uint64_t updates, subscriptions;
+    uint64_t dimensions;
     DDM_Extent *list_updates, *list_subscriptions;
     DDM_Extent_Partition *list_extents;
-    bitmatrix result_mat, temp_mat;
-    size_t k, j;
+    bitmatrix temp_mat;
+    uint16_t k;
 
     //DDM's variables
     DDM_Input *ddm_input;
-    DDM_Timer ddm_timer;
 
     //Check if the initialization of input was succesfully
     if ((ddm_input = DDM_Initialize_Input(argc, argv)) == NULL)
@@ -58,40 +57,37 @@ int main(int argc, char *argv[])
 
 
     //initialize bitmatrix for result
-    init_bit_matrix(&result_mat, updates, subscriptions, uninitialized);
-    init_bit_matrix(&temp_mat, updates, subscriptions, uninitialized);
+    bitmatrix_init(&ddm_input->result_mat, updates, subscriptions);
+    bitmatrix_init(&temp_mat, updates, subscriptions);
 
     //fill list extents with before updates and after subscriptions
     list_extents = create_and_fill_updates_and_subscriptions(list_updates, updates, list_subscriptions, subscriptions, dimensions);
 
     //TEST lists
 
-    print_list_updates_and_subscriptions(*ddm_input);
+    //print_list_updates_and_subscriptions(*ddm_input);
 
-    DDM_Start_Timer(&ddm_timer);
+    DDM_Start_Timer(ddm_input);
 
     //Execute Algorithm Here
     for (k = 0; k < dimensions; ++k){
-        reset_whole_bit_mat(temp_mat, updates, subscriptions);
         if (k == 0)
             //set result in result_mat
-            Partition(list_extents, (subscriptions + updates), k, LOWER_BOUND, UPPER_BOUND, &result_mat, subscriptions, list_extents, subscriptions);
+            Partition(list_extents, (subscriptions + updates), k, LOWER_BOUND, UPPER_BOUND, ddm_input->result_mat, subscriptions, list_extents, subscriptions);
         else{
+            bitmatrix_reset(temp_mat, updates, subscriptions, zero);
             //set result in temp_mat and do the AND operation between matrix
             //partition
-            Partition(list_extents, (subscriptions + updates), k, LOWER_BOUND, UPPER_BOUND, &temp_mat, subscriptions, list_extents, subscriptions);
-            for (j = 0; j < updates; ++j)
-                vector_bitwise_and(result_mat[j], temp_mat[j], subscriptions);
+            Partition(list_extents, (subscriptions + updates), k, LOWER_BOUND, UPPER_BOUND, temp_mat, subscriptions, list_extents, subscriptions);
+            bitmatrix_and(ddm_input->result_mat, temp_mat, updates, subscriptions);
         }
     }
 
-    DDM_Stop_Timer(&ddm_timer);
-
+    DDM_Stop_Timer(ddm_input);
+    bitmatrix_free(&temp_mat, updates, subscriptions);
     //Write result
-    DDM_Write_Result(argv, DDM_Get_Total_Time(ddm_timer));
-    printf("\nnmatches: %"PRId64"\n", count_ones(result_mat, updates, subscriptions));
+    //DDM_Write_Result(*ddm_input);
+    printf("\nnmatches: %"PRId64"\n", bitmatrix_count_ones(ddm_input->result_mat, updates, subscriptions));
 
-    //a caso per terminare il programma in codeblocks
-    scanf("%zu", &dimensions);
     return 0;
 }

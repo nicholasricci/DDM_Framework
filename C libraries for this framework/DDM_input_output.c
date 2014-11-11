@@ -28,7 +28,7 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
     //char **tokens;
 
     if (argc == 5){
-        sprintf(ddm_input->executable_name, argv[0]);
+        sprintf(ddm_input->executable_name, "%s", argv[0]);
         sprintf(ddm_input->type_test, "%s", argv[1]);
         if (strncmp(argv[1], "alfa", 4) == 0){
             ddm_input->extents = atoi(argv[2]);
@@ -346,6 +346,67 @@ uint64_t count_ones_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscr
             if (mat[i][j] == 1) count++;
         }
     }
+
+    return count;
+}
+
+/******************************************
+ *************** BIT MATRIX ***************
+ ******************************************/
+
+void bitmatrix_init(bitmatrix *mat, uint64_t updates, uint64_t subscriptions)
+{
+    mat->updates = updates;
+    mat->subscriptions = (subscriptions + BITS_PER_WORD - 1) / BITS_PER_WORD; /* round the number m of columns to the next multiple of BITS_PER_WORD */
+    mat->data = (uint32_t*)calloc(mat->subscriptions * mat->updates, sizeof(uint32_t));
+    if (mat->data == NULL){
+        printf("\nError on bitmatrix allocation\n");
+        exit(-1);
+    }
+}
+
+void bitmatrix_free(bitmatrix *mat )
+{
+    mat->subscriptions = mat->updates = 0;
+    free( mat->data );
+}
+
+void bitmatrix_set(bitmatrix *mat, uint64_t i, uint64_t j, int val)
+{
+    assert( i < mat->updates );
+    assert( j < mat->subscriptions * BITS_PER_WORD );
+    uint32_t bitval = 0x8000000 >> (j % BITS_PER_WORD);
+    bitval *= (val != 0);
+    uint32_t idx = i * mat->subscriptions + j / BITS_PER_WORD;
+    mat->data[idx] = ( mat->data[idx] & ~bitval ) | bitval;
+}
+
+int bitmatrix_get(const bitmatrix *mat, uint64_t i, uint64_t j)
+{
+    assert( i < mat->updates );
+    assert( j < mat->subscriptions* BITS_PER_WORD );
+    uint32_t mask = 0x8000000 >> (j % BITS_PER_WORD);
+    uint32_t idx = i * mat->subscriptions + j / BITS_PER_WORD;
+
+    return ( ( mat->data[idx] & mask ) > 0 );
+}
+
+void bitmatrix_and(bitmatrix *mat, const bitmatrix *mask){
+    uint64_t i, j;
+
+    for (i = 0; i < mat->updates; ++i)
+        for (j = 0; j < mat->subscriptions; ++j)
+            bitmatrix_set(mat, i, j, (bitmatrix_get(mat, i, j) & bitmatrix_get(mask, i, j)));
+}
+
+uint64_t bitmatrix_count_ones(const bitmatrix *mat){
+    uint64_t i, j;
+    uint64_t count = 0;
+
+    for (i = 0; i < mat->updates; ++i)
+        for (j = 0; j < mat->subscriptions; ++j)
+            if (bitmatrix_get(mat, i, j))
+                count++;
 
     return count;
 }

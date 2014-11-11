@@ -1,0 +1,22 @@
+# depslib dependency file v1.0
+1415473701 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/grid_sort_2/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415473701 /home/eneru/Documents/github/DDM_Framework/Algorithms/grid_sort_2/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+
+1415486998 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/grid_sort_2/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+	<stdlib.h>
+	<math.h>
+
