@@ -341,7 +341,7 @@ void int_tree_delete( struct int_tree* tree, const struct interval* interv, uint
     if ( found ) tree->size--;
 }
 
-static size_t find_intersect_rec( uint_fast8_t **result_matrix, const struct int_node* n, const struct interval* q, uint16_t current_dim )
+static size_t find_intersect_rec( bitmatrix result_matrix, const struct int_node* n, const struct interval* q, uint16_t current_dim )
 {
     if ( ! n )
 	return 0;
@@ -356,7 +356,7 @@ static size_t find_intersect_rec( uint_fast8_t **result_matrix, const struct int
 
     if ( intersect( n->in, q, current_dim ) ) {
         result++;
-        set_value_mat(result_matrix, q->id, n->in->id, one);
+        bitmatrix_set_value(result_matrix, q->id, n->in->id, one);
     }
 
     if ( q->upper[current_dim] > n->in->lower[current_dim] )
@@ -365,7 +365,7 @@ static size_t find_intersect_rec( uint_fast8_t **result_matrix, const struct int
     return result;
 }
 
-size_t int_tree_find_intersect( uint_fast8_t **result, const struct int_tree* tree, const struct interval* interv, uint16_t current_dim )
+size_t int_tree_find_intersect( bitmatrix result, const struct int_tree* tree, const struct interval* interv, uint16_t current_dim )
 {
     return find_intersect_rec( result, tree->root, interv, current_dim );
 }

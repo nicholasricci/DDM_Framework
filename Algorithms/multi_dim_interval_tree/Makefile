@@ -19,10 +19,10 @@ openmp:			LDLIBS+=-lgomp
 openmp:			$(PAR)
 		
 interval_tree:		$(OBJSSEQ)
-			cc $(CFLAGS) -o $(BIN)interval_tree $(OBJSSEQ)
+			cc $(CFLAGS) -o $(BIN)interval_tree $(OBJSSEQ) -lm
 
 interval_tree_mp:	$(OBJSSEQ)
-			cc $(CFLAGS) -o $(BIN)interval_tree_mp $(OBJSSEQ)
+			cc $(CFLAGS) -o $(BIN)interval_tree_mp $(OBJSSEQ) -lm
 
 main.o:			main.c
 

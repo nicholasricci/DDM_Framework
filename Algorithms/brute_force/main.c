@@ -3,7 +3,7 @@
 
 #include "DDM_input_output.h"
 
-void bruteforce1D(uint_fast8_t **result, DDM_Extent *upds, uint64_t updates, DDM_Extent *subs, uint64_t subscriptions, uint16_t current_dim){
+void bruteforce1D(bitmatrix result, DDM_Extent *upds, uint64_t updates, DDM_Extent *subs, uint64_t subscriptions, uint16_t current_dim){
     uint64_t i, j;
 
     for (i = 0; i < updates; ++i){
@@ -23,7 +23,7 @@ void bruteforce1D(uint_fast8_t **result, DDM_Extent *upds, uint64_t updates, DDM
                 ){
                 continue;
             }else{
-                set_value_mat(result, i, j, zero);
+                bitmatrix_set_value(result, i, j, 0);
             }
         }
     }
@@ -84,11 +84,7 @@ int main(int argc, char *argv[])
     list_subscriptions = DDM_Get_Subscriptions_List(*ddm_input);
     list_updates = DDM_Get_Updates_List(*ddm_input);
 
-    //write_test(list_updates, updates, list_subscriptions, subscriptions, dimensions);
-
-    //reset ddm_input->result_mat to one, so you can do the and operation between
-    //temp(init 0) and ddm_input->result_mat(init 1)
-    reset_mat(ddm_input->result_mat, updates, subscriptions, one);
+    bitmatrix_reset(ddm_input->result_mat, updates, subscriptions, one);
 
     DDM_Start_Timer(ddm_input);
 
@@ -103,7 +99,7 @@ int main(int argc, char *argv[])
 
     DDM_Stop_Timer(ddm_input);
 
-    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
+    printf("\nnmatches: %"PRIu64"\n", bitmatrix_count_ones(ddm_input->result_mat, updates, subscriptions));
 
     //Write result
     printf("\nWriting matrix result on a file\n");

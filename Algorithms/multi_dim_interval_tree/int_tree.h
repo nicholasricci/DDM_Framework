@@ -97,7 +97,7 @@ typedef int(*int_callback)(const struct interval*, const struct interval*, void*
  * user-defined callback |f(x,q,param)|. If |f| returns a nonzero
  * value, the search procedure terminates.
  */
-size_t int_tree_find_intersect( uint_fast8_t **result, const struct int_tree* tree, const struct interval* q, uint16_t current_dim );
+size_t int_tree_find_intersect( bitmatrix result, const struct int_tree* tree, const struct interval* q, uint16_t current_dim );
 
 /**
  * For debug only

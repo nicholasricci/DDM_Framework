@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #include <math.h>
+#include <assert.h>
 
 /******************************************
  ************** DEFINITIONS ***************
@@ -45,6 +46,38 @@
 * \brief the maximum number of dimensions that can be stored (this is done to avoid a further malloc for each extent).
 */
 #define MAX_DIMENSIONS 4
+
+/**
+ *  Utils definition for bit vector and bit matrix
+ */
+
+#define SPACE_TYPE uint32_t
+
+#if SPACE_TYPE==uint64_t
+#define BIT_MAX_ELEM 0x8000000000000000
+#define BIT_MIN_ELEM 0x0000000000000001
+#define BIT_NUMBER 64
+#endif // SPACE_TYPE
+#if SPACE_TYPE==uint32_t
+#define BIT_MAX_ELEM 0x80000000
+#define BIT_MIN_ELEM 0x00000001
+#define BIT_NUMBER 32
+#endif // SPACE_TYPE
+#if SPACE_TYPE==uint16_t
+#define BIT_MAX_ELEM 0x8000
+#define BIT_MIN_ELEM 0x0001
+#define BIT_NUMBER 16
+#endif
+#if SPACE_TYPE==uint8_t
+#define BIT_MAX_ELEM 0x80
+#define BIT_MIN_ELEM 0x01
+#define BIT_NUMBER 8
+#endif // SPACE_TYPE
+#define DBIT(_n)    (BIT_MAX_ELEM >> _n)
+
+typedef SPACE_TYPE bitelem;
+typedef SPACE_TYPE* bitvector;
+typedef bitvector* bitmatrix;
 
 /******************************************
  ***************** STRUCT *****************
@@ -85,7 +118,7 @@ typedef struct DDM_Input{
   DDM_Timer timer;
 
   /*variable useful to store result*/
-  uint_fast8_t **result_mat;
+  bitmatrix result_mat;
 
 }DDM_Input;
 
@@ -158,34 +191,9 @@ uint64_t DDM_Get_Updates(DDM_Input ddm_input);
  */
 uint64_t DDM_Get_Subscriptions(DDM_Input ddm_input);
 
-/**
- * \brief Return the array of updates used in this execution
- * \param ddm_input read-only structure variable DDM_Input
- */
 DDM_Extent* DDM_Get_Updates_List(DDM_Input ddm_input);
 
-/**
- * \brief Return the array of subscriptions used in this execution
- * \param ddm_input read-only structure variable DDM_Input
- */
 DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input);
-
-/**
- *  \brief This function set matrix cell to 1 at update row and subscription column.
- *  \param ddm_input: to manage the matrix,
- *  \param update: row where you want to set,
- *  \param subscription: column where you want to set.
- */
-void DDM_Set_Matrix_Update_Subscription(DDM_Input *ddm_input, uint64_t update, uint64_t subscription);
-
-/**
- *  \brief This function do the AND operation between ddm_input->result_mat and mask and store the result in ddm_input->result_mat
- *  \param ddm_input: to manage the matrix,
- *  \param mask: to do the and operation,
- *  \param updates: number of updates,
- *  \param subscriptions: number of subscriptions.
- */
-void DDM_And_Operation_Between_Matrices(DDM_Input *ddm_input, uint_fast8_t **mask, uint64_t updates, uint64_t subscriptions);
 
 /******************************************
  ***************** OUTPUT *****************
@@ -196,12 +204,6 @@ void DDM_And_Operation_Between_Matrices(DDM_Input *ddm_input, uint_fast8_t **mas
  * \param ddm_input: to store the matrix and the total time
  */
 void DDM_Write_Result(DDM_Input ddm_input);
-
-/**
- * \brief Function that count matches found.
- * \param ddm_input: to store the matrix and the total time
- */
-uint64_t DDM_Count_Matches(DDM_Input *ddm_input);
 
 /******************************************
  ***************** TIMER ******************
@@ -232,7 +234,7 @@ float DDM_Get_Total_Time(DDM_Input ddm_input);
 void print_list_updates_and_subscriptions(DDM_Input ddm_input);
 
 /******************************************
- ************* RESULT MATRIX **************
+ ********** uint_fast8_t MATRIX ***********
  ******************************************/
 
 /**
@@ -284,13 +286,120 @@ void print_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscriptions);
 
 uint64_t count_ones_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscriptions);
 
+/******************************************
+ *************** BIT MATRIX ***************
+ ******************************************/
+
 /**
- *  \brief set value of matrix cell with zero or one as and operation between value existent in row update and column subscription
- *  \param mat: matrix variable
- *  \param update: row to set
- *  \param subscription: column to set
- *  \param value: value to set, zero or one
+ * \brief initialize bitmatrix, alloc matrix with rows as updates number and columns as ceil(subscriptions / BIT_NUMBER)
+ * \param mat: bitmatrix to alloc,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
  */
-void set_value_mat_as_AND(uint_fast8_t **mat, uint64_t update, uint64_t subscription, mat_value value);
+void bitmatrix_init(bitmatrix *mat, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief set value into bitmatrix in row update and column subscription with value you've inserted
+ * \param mat: bitmatrix variable,
+ * \param updates: number of row,
+ * \param subscriptions: number of column,
+ * \param value: enum value of matrix single element.
+ */
+void bitmatrix_set_value(bitmatrix mat, uint64_t update, uint64_t subscription, mat_value value);
+
+/**
+ * \brief get the element of mat in row update and column subscription
+ * \param mat: bitmatrix variable,
+ * \param updates: number of row,
+ * \param subscriptions: number of column.
+ */
+int bitmatrix_get(const bitmatrix mat, uint64_t update, uint64_t subscription);
+
+/**
+ * \brief Do AND operation between two matrices, mat and mask, and store the result into mat.
+ * \param mat: bitmatrix to store the result,
+ * \param mask: bitmatrix to use as mask,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
+ */
+void bitmatrix_and(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief Do OR operation between two matrices, mat and mask, and store the result into mat.
+ * \param mat: bitmatrix to store the result,
+ * \param mask: bitmatrix to use as mask,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
+ */
+void bitmatrix_or(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief Do NOT operation of mat, and store the result into mat.
+ * \param mat: bitmatrix to store the result,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
+ */
+void bitmatrix_not(bitmatrix mat, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief Do XOR operation between two matrices, mat and mask, and store the result into mat.
+ * \param mat: bitmatrix to store the result,
+ * \param mask: bitmatrix to use as mask,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
+ */
+void bitmatrix_xor(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief reset bitmatrix into one or zero.
+ * \param mat: bitmatrix variable,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns,
+ * \param value: one or zero.
+ */
+void bitmatrix_reset(bitmatrix mat, uint64_t updates, uint64_t subscriptions, mat_value value);
+
+/**
+ * \brief print in a human readable manner 1 and 0.
+ * \param mat: bitmatrix variable,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
+ */
+void bitmatrix_print(bitmatrix mat, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief count ones inside bitmatrix to find number of matches.
+ * \param mat: bitmatrix variable,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
+ */
+uint64_t bitmatrix_count_ones(bitmatrix mat, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief count how many differences between two bitmatrix and return this number.
+ * \param mat1: bitmatrix variable,
+ * \param mat2: bitmatrix variable,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
+ */
+uint64_t bitmatrix_differences(bitmatrix mat1, bitmatrix mat2, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief Read bitmatrix from binary file and store into bitmatrix mat variable.
+ * \param mat: bitmatrix variable
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns,
+ * \param filename: name of the file.
+ */
+void bitmatrix_read_file(bitmatrix *mat, uint64_t updates, uint64_t subscriptions, char *filename);
+
+/**
+ * \brief Write bitmatrix into binary file from bitmatrix mat variable.
+ * \param mat: bitmatrix variable
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns,
+ * \param filename: name of the file.
+ */
+void bitmatrix_write_file(const bitmatrix mat, uint64_t updates, uint64_t subscriptions, char *filename);
 
 #endif

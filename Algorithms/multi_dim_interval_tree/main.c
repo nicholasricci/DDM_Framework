@@ -5,7 +5,7 @@
 #include "int_tree.h"
 #include <stdio.h>
 
-uint64_t ddm_matching( uint_fast8_t **result,
+uint64_t ddm_matching( bitmatrix result,
                    const struct interval* sub, size_t n,
                    const struct interval* upd, size_t m,
                    size_t current_dim )
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     uint64_t updates, subscriptions;
     uint16_t dimensions;
     DDM_Extent *list_updates, *list_subscriptions;
-    uint_fast8_t **temp;
+    bitmatrix temp;
 
     //DDM's variables
     DDM_Input *ddm_input;
@@ -98,10 +98,10 @@ int main(int argc, char *argv[])
     upds = (struct interval *) malloc(sizeof(struct interval) * updates);
 
     //create temporaneous matrix
-    temp = create_result_matrix(updates, subscriptions);
+    bitmatrix_init(&temp, updates, subscriptions);
     //reset ddm_input->result_mat to one, so you can do the and operation between
     //temp(init 0) and ddm_input->result_mat(init 1)
-    reset_mat(ddm_input->result_mat, updates, subscriptions, one);
+    bitmatrix_init(&ddm_input->result_mat, updates, subscriptions);
 
     //fill all data to all dimensions
     for (i = 0; i < updates; ++i){
@@ -124,21 +124,25 @@ int main(int argc, char *argv[])
 
     for (k = 0; k < dimensions; ++k){
 
+        if (k > 0){
         //each time execute different dimension
         //reset the temp matrix
-        reset_mat(temp, updates, subscriptions, zero);
+        bitmatrix_reset(temp, updates, subscriptions, zero);
         //Execute Algorithm Here
         count = ddm_matching(temp, subs, subscriptions, upds, updates, k);
 
         //printf("\nd: %d, nmatches: %"PRIu64"\n", k, count_ones_matrix(temp, updates, subscriptions));
 
         //Intersect temp matrix and ddm_input->result_mat and store result in ddm_input->result_mat
-        DDM_And_Operation_Between_Matrices(ddm_input, temp, updates, subscriptions);
+        bitmatrix_and(ddm_input->result_mat, temp, updates, subscriptions);
+        }else{
+            count = ddm_matching(ddm_input->result_mat, subs, subscriptions, upds, updates, k);
+        }
     }
 
     DDM_Stop_Timer(ddm_input);
 
-    printf("\nnmatches: %"PRIu64"\n", DDM_Count_Matches(ddm_input));
+    printf("\nnmatches: %"PRIu64"\n", bitmatrix_count_ones(ddm_input->result_mat, updates, subscriptions));
 
     //Write result
     printf("\nWriting matrix result on a file\n");

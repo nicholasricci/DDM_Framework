@@ -8,19 +8,19 @@ ALL: 			mkdirs release openmp
 mkdirs:			
 			mkdir -p $(BIN)
 			
-release:		CFLAGS=-Wall -O3 -DNDEBUG -Wno-unknown-pragmas -g
+release:		CFLAGS=-Wall -O3 -DNDEBUG -Wno-unknown-pragmas -g -lm 
 release:		LDLIBS+=-lrt
 release:		$(SEQ)
 
-openmp:			CFLAGS=-Wall -O3 -DNDEBUG -fopenmp -g
+openmp:			CFLAGS=-Wall -O3 -DNDEBUG -fopenmp -g -lm
 openmp:			LDLIBS+=-lgomp
 openmp:			$(PAR)
 
 multi_dim_brute_force:	$(OBJSSEQ)
-			cc $(CFLAGS) -o $(BIN)multi_dim_brute_force $(OBJSSEQ)
+			cc $(CFLAGS) -o $(BIN)multi_dim_brute_force $(OBJSSEQ) -lm
 			
 multi_dim_brute_force_mp:	$(OBJSPAR)
-				cc $(CFLAGS) -o $(BIN)multi_dim_brute_force_mp $(OBJSPAR)
+				cc $(CFLAGS) -o $(BIN)multi_dim_brute_force_mp $(OBJSPAR) -lm
 
 clean:
 			rm -f *.o
