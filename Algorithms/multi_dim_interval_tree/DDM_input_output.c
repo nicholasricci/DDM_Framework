@@ -185,15 +185,22 @@ DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input){
     return NULL;
 }
 
+void DDM_Dispose_Input(DDM_Input *ddm_input){
+
+    free(ddm_input->list_updates);
+    free(ddm_input->list_subscriptions);
+    //bitmatrix_free(&ddm_input->result_mat, ddm_input->updates, ddm_input->subscriptions);
+}
+
 /******************************************
  ***************** OUTPUT *****************
  ******************************************/
 
-void DDM_Write_Result(DDM_Input ddm_input){
+void DDM_Write_Result(DDM_Input *ddm_input){
 
     /* write results */
-    char str[100];
-    strcpy(str, ddm_input.executable_name);
+    char str[1000];
+    strcpy(str, ddm_input->executable_name);
     strcat(str, ".txt");
     FILE* fout = fopen(str, "a");
     if ( fout == NULL ) {
@@ -201,10 +208,11 @@ void DDM_Write_Result(DDM_Input ddm_input){
         exit(-1);
     }
 
-    fprintf(fout, "%f\n", ddm_input.timer.total);
-    fclose(fout);
+    fprintf(fout, "%f\n", ddm_input->timer.total);
+    //fclose(fout);
 
-    bitmatrix_write_file(ddm_input.result_mat, ddm_input.updates, ddm_input.subscriptions,"result_mat.bin");
+    bitmatrix_write_file(ddm_input->result_mat, ddm_input->updates, ddm_input->subscriptions,"result_mat.bin");
+    DDM_Dispose_Input(ddm_input);
 
     /*strcpy(strresmat, "result_mat.txt");
     fout = fopen(strresmat, "w+");
@@ -479,5 +487,25 @@ void bitmatrix_write_file(const bitmatrix mat, uint64_t updates, uint64_t subscr
     for (i = 0; i < updates; ++i){
         fwrite(mat[i], sizeof(bitelem), sizeof(bitelem) * subs_vec, fp);
     }
-    fclose(fp);
+    //fclose(fp);
+}
+
+void bitmatrix_free(bitmatrix *mat, uint64_t updates, uint64_t subscriptions){
+    uint64_t i;
+    bitvector vec;
+
+    for (i = 0; i < updates - 1; ++i){
+        vec = (*mat)[i];
+        free(vec);
+    }
+    free(*mat);
+}
+
+void bitmatrix_print_matches(const bitmatrix mat, uint64_t updates, uint64_t subscriptions){
+    uint64_t i, j;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            if (bitmatrix_get(mat, i, j))
+                printf("(U%"PRIu64", S%"PRIu64"), \n", i, j);
 }

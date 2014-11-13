@@ -52,27 +52,34 @@
  */
 
 #define SPACE_TYPE uint32_t
+#define ST 32
 
-#if SPACE_TYPE==uint64_t
+#if ST == 64
+
 #define BIT_MAX_ELEM 0x8000000000000000
 #define BIT_MIN_ELEM 0x0000000000000001
 #define BIT_NUMBER 64
-#endif // SPACE_TYPE
-#if SPACE_TYPE==uint32_t
+
+#elif ST == 32
+
 #define BIT_MAX_ELEM 0x80000000
 #define BIT_MIN_ELEM 0x00000001
 #define BIT_NUMBER 32
-#endif // SPACE_TYPE
-#if SPACE_TYPE==uint16_t
+
+#elif ST == 16
+
 #define BIT_MAX_ELEM 0x8000
 #define BIT_MIN_ELEM 0x0001
 #define BIT_NUMBER 16
-#endif
-#if SPACE_TYPE==uint8_t
+
+#elif ST == 8
+
 #define BIT_MAX_ELEM 0x80
 #define BIT_MIN_ELEM 0x01
 #define BIT_NUMBER 8
+
 #endif // SPACE_TYPE
+
 #define DBIT(_n)    (BIT_MAX_ELEM >> _n)
 
 typedef SPACE_TYPE bitelem;
@@ -199,7 +206,7 @@ uint64_t DDM_Get_Subscriptions(DDM_Input ddm_input);
  * \brief Write time of execution in a file called argv[0], name of executable and write the matrix in result_mat.txt file
  * \param ddm_input: to store the matrix and the total time
  */
-void DDM_Write_Result(DDM_Input ddm_input);
+void DDM_Write_Result(DDM_Input *ddm_input);
 
 DDM_Extent* DDM_Get_Updates_List(DDM_Input ddm_input);
 
@@ -409,5 +416,13 @@ void bitmatrix_write_file(const bitmatrix mat, uint64_t updates, uint64_t subscr
  * \param subscriptions: number of columns.
  */
 void bitmatrix_free(bitmatrix *mat, uint64_t updates, uint64_t subscriptions);
+
+/**
+ * \brief print all matching in format (Ux, Sy),
+ * \param mat: bitmatrix variable,
+ * \param updates: number of rows,
+ * \param subscriptions: number of columns.
+ */
+void bitmatrix_print_matches(const bitmatrix mat, uint64_t updates, uint64_t subscriptions);
 
 #endif

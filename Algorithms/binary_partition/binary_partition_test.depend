@@ -1,0 +1,81 @@
+# depslib dependency file v1.0
+1415737101 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition_test/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415737001 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition_test/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<assert.h>
+
+1415744699 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition_test/main.c
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	"DDM_input_output.h"
+	"lists.h"
+
+1415473701 /home/archieneru/github/DDM_Framework/Algorithms/binary_partition_test/lists.h
+	<stdlib.h>
+	<stdio.h>
+
+1415473701 source:/home/archieneru/github/DDM_Framework/Algorithms/binary_partition_test/lists.c
+	"lists.h"
+
+1415845123 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition_test/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415844755 /home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition_test/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<assert.h>
+
+1415473701 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition_test/lists.c
+	"lists.h"
+
+1415473701 /home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition_test/lists.h
+	<stdlib.h>
+	<stdio.h>
+
+1415844790 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition_test/main.c
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	"DDM_input_output.h"
+	"lists.h"
+
+1415845343 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415844755 /home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<assert.h>
+
+1415473701 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/lists.c
+	"lists.h"
+
+1415473701 /home/eneru/Documents/github/DDM_Framework/Algorithms/binary_partition/lists.h
+	<stdlib.h>
+	<stdio.h>
+

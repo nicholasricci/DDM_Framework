@@ -115,10 +115,9 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
         ddm_input = NULL;
 
     if (ddm_input != NULL){
-      ddm_input->result_mat = create_result_matrix(ddm_input->updates, ddm_input->subscriptions);
-      if (ddm_input->result_mat == NULL)
-	ddm_input = NULL;
-    }
+        bitmatrix_init(&ddm_input->result_mat, ddm_input->updates, ddm_input->subscriptions);
+    }else
+        ddm_input = NULL;
 
     return ddm_input;
 }
@@ -186,23 +185,14 @@ DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input){
     return NULL;
 }
 
-void DDM_Set_Matrix_Update_Subscription(DDM_Input *ddm_input, uint64_t update, uint64_t subscription){
-    ddm_input->result_mat[update][subscription] = 1;
-}
-
-void DDM_And_Operation_Between_Matrices(DDM_Input *ddm_input, uint_fast8_t **mask, uint64_t updates, uint64_t subscriptions){
-    and_operation_between_matrices(ddm_input->result_mat, mask, updates, subscriptions);
-}
-
 /******************************************
  ***************** OUTPUT *****************
  ******************************************/
 
 void DDM_Write_Result(DDM_Input ddm_input){
-    uint64_t i, j;
 
     /* write results */
-    char str[100], strresmat[100];
+    char str[100];
     strcpy(str, ddm_input.executable_name);
     strcat(str, ".txt");
     FILE* fout = fopen(str, "a");
@@ -214,7 +204,10 @@ void DDM_Write_Result(DDM_Input ddm_input){
     fprintf(fout, "%f\n", ddm_input.timer.total);
     fclose(fout);
 
-    strcpy(strresmat, "result_mat.txt");
+    bitmatrix_write_file(ddm_input.result_mat, ddm_input.updates, ddm_input.subscriptions,"result_mat.bin");
+    bitmatrix_free(&ddm_input.result_mat, ddm_input.updates, ddm_input.subscriptions);
+
+    /*strcpy(strresmat, "result_mat.txt");
     fout = fopen(strresmat, "w+");
     if (fout == NULL){
         printf("Error creating file %s\n", strresmat);
@@ -229,11 +222,7 @@ void DDM_Write_Result(DDM_Input ddm_input){
         fprintf(fout, "\n");
     }
 
-    fclose(fout);
-}
-
-uint64_t DDM_Count_Matches(DDM_Input *ddm_input){
-    return count_ones_matrix(ddm_input->result_mat, ddm_input->updates, ddm_input->subscriptions);
+    fclose(fout);*/
 }
 
 /******************************************
@@ -354,59 +343,159 @@ uint64_t count_ones_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscr
  *************** BIT MATRIX ***************
  ******************************************/
 
-void bitmatrix_init(bitmatrix *mat, uint64_t updates, uint64_t subscriptions)
-{
-    mat->updates = updates;
-    mat->subscriptions = (subscriptions + BITS_PER_WORD - 1) / BITS_PER_WORD; /* round the number m of columns to the next multiple of BITS_PER_WORD */
-    mat->data = (uint32_t*)calloc(mat->subscriptions * mat->updates, sizeof(uint32_t));
-    if (mat->data == NULL){
-        printf("\nError on bitmatrix allocation\n");
-        exit(-1);
+void bitmatrix_init(bitmatrix *mat, uint64_t updates, uint64_t subscriptions){
+    uint64_t i;
+
+    *mat = (bitmatrix)malloc(sizeof(bitvector) * updates);
+    for (i = 0; i < updates; ++i)
+        (*mat)[i] = (bitvector)calloc(ceill(subscriptions / BIT_NUMBER), sizeof(bitelem));
+}
+
+void bitmatrix_set_value(bitmatrix mat, uint64_t update, uint64_t subscription, mat_value value){
+    //position in bitvector that we have to set the value
+    uint64_t bitpos_invec = subscription / BIT_NUMBER;
+    //bit position in SPACE_TYPE we have to set
+    bitelem bitpos =  subscription % BIT_NUMBER;
+    bitelem mask = DBIT(bitpos);
+    if (value == one){
+        mat[update][bitpos_invec] |= mask;
+    }else{
+        mat[update][bitpos_invec] &= ~mask;
     }
 }
 
-void bitmatrix_free(bitmatrix *mat )
-{
-    mat->subscriptions = mat->updates = 0;
-    free( mat->data );
+int bitmatrix_get(const bitmatrix mat, uint64_t update, uint64_t subscription){
+    uint64_t bitpos_invec = subscription / BIT_NUMBER;
+    bitelem bitpos = subscription % BIT_NUMBER;
+    bitelem mask = DBIT(bitpos);
+    if (mat[update][bitpos_invec] & mask)
+        return 1;
+    else
+        return 0;
 }
 
-void bitmatrix_set(bitmatrix *mat, uint64_t i, uint64_t j, int val)
-{
-    assert( i < mat->updates );
-    assert( j < mat->subscriptions * BITS_PER_WORD );
-    uint32_t bitval = 0x8000000 >> (j % BITS_PER_WORD);
-    bitval *= (val != 0);
-    uint32_t idx = i * mat->subscriptions + j / BITS_PER_WORD;
-    mat->data[idx] = ( mat->data[idx] & ~bitval ) | bitval;
-}
-
-int bitmatrix_get(const bitmatrix *mat, uint64_t i, uint64_t j)
-{
-    assert( i < mat->updates );
-    assert( j < mat->subscriptions* BITS_PER_WORD );
-    uint32_t mask = 0x8000000 >> (j % BITS_PER_WORD);
-    uint32_t idx = i * mat->subscriptions + j / BITS_PER_WORD;
-
-    return ( ( mat->data[idx] & mask ) > 0 );
-}
-
-void bitmatrix_and(bitmatrix *mat, const bitmatrix *mask){
+void bitmatrix_and(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64_t subscriptions){
     uint64_t i, j;
 
-    for (i = 0; i < mat->updates; ++i)
-        for (j = 0; j < mat->subscriptions; ++j)
-            bitmatrix_set(mat, i, j, (bitmatrix_get(mat, i, j) & bitmatrix_get(mask, i, j)));
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            mat[i][j] &= mask[i][j];
 }
 
-uint64_t bitmatrix_count_ones(const bitmatrix *mat){
+void bitmatrix_or(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64_t subscriptions){
     uint64_t i, j;
-    uint64_t count = 0;
 
-    for (i = 0; i < mat->updates; ++i)
-        for (j = 0; j < mat->subscriptions; ++j)
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            mat[i][j] |= mask[i][j];
+}
+
+void bitmatrix_not(bitmatrix mat, uint64_t updates, uint64_t subscriptions){
+    uint64_t i, j;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            mat[i][j] = ~mat[i][j];
+}
+
+void bitmatrix_xor(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64_t subscriptions){
+    uint64_t i, j;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            mat[i][j] ^= mask[i][j];
+}
+
+void bitmatrix_reset(bitmatrix mat, uint64_t updates, uint64_t subscriptions, mat_value value){
+    uint64_t i;
+
+    for (i = 0; i < updates; ++i)
+        if (value == zero)
+            memset(mat[i], 0x00, sizeof(bitelem) * ceil((float)subscriptions / BIT_NUMBER));
+        else{
+            memset(mat[i], 0xFF, sizeof(bitelem) * ceil((float)subscriptions / BIT_NUMBER));
+        }
+}
+
+void bitmatrix_print(bitmatrix mat, uint64_t updates, uint64_t subscriptions){
+    uint64_t i, j;
+
+    for (i = 0; i < updates; ++i){
+        for (j = 0; j < subscriptions; ++j)
+            printf("%d ", bitmatrix_get(mat, i, j));
+        printf("\n");
+    }
+}
+
+uint64_t bitmatrix_count_ones(bitmatrix mat, uint64_t updates, uint64_t subscriptions){
+    uint64_t i, j, count = 0;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
             if (bitmatrix_get(mat, i, j))
                 count++;
 
     return count;
+}
+
+uint64_t bitmatrix_differences(bitmatrix mat1, bitmatrix mat2, uint64_t updates, uint64_t subscriptions){
+    uint64_t i, j, count = 0;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            if (bitmatrix_get(mat1, i, j) != bitmatrix_get(mat2, i, j))
+                count++;
+
+    return count;
+}
+
+void bitmatrix_read_file(bitmatrix *mat, uint64_t updates, uint64_t subscriptions, char *filename){
+    FILE *fp;
+    uint64_t i;
+    uint64_t subs_vec = ceil((float)subscriptions / BIT_NUMBER);
+
+    bitmatrix_init(mat, updates, subscriptions);
+
+    if ((fp = fopen(filename, "rb")) == NULL){
+        printf("\nError to open file to read\n");
+        exit(-1);
+    }
+
+    for (i = 0; i < updates; ++i){
+        fread((*mat)[i], sizeof(bitelem), sizeof(bitelem) * subs_vec, fp);
+    }
+    fclose(fp);
+}
+
+void bitmatrix_write_file(const bitmatrix mat, uint64_t updates, uint64_t subscriptions, char *filename){
+    FILE *fp;
+    uint64_t i;
+    uint64_t subs_vec = ceil((float)subscriptions / BIT_NUMBER);
+
+    if ((fp = fopen(filename, "wb")) == NULL){
+        printf("\nError to open file to write\n");
+        exit(-1);
+    }
+
+    for (i = 0; i < updates; ++i){
+        fwrite(mat[i], sizeof(bitelem), sizeof(bitelem) * subs_vec, fp);
+    }
+    fclose(fp);
+}
+
+void bitmatrix_free(bitmatrix *mat, uint64_t updates, uint64_t subscriptions){
+    uint64_t i;
+
+    for (i = 0; i < updates; ++i)
+        free((*mat)[i]);
+    free(*mat);
+}
+
+void bitmatrix_print_matches(const bitmatrix mat, uint64_t updates, uint64_t subscriptions){
+    uint64_t i, j;
+
+    for (i = 0; i < updates; ++i)
+        for (j = 0; j < subscriptions; ++j)
+            if (bitmatrix_get(mat, i, j))
+                printf("(U%"PRIu64", S%"PRIu64"), \n", i, j);
 }

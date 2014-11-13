@@ -1,6 +1,6 @@
 BIN=bin/
 SEQ=binary_partition
-OBJSSEQ=main.o DDM_input_output.o lists.o binary_partition.o
+OBJSSEQ=main.o DDM_input_output.o lists.o
 
 ALL: 			mkdirs release
 

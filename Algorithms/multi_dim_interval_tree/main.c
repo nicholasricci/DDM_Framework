@@ -141,12 +141,13 @@ int main(int argc, char *argv[])
     }
 
     DDM_Stop_Timer(ddm_input);
+    //bitmatrix_free(&temp, updates, subscriptions);
 
     printf("\nnmatches: %"PRIu64"\n", bitmatrix_count_ones(ddm_input->result_mat, updates, subscriptions));
 
     //Write result
     printf("\nWriting matrix result on a file\n");
-    DDM_Write_Result(*ddm_input);
+    DDM_Write_Result(ddm_input);
 
 
     return 0;

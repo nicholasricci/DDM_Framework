@@ -10,7 +10,7 @@ ALL: 			mkdirs release openmp
 mkdirs:		
 			mkdir -p $(BIN)
 
-release:		CFLAGS=-Wall -O3 -DNDEBUG -Wno-unknown-pragmas
+release:		CFLAGS=-Wall -DNDEBUG -Wno-unknown-pragmas
 release:		LDLIBS+=-lrt
 release:		$(SEQ)
 
