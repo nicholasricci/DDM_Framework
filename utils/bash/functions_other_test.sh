@@ -32,6 +32,7 @@ function run_other_executable_sequential {
   #$3 is dimensions
   #$4 is updates
   #$5 is subscriptions
+  #$6 is mem for valgrind
   
   local filename
   local filename_result
@@ -48,7 +49,7 @@ function run_other_executable_sequential {
   for R in `seq $RUN`
   do
     echo "running >$1< test: $2, dimensions: $3, updates: $4, subscriptions: $5, RUN:$R"
-    if [ "$VALGRIND" = "yes" ];
+    if [ "$6" = "mem" ];
     then
       
       valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $3 $4 $5 
@@ -66,18 +67,19 @@ function run_other_executable_sequential {
     let R+=1
   done
   
-  AVERAGE=`$AVERAGER $filename`
-  echo -e "$AVERAGE" > $filename
-		  
-  #average of memory usage
-  AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
-  echo -e "$AVERAGE_MEMORY" > $_VALGRIND_OUT_FILE		    
-  
-  filename_result="${1}_${3}_${4}_${5}.txt"
-  filename_memory="${1}_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
-  
-  mv $filename $RESULTS/$filename_result
-  mv $_VALGRIND_OUT_FILE $RESULTS/$filename_memory
+  if [ "$6" != "mem" ];
+  then 
+    AVERAGE=`$AVERAGER $filename`
+    echo -e "$AVERAGE" > $filename
+    filename_result="${1}_${3}_${4}_${5}.txt"
+    mv $filename $RESULTS/$filename_result
+  else
+    #average of memory usage
+    AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+    echo -e "$AVERAGE_MEMORY" > $_VALGRIND_OUT_FILE
+    filename_memory="${1}_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
+    mv $_VALGRIND_OUT_FILE $RESULTS/$filename_memory
+  fi
 }
 
 function run_other_executable_parallel {
@@ -86,6 +88,7 @@ function run_other_executable_parallel {
   #$3 is dimensions
   #$4 is updates
   #$5 is subscriptions
+  #$6 is mem for valgrind
   
   local filename
   local filename_result
@@ -98,17 +101,39 @@ function run_other_executable_parallel {
   mkdir -p $GRAPHS
   
   filename="$1.txt"
-  
-  for R in $(seq $RUN)
+  echo $RUN
+  for R in `seq $RUN`
   do
     echo "running >$1< test: $2, dimensions: $3, updates: $4, subscriptions: $5, RUN:$R"
-    ./$1 $2 $3 $4 $5 
+    if [ "$6" = "mem" ];
+    then
+      
+      valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $3 $4 $5 
+      ms_print $_VALGRIND_OUT_FILE > "temp"
+      temporaneous_variable=`cat "temp" | head -9 | tail -1 | awk '{print $1}'`
+      echo "${temporaneous_variable//^}" > $_VALGRIND_OUT_FILE
+      rm -f "temp"
+      
+    else
+			    
+      ./$1 $2 $3 $4 $5
+	
+    fi
+      
+    let R+=1
   done
   
-  AVERAGE=`$AVERAGER $filename`
-  echo -e "$AVERAGE" > $filename
-  
-  filename_result="${1}_${3}_${4}_${5}.txt"
-  
-  mv $filename $RESULTS/$filename_result
+  if [ "$6" != "mem" ];
+  then 
+    AVERAGE=`$AVERAGER $filename`
+    echo -e "$AVERAGE" > $filename
+    filename_result="${1}_${3}_${4}_${5}.txt"
+    mv $filename $RESULTS/$filename_result
+  else
+    #average of memory usage
+    AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+    echo -e "$AVERAGE_MEMORY" > $_VALGRIND_OUT_FILE
+    filename_memory="${1}_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
+    mv $_VALGRIND_OUT_FILE $RESULTS/$filename_memory
+  fi
 }

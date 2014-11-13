@@ -215,6 +215,24 @@ function configure {
       echo "Please insert an integer number."
     fi
   done
+  
+  #VALGRIND
+  while true; do
+    read -p "Do you want run your algorithms with valgrind command (slower then normal). Keep memory usage and plot graphics (yes/no):" yn
+    if [ "$yn" = "yes" ];
+    then
+      VALGRIND=$yn
+      echo "VALGRIND=$yn" >> $_CONFIGURATION_SHELL
+      break
+    elif [ -z "$yn" ] || [ "$yn" = "no" ];
+    then
+      VALGRIND="no"
+      echo "VALGRIND=$VALGRIND" >> $_CONFIGURATION_SHELL
+      break
+    else
+      echo "Please insert yes or no."
+    fi
+  done
 
   #Return to root
   cd ..
@@ -315,7 +333,7 @@ function run {
   check_configure
   build
   
-  if  [ $# -ge 1 ] && [ $# -le 2 ] && [ "$1" == "alfa" ]; 
+  if  [ $# -eq 1 ] && [ "$1" == "alfa" ]; 
   then
     
     cd $_ALGORITHMS
@@ -333,24 +351,14 @@ function run {
       #for each executables sequential starts program in some configuration
       for exe in ${exe_sequential[*]}
       do
-	if [ "$2" != "mem" ];
-	then
-	  run_alfa_executable_sequential $exe $1
-	else
-	  run_alfa_executable_sequential $exe $1 $2
-	fi
+	run_alfa_executable_sequential $exe $1
       done
       #prepare alfa folders and files
       create_all_alfa_folders_and_files $ALFAS_PAR
       #for each executables parallel starts program in some configuration
       for exe_par in ${exe_parallel[*]}
       do
-	if [ "$2" != "mem" ];
-	then
-	  run_alfa_executable_parallel $exe_par $1
-	else
-	  run_alfa_executable_parallel $exe_par $1 $2
-	fi
+	run_alfa_executable_parallel $exe_par $1
       done
       #change to algorithm directory
       cd ..
@@ -361,7 +369,7 @@ function run {
     unset exe_sequential
     unset exe_parallel
     
-  elif [ $# -ge 1 ] && [ $# -le 2 ] && [ "$1" != "alfa" ];
+  elif [ $# -eq 1 ] && [ "$1" != "alfa" ];
   then
     
     if [ -d "$_TESTS_INSTANCES" ];
@@ -411,22 +419,16 @@ function run {
 	#for each executables sequential starts program in some configuration
 	for exe in ${exe_sequential[*]}
 	do
-	  if [ "$2" != "mem" ];
-	  then
-	    run_other_executable_sequential $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
-	  else
-	    run_other_executable_sequential $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS $2
-	  fi
+	  run_other_executable_sequential $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  #./$exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  #: #TODO create the execution run of sequential with not alfa tests
 	done
 	#for each executables parallel starts program in some configuration
 	for exe_par in ${exe_parallel[*]}
 	do
-	  if [ "$2" != "mem" ];
-	  then
-	    run_other_executable_parallel $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
-	  else
-	    run_other_executable_parallel $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS $2
-	  fi
+	  run_other_executable_parallel $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  #./$exe_par $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  #: #TODO create the execution run of parallel with not alfa tests
 	done
 	#change to algorithm directory
 	cd ..

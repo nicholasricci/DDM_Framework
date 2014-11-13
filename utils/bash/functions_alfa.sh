@@ -67,6 +67,8 @@ function create_all_alfa_folders_and_files {
 
 function run_alfa_executable_sequential {
 
+  #$3 is mem for valgrind
+
   local filename
   local filename_result
   local executed_filename
@@ -96,7 +98,7 @@ function run_alfa_executable_sequential {
 			  echo "running >$1< $EXTENTS/$ALFA:$R"
 			  
 			  #If VALGRIND VARIABLE IS USED RUN WITH DIFFERENT COMMAND
-			  if [ "$VALGRIND" = "yes" ];
+			  if [ "$3" = "mem" ];
 			  then
 			  
 			    valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $EXTENTS $DIMENSION $ALFA 
@@ -112,19 +114,20 @@ function run_alfa_executable_sequential {
 			  fi
 		  done
 		  
-		  #average of time
-		  AVERAGE=`$AVERAGER $filename`
-		  echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
-		  
-		  #average of memory usage
-		  AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
-		  echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
-		  
-		  filename_result="${1}_${EXTENTS}_${DIMENSION}_${ALFA}.txt"
-		  filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_FINAL_FILE"
-		  
-		  mv $filename $RESULTS/$filename_result
-		  mv $executed_filename_memory $RESULTS/$filename_memory
+		  if [ "$3" != "mem" ];
+		  then
+		    #average of time
+		    AVERAGE=`$AVERAGER $filename`
+		    echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
+		    filename_result="${1}_${EXTENTS}_${DIMENSION}_${ALFA}.txt"
+		    mv $filename $RESULTS/$filename_result
+		  else
+		    #average of memory usage
+		    AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+		    echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
+		    filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_FINAL_FILE"
+		    mv $executed_filename_memory $RESULTS/$filename_memory
+		  fi
 
 		  let EXTENTS+=$STEP_SIZE
 		  
@@ -171,7 +174,7 @@ function run_alfa_executable_parallel {
 		    do
 			    echo "running >$1< $EXTENTS/$ALFA:$R"
 			    #If VALGRIND VARIABLE IS USED RUN WITH DIFFERENT COMMAND
-			    if [ "$VALGRIND" = "yes" ];
+			    if [ "$3" = "mem" ];
 			    then
 			    
 			      valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $EXTENTS $DIMENSION $ALFA 
@@ -187,19 +190,20 @@ function run_alfa_executable_parallel {
 			    fi
 		    done
 		    
-		    AVERAGE=`$AVERAGER $filename`
-		    echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
-		  
-		    #average of memory usage
-		    AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
-		    echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
+		    if [ "$3" = "mem" ];
+		    then
+		      AVERAGE=`$AVERAGER $filename`
+		      echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
+		      filename_result="${1}_${EXTENTS}_${DIMENSION}_${CORE}_${ALFA}.txt"
+		      mv $filename $RESULTS/$filename_result
+		    else
+		      #average of memory usage
+		      AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+		      echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
+		      filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_OUT_FILE"     
+		      mv $executed_filename_memory $RESULTS/$filename_memory
+		    fi
 		    
-		    filename_result="${1}_${EXTENTS}_${DIMENSION}_${CORE}_${ALFA}.txt"
-		    filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_OUT_FILE"
-		    
-		    mv $filename $RESULTS/$filename_result
-		    mv $executed_filename_memory $RESULTS/$filename_memory
-
 		    let EXTENTS+=$STEP_SIZE
 		    
 	    done
