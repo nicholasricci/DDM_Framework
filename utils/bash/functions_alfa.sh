@@ -114,19 +114,25 @@ function run_alfa_executable_sequential {
 			  fi
 		  done
 		  
-		  if [ "$3" != "mem" ];
+		  if [ "$3" = "dist" ];
 		  then
-		    #average of time
-		    AVERAGE=`$AVERAGER $filename`
-		    echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
-		    filename_result="${1}_${EXTENTS}_${DIMENSION}_${ALFA}.txt"
-		    mv $filename $RESULTS/$filename_result
+		    mv $_BITMATRIX_NAME "$RESULTS/${1}.bin"
 		  else
-		    #average of memory usage
-		    AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
-		    echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
-		    filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_FINAL_FILE"
-		    mv $executed_filename_memory $RESULTS/$filename_memory
+		    rm $_BITMATRIX_NAME
+		    if [ "$3" != "mem" ];
+		    then
+		      #average of time
+		      AVERAGE=`$AVERAGER $filename`
+		      echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
+		      filename_result="${1}_${EXTENTS}_${DIMENSION}_${ALFA}.txt"
+		      mv $filename $RESULTS/$filename_result
+		    else
+		      #average of memory usage
+		      AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+		      echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
+		      filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_FINAL_FILE"
+		      mv $executed_filename_memory $RESULTS/$filename_memory
+		    fi
 		  fi
 
 		  let EXTENTS+=$STEP_SIZE
@@ -190,18 +196,24 @@ function run_alfa_executable_parallel {
 			    fi
 		    done
 		    
-		    if [ "$3" = "mem" ];
+		    if [ "$3" = "dist" ];
 		    then
-		      AVERAGE=`$AVERAGER $filename`
-		      echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
-		      filename_result="${1}_${EXTENTS}_${DIMENSION}_${CORE}_${ALFA}.txt"
-		      mv $filename $RESULTS/$filename_result
+		      mv $_BITMATRIX_NAME "$RESULTS/${1}.bin"
 		    else
-		      #average of memory usage
-		      AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
-		      echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
-		      filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_OUT_FILE"     
-		      mv $executed_filename_memory $RESULTS/$filename_memory
+		      rm $_BITMATRIX_NAME
+		      if [ "$3" != "mem" ];
+		      then
+			AVERAGE=`$AVERAGER $filename`
+			echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
+			filename_result="${1}_${EXTENTS}_${DIMENSION}_${CORE}_${ALFA}.txt"
+			mv $filename $RESULTS/$filename_result
+		      else
+			#average of memory usage
+			AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+			echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
+			filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_OUT_FILE"     
+			mv $executed_filename_memory $RESULTS/$filename_memory
+		      fi
 		    fi
 		    
 		    let EXTENTS+=$STEP_SIZE

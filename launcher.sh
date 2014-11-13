@@ -42,6 +42,10 @@ function build {
     make
     mv ./$_DDM_INSTANCE_MAKER ../
     cd ..
+    cd $_F_BITMATRIX_COMPARATOR
+    make
+    mv ./$_BITMATRIX_COMPARATOR ../
+    cd ..
   cd ..
   
 }
@@ -333,7 +337,7 @@ function run {
       #for each executables sequential starts program in some configuration
       for exe in ${exe_sequential[*]}
       do
-	if [ "$2" != "mem" ];
+	if [ "$2" != "mem" ] && [ "$2" != "dist" ];
 	then
 	  run_alfa_executable_sequential $exe $1
 	else
@@ -345,7 +349,7 @@ function run {
       #for each executables parallel starts program in some configuration
       for exe_par in ${exe_parallel[*]}
       do
-	if [ "$2" != "mem" ];
+	if [ "$2" != "mem" ] && [ "$2" != "dist" ];
 	then
 	  run_alfa_executable_parallel $exe_par $1
 	else
@@ -411,7 +415,7 @@ function run {
 	#for each executables sequential starts program in some configuration
 	for exe in ${exe_sequential[*]}
 	do
-	  if [ "$2" != "mem" ];
+	  if [ "$2" != "mem" ] && [ "$2" != "dist" ];
 	  then
 	    run_other_executable_sequential $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
 	  else
@@ -421,7 +425,7 @@ function run {
 	#for each executables parallel starts program in some configuration
 	for exe_par in ${exe_parallel[*]}
 	do
-	  if [ "$2" != "mem" ];
+	  if [ "$2" != "mem" ] && [ "$2" != "dist" ];
 	  then
 	    run_other_executable_parallel $exe $1 $_TEST_DIMENSIONS $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
 	  else
@@ -483,6 +487,8 @@ function plotresult {
   
     local test=`ls`
     local graph="../../$_GRAPHS"
+    local utils="../../$_UTILS"
+    local testsinstances="../../$_TESTS_INSTANCES"
     for t in $test
     do
       #for each test folder
@@ -588,6 +594,59 @@ function plotresult {
 	fi
 	rm -f tmp
 	mv result_memory.png $graph/$t/result_memory.png
+	
+	#DISTANCE
+	touch tmp
+	echo -e 'Algorithm_Name\tDistance_From_Optimal_Result' > tmp
+	count=0
+	for a in `ls *.bin`
+	do
+	  #get the first value on text file
+	  read_info_file "../../$_TESTS_INSTANCES/$t/info.txt"
+	  echo $a
+	  $utils/$_BITMATRIX_COMPARATOR "multi_dim_brute_force.bin" $a $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
+	  time_test=`head -n 1 "diff.txt"`
+	  #if a value of executed time exists
+	  if [ ! -z "$time_test" ];
+	  then
+	    #take first character of all word in file name and create name with them
+	    IFS='_' read -a words <<< "$a"
+	    name=""
+	    for word in "${words[@]}"
+	    do
+	      firstchar=`echo $word | head -c 1`
+	      name="$name$firstchar"
+	    done
+	    echo -e "$name\t$time_test" >> tmp
+	    let count+=1
+	  fi
+	done
+	if [ $count != 0 ];
+	then
+	  let offset=-5/$count
+	  #create output file graph
+	  gnuplot <<- EOF
+	    set title "`echo $t`"
+	    set xlabel "Algorithm Name"
+	    set ylabel "Distance"
+	    set xtics rotate by 90 offset `echo $offset`, 1
+	    set ytics out nomirror
+	    set term png
+	    set output "result_distance.png"
+	    set style fill solid border -1
+	    # Make the histogram boxes half the width of their slots.
+	    set boxwidth 0.5 relative
+	    set grid front
+
+	    # Select histogram mode.
+	    set style data histograms
+	    # Select a row-stacked histogram.
+	    set style histogram rowstacked
+	    plot "tmp" using 2:xticlabels(1) title 'Algorithm'
+		EOF
+	fi
+	rm -f tmp
+	mv result_distance.png $graph/$t/result_distance.png
       cd ..
     done
   

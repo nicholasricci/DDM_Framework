@@ -67,18 +67,24 @@ function run_other_executable_sequential {
     let R+=1
   done
   
-  if [ "$6" != "mem" ];
-  then 
-    AVERAGE=`$AVERAGER $filename`
-    echo -e "$AVERAGE" > $filename
-    filename_result="${1}_${3}_${4}_${5}.txt"
-    mv $filename $RESULTS/$filename_result
+  if [ "$6" = "dist" ];
+  then
+    mv $_BITMATRIX_NAME  "$RESULTS/${1}.bin"
   else
-    #average of memory usage
-    AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
-    echo -e "$AVERAGE_MEMORY" > $_VALGRIND_OUT_FILE
-    filename_memory="${1}_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
-    mv $_VALGRIND_OUT_FILE $RESULTS/$filename_memory
+    rm $_BITMATRIX_NAME
+    if [ "$6" = "mem" ];
+    then 
+      #average of memory usage
+      AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+      echo -e "$AVERAGE_MEMORY" > $_VALGRIND_OUT_FILE
+      filename_memory="${1}_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
+      mv $_VALGRIND_OUT_FILE $RESULTS/$filename_memory
+    else
+      AVERAGE=`$AVERAGER $filename`
+      echo -e "$AVERAGE" > $filename
+      filename_result="${1}_${3}_${4}_${5}.txt"
+      mv $filename $RESULTS/$filename_result
+    fi
   fi
 }
 
@@ -123,17 +129,23 @@ function run_other_executable_parallel {
     let R+=1
   done
   
-  if [ "$6" != "mem" ];
-  then 
-    AVERAGE=`$AVERAGER $filename`
-    echo -e "$AVERAGE" > $filename
-    filename_result="${1}_${3}_${4}_${5}.txt"
-    mv $filename $RESULTS/$filename_result
+  if [ "$6" = "dist" ];
+  then
+    mv $_BITMATRIX_NAME  "$RESULTS/${1}.bin"
   else
-    #average of memory usage
-    AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
-    echo -e "$AVERAGE_MEMORY" > $_VALGRIND_OUT_FILE
-    filename_memory="${1}_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
-    mv $_VALGRIND_OUT_FILE $RESULTS/$filename_memory
+    rm $_BITMATRIX_NAME
+    if [ "$6" = "mem" ];
+    then 
+      #average of memory usage
+      AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
+      echo -e "$AVERAGE_MEMORY" > $_VALGRIND_OUT_FILE
+      filename_memory="${1}_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
+      mv $_VALGRIND_OUT_FILE $RESULTS/$filename_memory
+    else
+      AVERAGE=`$AVERAGER $filename`
+      echo -e "$AVERAGE" > $filename
+      filename_result="${1}_${3}_${4}_${5}.txt"
+      mv $filename $RESULTS/$filename_result
+    fi
   fi
 }

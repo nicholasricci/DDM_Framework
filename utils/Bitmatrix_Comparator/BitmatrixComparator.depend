@@ -1,0 +1,36 @@
+# depslib dependency file v1.0
+1415882047 source:/home/eneru/Documents/github/DDM_Framework/utils/BitmatrixComparator/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415881572 /home/eneru/Documents/github/DDM_Framework/utils/BitmatrixComparator/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<assert.h>
+
+1415896611 source:/home/eneru/Documents/github/DDM_Framework/utils/Bitmatrix_Comparator/DDM_input_output.c
+	"DDM_input_output.h"
+
+1415896454 /home/eneru/Documents/github/DDM_Framework/utils/Bitmatrix_Comparator/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<assert.h>
+
+1415894254 source:/home/eneru/Documents/github/DDM_Framework/utils/Bitmatrix_Comparator/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+

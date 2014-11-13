@@ -51,7 +51,7 @@
  *  Utils definition for bit vector and bit matrix
  */
 
-#define ST 8
+#define ST 32
 
 #if ST == 64
 
