@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     bitmatrix_init(&temp, updates, subscriptions);
     //reset ddm_input->result_mat to one, so you can do the and operation between
     //temp(init 0) and ddm_input->result_mat(init 1)
-    bitmatrix_init(&ddm_input->result_mat, updates, subscriptions);
+    //bitmatrix_init(&ddm_input->result_mat, updates, subscriptions);
 
     //fill all data to all dimensions
     for (i = 0; i < updates; ++i){
@@ -141,7 +141,10 @@ int main(int argc, char *argv[])
     }
 
     DDM_Stop_Timer(ddm_input);
-    //bitmatrix_free(&temp, updates, subscriptions);
+
+    free(subs);
+    free(upds);
+    bitmatrix_free(&temp, updates, subscriptions);
 
     printf("\nnmatches: %"PRIu64"\n", bitmatrix_count_ones(ddm_input->result_mat, updates, subscriptions));
 

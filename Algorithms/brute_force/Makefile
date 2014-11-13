@@ -17,10 +17,10 @@ openmp:			LDLIBS+=-lgomp
 openmp:			$(PAR)
 
 multi_dim_brute_force:	$(OBJSSEQ)
-			cc $(CFLAGS) -o $(BIN)multi_dim_brute_force $(OBJSSEQ) -lm
+			cc $(CFLAGS) -o $(BIN)multi_dim_brute_force $(OBJSSEQ) -lm -g
 			
 multi_dim_brute_force_mp:	$(OBJSPAR)
-				cc $(CFLAGS) -o $(BIN)multi_dim_brute_force_mp $(OBJSPAR) -lm
+				cc $(CFLAGS) -o $(BIN)multi_dim_brute_force_mp $(OBJSPAR) -lm -g
 
 clean:
 			rm -f *.o

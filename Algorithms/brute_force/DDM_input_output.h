@@ -51,37 +51,45 @@
  *  Utils definition for bit vector and bit matrix
  */
 
-#define SPACE_TYPE uint32_t
-#define ST 32
+#define ST 8
 
 #if ST == 64
 
 #define BIT_MAX_ELEM 0x8000000000000000
 #define BIT_MIN_ELEM 0x0000000000000001
 #define BIT_NUMBER 64
+#define BITS_ONE 0xFFFFFFFFFFFFFFFF
+#define BITS_ZERO 0x0000000000000000
 
 #elif ST == 32
 
 #define BIT_MAX_ELEM 0x80000000
 #define BIT_MIN_ELEM 0x00000001
 #define BIT_NUMBER 32
+#define BITS_ONE 0xFFFFFFFF
+#define BITS_ZERO 0x00000000
 
 #elif ST == 16
 
 #define BIT_MAX_ELEM 0x8000
 #define BIT_MIN_ELEM 0x0001
 #define BIT_NUMBER 16
+#define BITS_ONE 0xFFFF
+#define BITS_ZERO 0x0000
 
 #elif ST == 8
 
 #define BIT_MAX_ELEM 0x80
 #define BIT_MIN_ELEM 0x01
 #define BIT_NUMBER 8
+#define BITS_ONE 0xFF
+#define BITS_ZERO 0x00
 
 #endif // SPACE_TYPE
 
 #define DBIT(_n)    (BIT_MAX_ELEM >> _n)
 
+typedef uint32_t SPACE_TYPE;
 typedef SPACE_TYPE bitelem;
 typedef SPACE_TYPE* bitvector;
 typedef bitvector* bitmatrix;
@@ -198,6 +206,12 @@ uint64_t DDM_Get_Updates(DDM_Input ddm_input);
  */
 uint64_t DDM_Get_Subscriptions(DDM_Input ddm_input);
 
+/**
+ * \brief Set unallocate all items inside ddm_input
+ * \param ddm_input
+ */
+void DDM_Dispose_Input(DDM_Input *ddm_input);
+
 /******************************************
  ***************** OUTPUT *****************
  ******************************************/
@@ -208,8 +222,16 @@ uint64_t DDM_Get_Subscriptions(DDM_Input ddm_input);
  */
 void DDM_Write_Result(DDM_Input *ddm_input);
 
+/**
+ * \brief Get the list of updates
+ * \param ddm_input
+ */
 DDM_Extent* DDM_Get_Updates_List(DDM_Input ddm_input);
 
+/**
+ * \brief Get the list of subscriptions
+ * \param ddm_input
+ */
 DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input);
 
 /******************************************

@@ -7,12 +7,12 @@ ALL: 			mkdirs release
 mkdirs:			
 			mkdir -p $(BIN)
 			
-release:		CFLAGS=-Wall -O3 -DNDEBUG -Wno-unknown-pragmas -g
+release:		CFLAGS=-Wall -O3 -DNDEBUG -Wno-unknown-pragmas
 release:		LDLIBS+=-lrt
 release:		$(SEQ)
 
 binary_partition:	$(OBJSSEQ)
-			cc $(CFLAGS) -o $(BIN)binary_partition $(OBJSSEQ) -lm
+			cc $(CFLAGS) -o $(BIN)binary_partition $(OBJSSEQ) -lm -g
 
 clean:
 			rm -f *.o

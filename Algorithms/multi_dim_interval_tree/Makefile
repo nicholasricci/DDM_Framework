@@ -10,16 +10,16 @@ ALL: 			mkdirs release openmp
 mkdirs:		
 			mkdir -p $(BIN)
 
-release:		CFLAGS=-Wall -DNDEBUG -Wno-unknown-pragmas
+release:		CFLAGS=-Wall -O3 -DNDEBUG -Wno-unknown-pragmas -g
 release:		LDLIBS+=-lrt
 release:		$(SEQ)
 
-openmp:			CFLAGS=-Wall -O3 -DNDEBUG -fopenmp 
+openmp:			CFLAGS=-Wall -O3 -DNDEBUG -fopenmp -g
 openmp:			LDLIBS+=-lgomp
 openmp:			$(PAR)
 		
 interval_tree:		$(OBJSSEQ)
-			cc $(CFLAGS) -o $(BIN)interval_tree $(OBJSSEQ) -lm
+			cc $(CFLAGS) -o $(BIN)interval_tree $(OBJSSEQ) -lm -g
 
 interval_tree_mp:	$(OBJSSEQ)
 			cc $(CFLAGS) -o $(BIN)interval_tree_mp $(OBJSSEQ) -lm

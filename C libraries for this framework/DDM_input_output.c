@@ -185,15 +185,23 @@ DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input){
     return NULL;
 }
 
+void DDM_Dispose_Input(DDM_Input *ddm_input){
+
+    free(ddm_input->list_updates);
+    free(ddm_input->list_subscriptions);
+    bitmatrix_free(&ddm_input->result_mat, ddm_input->updates, ddm_input->subscriptions);
+    free(ddm_input);
+}
+
 /******************************************
  ***************** OUTPUT *****************
  ******************************************/
 
-void DDM_Write_Result(DDM_Input ddm_input){
+void DDM_Write_Result(DDM_Input *ddm_input){
 
     /* write results */
-    char str[100];
-    strcpy(str, ddm_input.executable_name);
+    char str[1000];
+    strcpy(str, ddm_input->executable_name);
     strcat(str, ".txt");
     FILE* fout = fopen(str, "a");
     if ( fout == NULL ) {
@@ -201,11 +209,11 @@ void DDM_Write_Result(DDM_Input ddm_input){
         exit(-1);
     }
 
-    fprintf(fout, "%f\n", ddm_input.timer.total);
-    fclose(fout);
+    fprintf(fout, "%f\n", ddm_input->timer.total);
+    //fclose(fout);
 
-    bitmatrix_write_file(ddm_input.result_mat, ddm_input.updates, ddm_input.subscriptions,"result_mat.bin");
-    bitmatrix_free(&ddm_input.result_mat, ddm_input.updates, ddm_input.subscriptions);
+    bitmatrix_write_file(ddm_input->result_mat, ddm_input->updates, ddm_input->subscriptions,"result_mat.bin");
+    DDM_Dispose_Input(ddm_input);
 
     /*strcpy(strresmat, "result_mat.txt");
     fout = fopen(strresmat, "w+");
@@ -348,7 +356,7 @@ void bitmatrix_init(bitmatrix *mat, uint64_t updates, uint64_t subscriptions){
 
     *mat = (bitmatrix)malloc(sizeof(bitvector) * updates);
     for (i = 0; i < updates; ++i)
-        (*mat)[i] = (bitvector)calloc(ceill(subscriptions / BIT_NUMBER), sizeof(bitelem));
+        (*mat)[i] = (bitvector)malloc(ceill(subscriptions / (float)BIT_NUMBER) * sizeof(bitelem));
 }
 
 void bitmatrix_set_value(bitmatrix mat, uint64_t update, uint64_t subscription, mat_value value){
@@ -378,7 +386,7 @@ void bitmatrix_and(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64
     uint64_t i, j;
 
     for (i = 0; i < updates; ++i)
-        for (j = 0; j < subscriptions; ++j)
+        for (j = 0; j < ceill(subscriptions / (float)BIT_NUMBER); ++j)
             mat[i][j] &= mask[i][j];
 }
 
@@ -386,7 +394,7 @@ void bitmatrix_or(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64_
     uint64_t i, j;
 
     for (i = 0; i < updates; ++i)
-        for (j = 0; j < subscriptions; ++j)
+        for (j = 0; j < ceill(subscriptions / (float)BIT_NUMBER); ++j)
             mat[i][j] |= mask[i][j];
 }
 
@@ -394,7 +402,7 @@ void bitmatrix_not(bitmatrix mat, uint64_t updates, uint64_t subscriptions){
     uint64_t i, j;
 
     for (i = 0; i < updates; ++i)
-        for (j = 0; j < subscriptions; ++j)
+        for (j = 0; j < ceill(subscriptions / (float)BIT_NUMBER); ++j)
             mat[i][j] = ~mat[i][j];
 }
 
@@ -402,18 +410,22 @@ void bitmatrix_xor(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64
     uint64_t i, j;
 
     for (i = 0; i < updates; ++i)
-        for (j = 0; j < subscriptions; ++j)
+        for (j = 0; j < ceill(subscriptions / (float)BIT_NUMBER); ++j)
             mat[i][j] ^= mask[i][j];
 }
 
 void bitmatrix_reset(bitmatrix mat, uint64_t updates, uint64_t subscriptions, mat_value value){
-    uint64_t i;
+    uint64_t i, j;
 
     for (i = 0; i < updates; ++i)
         if (value == zero)
-            memset(mat[i], 0x00, sizeof(bitelem) * ceil((float)subscriptions / BIT_NUMBER));
+            for (j = 0; j < ceil(subscriptions / (float)BIT_NUMBER); ++j)
+                mat[i][j] = BITS_ZERO;
+            //memset(mat[i], BITS_ZERO, sizeof(bitelem) * ceil((float)subscriptions / BIT_NUMBER));
         else{
-            memset(mat[i], 0xFF, sizeof(bitelem) * ceil((float)subscriptions / BIT_NUMBER));
+            for (j = 0; j < ceil(subscriptions / (float)BIT_NUMBER); ++j)
+                mat[i][j] = BITS_ONE;
+            //memset(mat[i], BITS_ONE, sizeof(bitelem) * ceil((float)subscriptions / BIT_NUMBER));
         }
 }
 
@@ -452,7 +464,7 @@ uint64_t bitmatrix_differences(bitmatrix mat1, bitmatrix mat2, uint64_t updates,
 void bitmatrix_read_file(bitmatrix *mat, uint64_t updates, uint64_t subscriptions, char *filename){
     FILE *fp;
     uint64_t i;
-    uint64_t subs_vec = ceil((float)subscriptions / BIT_NUMBER);
+    uint64_t subs_vec = ceil(subscriptions / (float)BIT_NUMBER);
 
     bitmatrix_init(mat, updates, subscriptions);
 
@@ -470,7 +482,7 @@ void bitmatrix_read_file(bitmatrix *mat, uint64_t updates, uint64_t subscription
 void bitmatrix_write_file(const bitmatrix mat, uint64_t updates, uint64_t subscriptions, char *filename){
     FILE *fp;
     uint64_t i;
-    uint64_t subs_vec = ceil((float)subscriptions / BIT_NUMBER);
+    uint64_t subs_vec = ceil(subscriptions / (float)BIT_NUMBER);
 
     if ((fp = fopen(filename, "wb")) == NULL){
         printf("\nError to open file to write\n");
@@ -485,9 +497,12 @@ void bitmatrix_write_file(const bitmatrix mat, uint64_t updates, uint64_t subscr
 
 void bitmatrix_free(bitmatrix *mat, uint64_t updates, uint64_t subscriptions){
     uint64_t i;
+    bitvector vec;
 
-    for (i = 0; i < updates; ++i)
-        free((*mat)[i]);
+    for (i = 0; i < updates - 1; ++i){
+        vec = (*mat)[i];
+        free(vec);
+    }
     free(*mat);
 }
 
