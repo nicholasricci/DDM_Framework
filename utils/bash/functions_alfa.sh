@@ -54,7 +54,8 @@ function create_alfa_folders_and_files {
 }
 
 function create_all_alfa_folders_and_files {
-  for ALFA in $1
+  local alfas=( "$@" )
+  for ALFA in ${alfas[@]}
   do
     EXTENTS=$START_EXTENTS
     while [ $EXTENTS -le "$MAX_EXTENTS" ]
@@ -114,9 +115,12 @@ function run_alfa_executable_sequential {
 			  fi
 		  done
 		  
+		  RESULT_FOLDER="${RESULTS}_${ALFA}_${EXTENTS}_${DIMENSION}"
+		  mkdir -p $RESULT_FOLDER
+		  
 		  if [ "$3" = "dist" ];
 		  then
-		    mv $_BITMATRIX_NAME "$RESULTS/${1}.bin"
+		    mv $_BITMATRIX_NAME "$RESULT_FOLDER/${1}.bin"
 		  else
 		    rm $_BITMATRIX_NAME
 		    if [ "$3" != "mem" ];
@@ -125,13 +129,13 @@ function run_alfa_executable_sequential {
 		      AVERAGE=`$AVERAGER $filename`
 		      echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
 		      filename_result="${1}_${EXTENTS}_${DIMENSION}_${ALFA}.txt"
-		      mv $filename $RESULTS/$filename_result
+		      mv $filename $RESULT_FOLDER/$filename_result
 		    else
 		      #average of memory usage
 		      AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
 		      echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
 		      filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_FINAL_FILE"
-		      mv $executed_filename_memory $RESULTS/$filename_memory
+		      mv $executed_filename_memory $RESULT_FOLDER/$filename_memory
 		    fi
 		  fi
 
@@ -196,9 +200,12 @@ function run_alfa_executable_parallel {
 			    fi
 		    done
 		    
+		    RESULT_FOLDER="${RESULTS}_${ALFA}_${EXTENTS}_${DIMENSION}"
+		    mkdir -p $RESULT_FOLDER
+		    
 		    if [ "$3" = "dist" ];
 		    then
-		      mv $_BITMATRIX_NAME "$RESULTS/${1}.bin"
+		      mv $_BITMATRIX_NAME "$RESULT_FOLDER/${1}.bin"
 		    else
 		      rm $_BITMATRIX_NAME
 		      if [ "$3" != "mem" ];
@@ -206,13 +213,13 @@ function run_alfa_executable_parallel {
 			AVERAGE=`$AVERAGER $filename`
 			echo -e "$EXTENTS\t$AVERAGE" >> $executed_filename
 			filename_result="${1}_${EXTENTS}_${DIMENSION}_${CORE}_${ALFA}.txt"
-			mv $filename $RESULTS/$filename_result
+			mv $filename $RESULT_FOLDER/$filename_result
 		      else
 			#average of memory usage
 			AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
 			echo -e "$EXTENTS\t$AVERAGE_MEMORY" >> $executed_filename_memory
 			filename_memory="${1}_${EXTENTS}_${DIMENSION}_${ALFA}_$_VALGRIND_OUT_FILE"     
-			mv $executed_filename_memory $RESULTS/$filename_memory
+			mv $executed_filename_memory $RESULT_FOLDER/$filename_memory
 		      fi
 		    fi
 		    
@@ -220,8 +227,8 @@ function run_alfa_executable_parallel {
 		    
 	    done
 
-	    mv $executed_filename $GRAPHS
-	    mv $executed_filename_memory $GRAPHS
+	    #mv $executed_filename $GRAPHS
+	    #mv $executed_filename_memory $GRAPHS
     done
     
   done

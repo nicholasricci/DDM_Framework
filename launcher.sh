@@ -333,7 +333,7 @@ function run {
       #change to bin directory
       cd $_ALGORITHM_BIN
       #prepare alfa folders and files
-      create_all_alfa_folders_and_files $ALFAS
+      create_all_alfa_folders_and_files "${ALFAS[@]}"
       #for each executables sequential starts program in some configuration
       for exe in ${exe_sequential[*]}
       do
@@ -345,7 +345,7 @@ function run {
 	fi
       done
       #prepare alfa folders and files
-      create_all_alfa_folders_and_files $ALFAS_PAR
+      create_all_alfa_folders_and_files "${ALFAS_PAR[@]}"
       #for each executables parallel starts program in some configuration
       for exe_par in ${exe_parallel[*]}
       do
@@ -493,6 +493,9 @@ function plotresult {
     do
       #for each test folder
       cd $t
+      
+	#create dir for graph
+	mkdir -p $graph/$t
 	#TIME
 	#for each algorithm result file in test folder
 	touch tmp
@@ -602,8 +605,7 @@ function plotresult {
 	for a in `ls *.bin`
 	do
 	  #get the first value on text file
-	  read_info_file "../../$_TESTS_INSTANCES/$t/info.txt"
-	  echo $a
+	  read_info_file "$_TESTS_INSTANCES/$t/info.txt"
 	  $utils/$_BITMATRIX_COMPARATOR "multi_dim_brute_force.bin" $a $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
 	  time_test=`head -n 1 "diff.txt"`
 	  #if a value of executed time exists
