@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     printf("\nnmatches: %"PRIu64"\n", bitmatrix_count_ones(ddm_input->result_mat, updates, subscriptions));
 
     //Write result
-    DDM_Write_Result(*ddm_input);
+    DDM_Write_Result(ddm_input);
 
     return 0;
 }

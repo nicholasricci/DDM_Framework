@@ -354,9 +354,9 @@ uint64_t count_ones_matrix(uint_fast8_t **mat, uint64_t updates, uint64_t subscr
 void bitmatrix_init(bitmatrix *mat, uint64_t updates, uint64_t subscriptions){
     uint64_t i;
 
-    *mat = (bitmatrix)malloc(sizeof(bitvector) * updates);
+    *mat = (bitmatrix)malloc(sizeof * (*mat) * updates);
     for (i = 0; i < updates; ++i)
-        (*mat)[i] = (bitvector)malloc(ceill(subscriptions / (float)BIT_NUMBER) * sizeof(bitelem));
+        (*mat)[i] = (bitvector)malloc(ceill(subscriptions / (float)BIT_NUMBER) * sizeof * (*mat)[i]);
 }
 
 void bitmatrix_set_value(bitmatrix mat, uint64_t update, uint64_t subscription, mat_value value){
@@ -474,7 +474,7 @@ void bitmatrix_read_file(bitmatrix *mat, uint64_t updates, uint64_t subscription
     }
 
     for (i = 0; i < updates; ++i){
-        fread((*mat)[i], sizeof(bitelem), sizeof(bitelem) * subs_vec, fp);
+        fread((*mat)[i], sizeof * (*mat)[i], subs_vec, fp);
     }
     fclose(fp);
 }
@@ -490,7 +490,7 @@ void bitmatrix_write_file(const bitmatrix mat, uint64_t updates, uint64_t subscr
     }
 
     for (i = 0; i < updates; ++i){
-        fwrite(mat[i], sizeof(bitelem), sizeof(bitelem) * subs_vec, fp);
+        fwrite(mat[i], sizeof * mat[i], subs_vec, fp);
     }
     fclose(fp);
 }
@@ -499,7 +499,7 @@ void bitmatrix_free(bitmatrix *mat, uint64_t updates, uint64_t subscriptions){
     uint64_t i;
     bitvector vec;
 
-    for (i = 0; i < updates - 1; ++i){
+    for (i = 0; i < updates; ++i){
         vec = (*mat)[i];
         free(vec);
     }

@@ -605,7 +605,7 @@ function plotresult {
 	for a in `ls *.bin`
 	do
 	  #get the first value on text file
-	  read_info_file "$_TESTS_INSTANCES/$t/info.txt"
+	  read_info_file "$testsinstances/$t/info.txt"
 	  $utils/$_BITMATRIX_COMPARATOR "multi_dim_brute_force.bin" $a $_TEST_UPDATES $_TEST_SUBSCRIPTIONS
 	  time_test=`head -n 1 "diff.txt"`
 	  #if a value of executed time exists
