@@ -648,6 +648,7 @@ function plotresult {
 		EOF
 	fi
 	rm -f tmp
+	rm -f diff.txt
 	mv result_distance.png $graph/$t/result_distance.png
       cd ..
     done
