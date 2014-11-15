@@ -415,17 +415,17 @@ void bitmatrix_xor(bitmatrix mat, const bitmatrix mask, uint64_t updates, uint64
 }
 
 void bitmatrix_reset(bitmatrix mat, uint64_t updates, uint64_t subscriptions, mat_value value){
-    uint64_t i, j;
+    uint64_t i;
 
     for (i = 0; i < updates; ++i)
         if (value == zero)
-            for (j = 0; j < ceil(subscriptions / (float)BIT_NUMBER); ++j)
-                mat[i][j] = BITS_ZERO;
-            //memset(mat[i], BITS_ZERO, sizeof(bitelem) * ceil((float)subscriptions / BIT_NUMBER));
+            /*for (j = 0; j < ceil(subscriptions / (float)BIT_NUMBER); ++j)
+                mat[i][j] = BITS_ZERO;*/
+            memset(mat[i], BITS_ZERO, sizeof(bitelem) * ceil(subscriptions / (float)BIT_NUMBER));
         else{
-            for (j = 0; j < ceil(subscriptions / (float)BIT_NUMBER); ++j)
-                mat[i][j] = BITS_ONE;
-            //memset(mat[i], BITS_ONE, sizeof(bitelem) * ceil((float)subscriptions / BIT_NUMBER));
+            /*for (j = 0; j < ceil(subscriptions / (float)BIT_NUMBER); ++j)
+                mat[i][j] = BITS_ONE;*/
+            memset(mat[i], BITS_ONE, sizeof(bitelem) * ceil(subscriptions / (float)BIT_NUMBER));
         }
 }
 
