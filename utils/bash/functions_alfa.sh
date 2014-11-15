@@ -174,7 +174,7 @@ function run_alfa_executable_parallel {
 	    EXTENTS=$START_EXTENTS
 	    filename="$1.txt"
 	    executed_filename="exec_time_${1}_cores_${CORE}_alfa_${ALFA}.txt"
-	    executed_filename_memory="exec_memory_$1_alfa_${ALFA}_$_VALGRIND_FINAL_FILE"
+	    executed_filename_memory="exec_memory_$1_m_alfa_${ALFA}_$_VALGRIND_FINAL_FILE"
 	    
 	    while [ $EXTENTS -le "$MAX_EXTENTS" ]
 	    do
