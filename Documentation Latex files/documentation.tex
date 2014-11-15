@@ -110,31 +110,68 @@
   #include "DDM_input_output.h"
  \end{lstlisting}
  
- Another thing you must do is to declare a new \variable{DDM\_Timer}:
+ Another thing you must do is to declare a new \variable{DDM\_Input} and a temporaneous bitmatrix variable,
+ if you need to do an AND operation between different dimension:
  \begin{lstlisting}
-  DDM_Timer ddm_timer;
+  //temporaneous result matrix, if your algorithm need an and 
+  //operation between results of single dimensions
+  bitmatrix temp;
+  DDM_Timer *ddm_input;
  \end{lstlisting}
 
- Now you can get the number of extents, updates, subscriptions, alfa, dimensions:
+ Now you can get the number of extents, updates, subscriptions, alfa, dimensions and list of subscriptions,
+ list of updates:
  \begin{lstlisting}
-  size_t extents = DDM_Get_Extents(argc, argv);
-  size_t dimension = DDM_Get_Dimension(argc, argv);
-  size_t updates = DDM_Get_Updates(argc, argv);
-  size_t subscriptions = DDM_Get_Subscriptions(argc, argv);
-  float alfa = DDM_Get_Alfa(argc, argv);
+  //Initialize variable of DDM
+  ddm_input = DDM_Initialize_Input(argc, argv);
+  //Check if the initialization of input was succesfully
+  if (ddm_input == NULL)
+      exit(-1);
+  uint64_t extents = DDM_Get_Extents(*ddm_input);
+  uint64_t dimension = DDM_Get_Dimension(*ddm_input);
+  uint64_t updates = DDM_Get_Updates(*ddm_input);
+  uint64_t subscriptions = DDM_Get_Subscriptions(*ddm_input);
+  float alfa = DDM_Get_Alfa(*ddm_input);
+  DDM_Extent *list_updates = DDM_Get_Updates_List(*ddm_input);
+  DDM_Extent *list_subscriptions = 
+  DDM_Get_Subscriptions_List(*ddm_input);
+  
+  //create temporaneous matrix
+  bitmatrix_init(&temp, updates, subscriptions);
  \end{lstlisting}
 
  After you've gotten parameters it's time to start the timer, execute the matching algorithm and
  at the end stop the timer:
  \begin{lstlisting}
-  DDM_Start_Timer(&ddm_timer);
-    //execute the matching algorithm
-  DDM_Stop_Timer(&ddm_timer);
+  DDM_Start_Timer(ddm_input);
+  for (k = 0; k < dimensions; ++k){
+      if (k > 0){
+	  //each time execute different dimension
+	  //reset the temp matrix
+	  bitmatrix_reset(temp, updates, subscriptions, zero);
+
+	  //Execute Algorithm Here **
+
+	  //Intersect temp matrix and ddm_input->result_mat and store 
+	  //result in ddm_input->result_mat
+	  bitmatrix_and(ddm_input->result_mat, temp, updates, 
+	  subscriptions);
+      }else{
+	  //Execute algorithm and store result into 
+	  //ddm_input->result_mat **
+      }
+  }
+  DDM_Stop_Timer(ddm_input);
  \end{lstlisting}
 
   At the end you need to write result into a file then:
   \begin{lstlisting}
-   DDM_Write_Result(argv, DDM_Get_Total_Time(ddm_timer));
+  //if you want see the number of matches
+  printf("\nnmatches: %"PRIu64"\n", bitmatrix_count_ones(
+  ddm_input->result_mat, updates, subscriptions));
+
+  //Write result
+  DDM_Write_Result(ddm_input);
   \end{lstlisting}
   
   After you've fix your algorithm you can put it inside the framework and go to the next chapter!
@@ -172,7 +209,8 @@
   \end{itemize}
   This command will create a file in the root of the framework called \bashfile{configure.sh};
   \item \command{build}: will be compiled all algorithms in the folder \folder{Algorithms} 
-  and \folder{utils} where there are an avarager and a DDMInstanceMaker programs.
+  and \folder{utils} where there are an avarager, a DDMInstanceMaker, a BitmatrixComparator and an
+  alfa\_creator programs.
   At the end of the process there will be two text files in the root of each algorithm:
   \begin{itemize}
    \item DDM\_Sequential: in this file is necessary to write all names of sequential version 
@@ -188,14 +226,19 @@
       goals but isn't very accurate beacause values are very random and not created with some
       criteria, update and subscription extents are the same number:
       \begin{itemize}
-       \item \folder{\_results}: in this folder will be available all the runs performed with 
-       execution time;
-       \item \folder{\_graphs}: in this folder will be available files with the number 
-       of extents on the left and to the right will be the average time of the runs performed.
+       \item \folder{Results}: in this folder will be available all the runs performed with 
+       execution time, memory usage or/and bitmatrix file for distance calculation;
       \end{itemize}
       You can use more precise tests, read below;
      \item \command{<every elements inside TestsInstances>}: This tests are more accurate then
      alfa test. Values are always random but with more clauses.
+     \item plus options with run command:
+     \begin{itemize}
+      \item without any option: the result is execution time in seconds;
+      \item mem: the result is memory usage in a .mem file. Memory usage in MB;
+      \item dist: the result is the distance from optimal solution;
+      \item all: the result is the all three options above in sequential.
+     \end{itemize}
     \end{itemize}
  \end{enumerate}
  This commands are listed in order of their executions.
@@ -206,7 +249,7 @@
   \item \command{cleantestsinstances}: delete \folder{TestsInstances} folder;
   \item \command{cleanalgorithms}: for each algorithm executes command \command{make clean}, 
   then is foundamental define a clean target in your makefile;
-  \item \command{cleanresults}: will delete \folder{\_results} and \folder{\_graphs} folders 
+  \item \command{cleanresults}: will delete \folder{Results} and \folder{Graphs} folders 
   with all their files;
   \item \command{clean}: executes all previous clean commands.
  \end{itemize}
@@ -215,6 +258,8 @@
  \begin{itemize}
   \item \command{DDMInstanceMaker}: with this you can create a test instance;
   \item \command{DDMDefaultsTests}: with this you can create a set of default tests instances.
+  \item \command{plotresult}: with this you can transform your .txt, .mem, .bin files into a graphics more
+  readable for human in \folder{Graphs} folder.
  \end{itemize}
 
  

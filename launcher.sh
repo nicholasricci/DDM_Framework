@@ -673,7 +673,7 @@ if [ ! -z "$1" ] && [ "$1" == "--help" ];
 then
 
   echo "for build and run all algorithms:
-usage: 	./launcher.sh run EXTENTS DIMENSION ALFA ALFA_PARALLEL
+usage: 	./launcher.sh run TEST_TYPE
   
 for only build:
 usage:	./launcher.sh build
@@ -682,8 +682,14 @@ for configure the run command:
 usage:	./launcher.sh configure
 
 for only run, you must pass a parameter that indicates the test type:
-usage:	./launcher.sh run <test_type>
+usage:	./launcher.sh run <test_type> <option>
 example:./launcher.sh run alfa
+you can execute three type of test:
+1 - without any options you can get time execution;
+2 - with mem option you can get the memory usage of your algorithms;
+3 - with dist option you can get the distance between optimal solution;
+4 - with all option you can get all three options above.
+example:./launcher.sh run alfa dist
 
 for clean (all builded objects, Results, Graphs folder, utils and TestsInstances):
 usage:	./launcher.sh clean
@@ -691,7 +697,7 @@ usage:	./launcher.sh clean
 for clean only algorithm:
 usage:	./launcher.sh cleanalgorithms
 
-for clean only _results and _graphs folder:
+for clean only $_RESULTS and $_GRAPHS folder:
 usage:	./launcher.sh cleanresults
 
 for clean only utils object files:
@@ -704,7 +710,10 @@ for create a new DDM Test Instance:
 usage:	./launcher.sh DDMInstanceMaker
 
 for create defaults DDM Tests Instances:
-usage:	./launcher.sh DDMDefaultsTests"
+usage:	./launcher.sh DDMDefaultsTests
+
+for create graphics to better comprehension you must execute before run command and after that you can use plotresult command:
+usage: 	./launcher.sh plotresult"
 
 elif [ ! -z "$1" ] && [ "$1" == "build" ];
 then
