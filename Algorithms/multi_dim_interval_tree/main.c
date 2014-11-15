@@ -18,7 +18,7 @@ uint64_t ddm_matching( bitmatrix result,
         int_tree_insert( &tree, &sub[i], current_dim );
     }
 
-#pragma omp parallel for reduction(+:result)
+#pragma omp parallel for private(j) reduction(+:count)
     for ( j=0; j<m; ++j) {
        count += int_tree_find_intersect( result, &tree, &upd[j], current_dim );
     }

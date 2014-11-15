@@ -94,7 +94,7 @@ function run_other_executable_parallel {
   #$3 is dimensions
   #$4 is updates
   #$5 is subscriptions
-  #$6 is mem for valgrind
+  #$6 is mem for valgrind or dist to calculate distance between variuos algorithms
   
   local filename
   local filename_result
@@ -110,7 +110,7 @@ function run_other_executable_parallel {
   echo $RUN
   for R in `seq $RUN`
   do
-    echo "running >$1< test: $2, dimensions: $3, updates: $4, subscriptions: $5, RUN:$R"
+    echo "running >${1}_mp< test: $2, dimensions: $3, updates: $4, subscriptions: $5, RUN:$R"
     if [ "$6" = "mem" ];
     then
       
@@ -131,7 +131,7 @@ function run_other_executable_parallel {
   
   if [ "$6" = "dist" ];
   then
-    mv $_BITMATRIX_NAME  "$RESULTS/${1}.bin"
+    mv $_BITMATRIX_NAME  "$RESULTS/${1}_mp.bin"
   else
     rm $_BITMATRIX_NAME
     if [ "$6" = "mem" ];
@@ -139,12 +139,12 @@ function run_other_executable_parallel {
       #average of memory usage
       AVERAGE_MEMORY=`$AVERAGER $_VALGRIND_OUT_FILE`
       echo -e "$AVERAGE_MEMORY" > $_VALGRIND_OUT_FILE
-      filename_memory="${1}_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
+      filename_memory="${1}_mp_${3}_${4}_${5}_$_VALGRIND_FINAL_FILE"
       mv $_VALGRIND_OUT_FILE $RESULTS/$filename_memory
     else
       AVERAGE=`$AVERAGER $filename`
       echo -e "$AVERAGE" > $filename
-      filename_result="${1}_${3}_${4}_${5}.txt"
+      filename_result="${1}_mp_${3}_${4}_${5}.txt"
       mv $filename $RESULTS/$filename_result
     fi
   fi

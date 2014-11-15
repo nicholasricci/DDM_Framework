@@ -7,6 +7,7 @@ void bruteforce1D(bitmatrix result, DDM_Extent *upds, uint64_t updates, DDM_Exte
     uint64_t i, j;
 
     for (i = 0; i < updates; ++i){
+#pragma omp parallel for private(j)
         for (j = 0; j < subscriptions; ++j){
             if (
                 (upds[i].lower[current_dim] <= subs[j].lower[current_dim]

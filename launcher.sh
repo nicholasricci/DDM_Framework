@@ -319,7 +319,7 @@ function run {
   check_configure
   build
   
-  if  [ $# -ge 1 ] && [ $# -le 2 ] && [ "$1" == "alfa" ]; 
+  if  [ $# -ge 1 ] && [ $# -le 2 ] && [ "$1" == "alfa" ] && [ "$2" != "all" ]; 
   then
     
     cd $_ALGORITHMS
@@ -365,7 +365,7 @@ function run {
     unset exe_sequential
     unset exe_parallel
     
-  elif [ $# -ge 1 ] && [ $# -le 2 ] && [ "$1" != "alfa" ];
+  elif [ $# -ge 1 ] && [ $# -le 2 ] && [ "$1" != "alfa" ] && [ "$2" != "all" ];
   then
     
     if [ -d "$_TESTS_INSTANCES" ];
@@ -446,6 +446,15 @@ function run {
       echo "Variables for tests isn't set!"
     
     fi
+   
+  
+  elif [ $# -ge 1 ] && [ $# -le 2 ] && [ "$2" = "all" ];
+  then
+  
+    ./launcher.sh "run" "$1"
+    ./launcher.sh "run" "$1" "mem"
+    ./launcher.sh "run" "$1" "dist"
+  
   else
   
     echo " syntax: usage: ./launcher.sh run STRING

@@ -213,7 +213,7 @@ void DDM_Write_Result(DDM_Input ddm_input){
 
     fprintf(fout, "%f\n", ddm_input.timer.total);
     fclose(fout);
-
+/*
     strcpy(strresmat, "result_mat.txt");
     fout = fopen(strresmat, "w+");
     if (fout == NULL){
@@ -229,7 +229,7 @@ void DDM_Write_Result(DDM_Input ddm_input){
         fprintf(fout, "\n");
     }
 
-    fclose(fout);
+    fclose(fout);*/
 }
 
 uint64_t DDM_Count_Matches(DDM_Input *ddm_input){
