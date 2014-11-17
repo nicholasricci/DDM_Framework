@@ -49,8 +49,6 @@ function create_alfa_folders_and_files {
   echo "$2 / 2" | bc >> $ALFA_INFO
   
   $ALFA_CREATOR $2 $DIMENSION $1 $ALFA_INPUT
-  
-  
 }
 
 function create_all_alfa_folders_and_files {
@@ -78,9 +76,7 @@ function run_alfa_executable_sequential {
   local RESULTS="../../../Results/ALFA"
   local GRAPHS="../../../Graphs/ALFA"
   local AVERAGER="../../../utils/averager"
-  
-  mkdir -p $RESULTS
-  mkdir -p $GRAPHS
+
   
   for ALFA in $ALFAS
   do
@@ -104,13 +100,23 @@ function run_alfa_executable_sequential {
 			  
 			    valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $EXTENTS $DIMENSION $ALFA 
 			    ms_print $_VALGRIND_OUT_FILE > "temp"
+			    unit=`cat "temp" | head -9 | tail -2 | head -1`
+			    unit=`echo $unit | cut -c1-2`
 			    temporaneous_variable=`cat "temp" | head -9 | tail -1 | awk '{print $1}'`
-			    echo "${temporaneous_variable//^}" > $_VALGRIND_OUT_FILE
+			    temporaneous_variable=`echo "${temporaneous_variable//^}"`
+			    if [ "$unit" = "KB" ];
+			    then 
+			      temporaneous_variable=`echo "$temporaneous_variable / 1024" | bc -l`
+			    elif [ "$unit" = "GB" ];
+			    then
+			      temporaneous_variable=`echo "$temporaneous_variable * 1024" | bc -l`
+			    fi
+			    echo $temporaneous_variable > $_VALGRIND_OUT_FILE
 			    rm -f "temp"
 			  
 			  else
 			  
-			    ./$1 $2 $EXTENTS $DIMENSION $ALFA 
+			    ./$1 $2 $EXTENTS $DIMENSION $ALFA $3
 			  
 			  fi
 		  done
@@ -122,7 +128,6 @@ function run_alfa_executable_sequential {
 		  then
 		    mv $_BITMATRIX_NAME "$RESULT_FOLDER/${1}.bin"
 		  else
-		    rm $_BITMATRIX_NAME
 		    if [ "$3" != "mem" ];
 		    then
 		      #average of time
@@ -158,10 +163,7 @@ function run_alfa_executable_parallel {
   local RESULTS="../../../Results/ALFA"
   local GRAPHS="../../../Graphs/ALFA"
   local AVERAGER="../../../utils/averager"
-  
-  mkdir -p $RESULTS
-  mkdir -p $GRAPHS
-  
+
   #for CORE in {2..$CORES}
   for ((CORE=2; CORE<=$CORES; CORE++))
   do
@@ -189,13 +191,23 @@ function run_alfa_executable_parallel {
 			    
 			      valgrind --tool=massif --massif-out-file=$_VALGRIND_OUT_FILE ./$1 $2 $EXTENTS $DIMENSION $ALFA 
 			      ms_print $_VALGRIND_OUT_FILE > "temp"
+			      unit=`cat "temp" | head -9 | tail -2 | head -1`
+			      unit=`echo $unit | cut -c1-2`
 			      temporaneous_variable=`cat "temp" | head -9 | tail -1 | awk '{print $1}'`
-			      echo "${temporaneous_variable//^}" > $_VALGRIND_OUT_FILE
+			      temporaneous_variable=`echo "${temporaneous_variable//^}"`
+			      if [ "$unit" = "KB" ];
+			      then 
+				temporaneous_variable=`echo "$temporaneous_variable / 1024" | bc -l`
+			      elif [ "$unit" = "GB" ];
+			      then
+				temporaneous_variable=`echo "$temporaneous_variable * 1024" | bc -l`
+			      fi
+			      echo $temporaneous_variable > $_VALGRIND_OUT_FILE
 			      rm -f "temp"
 			    
 			    else
 			    
-			      ./$1 $2 $EXTENTS $DIMENSION $ALFA
+			      ./$1 $2 $EXTENTS $DIMENSION $ALFA $3
 			    
 			    fi
 		    done
@@ -207,7 +219,6 @@ function run_alfa_executable_parallel {
 		    then
 		      mv $_BITMATRIX_NAME "$RESULT_FOLDER/${1}_mp.bin"
 		    else
-		      rm $_BITMATRIX_NAME
 		      if [ "$3" != "mem" ];
 		      then
 			AVERAGE=`$AVERAGER $filename`

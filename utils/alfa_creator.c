@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
     fclose(file_input);
     remove(argv[4]);
   }
-  if ((file_input = fopen(argv[4], "a+")) != NULL){
+  if ((file_input = fopen(argv[4], "w+")) != NULL){
     sprintf(to_write, "#Subscriptions <id> <D1 edges> [<D2 edges>]...\n");
     fputs(to_write, file_input);
     for (i = 0; i < subscriptions; ++i){

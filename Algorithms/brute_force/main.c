@@ -105,7 +105,6 @@ int main(int argc, char *argv[])
     //bitmatrix_print_matches(ddm_input->result_mat, updates, subscriptions);
     
     //Write result
-    printf("\nWriting matrix result on a file\n");
     DDM_Write_Result(ddm_input);
 
     return 0;

@@ -117,6 +117,7 @@ typedef struct DDM_Input{
   /*variables useful for any kind of test*/
   char type_test[100];
   char executable_name[100];
+  uint8_t write_to_file;
   uint16_t dimensions;
   uint64_t extents;
   uint64_t updates;
@@ -207,6 +208,18 @@ uint64_t DDM_Get_Updates(DDM_Input ddm_input);
 uint64_t DDM_Get_Subscriptions(DDM_Input ddm_input);
 
 /**
+ * \brief Get the list of updates
+ * \param ddm_input
+ */
+DDM_Extent* DDM_Get_Updates_List(DDM_Input ddm_input);
+
+/**
+ * \brief Get the list of subscriptions
+ * \param ddm_input
+ */
+DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input);
+
+/**
  * \brief Set unallocate all items inside ddm_input
  * \param ddm_input
  */
@@ -221,18 +234,6 @@ void DDM_Dispose_Input(DDM_Input *ddm_input);
  * \param ddm_input: to store the matrix and the total time
  */
 void DDM_Write_Result(DDM_Input *ddm_input);
-
-/**
- * \brief Get the list of updates
- * \param ddm_input
- */
-DDM_Extent* DDM_Get_Updates_List(DDM_Input ddm_input);
-
-/**
- * \brief Get the list of subscriptions
- * \param ddm_input
- */
-DDM_Extent* DDM_Get_Subscriptions_List(DDM_Input ddm_input);
 
 /******************************************
  ***************** TIMER ******************

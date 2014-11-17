@@ -27,9 +27,18 @@ DDM_Input* DDM_Initialize_Input(int argc, char* argv[]){
     char alfa_name[100];
     //char **tokens;
 
-    if (argc == 5){
+    if (argc == 5 || argc == 6){
         sprintf(ddm_input->executable_name, "%s", argv[0]);
         sprintf(ddm_input->type_test, "%s", argv[1]);
+        if (argv[5] != NULL){
+            if (strncmp(argv[5], "dist", 4) == 0)
+                ddm_input->write_to_file = 1;
+            else{
+                ddm_input->write_to_file = 0;
+            }
+        }else{
+            ddm_input->write_to_file = 0;
+        }
         if (strncmp(argv[1], "alfa", 4) == 0){
             ddm_input->extents = atoi(argv[2]);
             ddm_input->dimensions = atoi(argv[3]);
@@ -212,7 +221,10 @@ void DDM_Write_Result(DDM_Input *ddm_input){
     fprintf(fout, "%f\n", ddm_input->timer.total);
     //fclose(fout);
 
-    bitmatrix_write_file(ddm_input->result_mat, ddm_input->updates, ddm_input->subscriptions,"result_mat.bin");
+    if (ddm_input->write_to_file){
+        printf("\nWriting matrix result on a file\n");
+        bitmatrix_write_file(ddm_input->result_mat, ddm_input->updates, ddm_input->subscriptions,"result_mat.bin");
+    }
     DDM_Dispose_Input(ddm_input);
 
     /*strcpy(strresmat, "result_mat.txt");
@@ -221,7 +233,6 @@ void DDM_Write_Result(DDM_Input *ddm_input){
         printf("Error creating file %s\n", strresmat);
         exit(-1);
     }
-
     //write result matrix
     for (i = 0; i < ddm_input.updates; ++i){
         for (j = 0; j < ddm_input.subscriptions; ++j){
@@ -229,7 +240,6 @@ void DDM_Write_Result(DDM_Input *ddm_input){
         }
         fprintf(fout, "\n");
     }
-
     fclose(fout);*/
 }
 
@@ -356,7 +366,7 @@ void bitmatrix_init(bitmatrix *mat, uint64_t updates, uint64_t subscriptions){
 
     *mat = (bitmatrix)malloc(sizeof * (*mat) * updates);
     for (i = 0; i < updates; ++i)
-        (*mat)[i] = (bitvector)malloc(ceill(subscriptions / (float)BIT_NUMBER) * sizeof * (*mat)[i]);
+        (*mat)[i] = (bitvector)calloc(ceill(subscriptions / (float)BIT_NUMBER), sizeof * (*mat)[i]);
 }
 
 void bitmatrix_set_value(bitmatrix mat, uint64_t update, uint64_t subscription, mat_value value){
@@ -421,11 +431,11 @@ void bitmatrix_reset(bitmatrix mat, uint64_t updates, uint64_t subscriptions, ma
         if (value == zero)
             /*for (j = 0; j < ceil(subscriptions / (float)BIT_NUMBER); ++j)
                 mat[i][j] = BITS_ZERO;*/
-            memset(mat[i], BITS_ZERO, sizeof(bitelem) * ceil(subscriptions / (float)BIT_NUMBER));
+            memset(mat[i], BITS_ZERO, sizeof * mat[i] * ceil(subscriptions / (float)BIT_NUMBER));
         else{
             /*for (j = 0; j < ceil(subscriptions / (float)BIT_NUMBER); ++j)
                 mat[i][j] = BITS_ONE;*/
-            memset(mat[i], BITS_ONE, sizeof(bitelem) * ceil(subscriptions / (float)BIT_NUMBER));
+            memset(mat[i], BITS_ONE, sizeof * mat[i] * ceil(subscriptions / (float)BIT_NUMBER));
         }
 }
 
