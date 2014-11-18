@@ -52,3 +52,23 @@
 	<math.h>
 	<assert.h>
 
+1416197703 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/brute_force/DDM_input_output.c
+	"DDM_input_output.h"
+
+1416196718 /home/eneru/Documents/github/DDM_Framework/Algorithms/brute_force/DDM_input_output.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<dirent.h>
+	<errno.h>
+	<stdint.h>
+	<inttypes.h>
+	<math.h>
+	<assert.h>
+
+1416329922 source:/home/eneru/Documents/github/DDM_Framework/Algorithms/brute_force/main.c
+	<stdio.h>
+	<stdlib.h>
+	"DDM_input_output.h"
+

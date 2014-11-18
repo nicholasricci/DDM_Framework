@@ -12,7 +12,7 @@
 				<Option object_output="obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="SMALLEST 3 1000 1000" />
+				<Option parameters="alfa 10000 3 200" />
 				<Compiler>
 					<Add option="-g" />
 				</Compiler>

@@ -77,7 +77,7 @@ void sort_matching_1D(const list_ptr ep_list, const bitmatrix out, const bitvect
 		{
 			// calculate the element in the bit vector that contains the bit
 			bit_pos = BIT_TO_POS(ep_list[i].id);
-			
+
 			// if it's the lower endpoint
 			if (ep_list[i].is_lower_point)
 			{
@@ -162,14 +162,14 @@ _ERR_CODE sort_matching(const match_data_t data, const bitmatrix out)
 
 	// allocate the "list"
 	ep_list = (list_ptr)malloc(list_size * sizeof(list_t));
-	
+
 	// allocate the two subscription extents sets
 	subscr_set_before = (bitvector)malloc(line_width * sizeof(bitvec_elem));
 	subscr_set_after = (bitvector)malloc(line_width * sizeof(bitvec_elem));
-	
+
 	if (ep_list == NULL || subscr_set_before == NULL || subscr_set_after == NULL)
 		return set_error(err_alloc, __FILE__, __FUNCTION__, __LINE__);
-	
+
 	// for each dimension
 	for (i = 0; i < data.dimensions; i++)
 	{
@@ -185,7 +185,7 @@ _ERR_CODE sort_matching(const match_data_t data, const bitmatrix out)
 		// bitwise NOT of the non-matching table to obtain the matching table
 		// directly on matrix 'out' for the first dimension, following times on 'result_tmp'
 		vector_bitwise_not((i > 0) ? result_tmp[0] : out[0], matrix_size);
-			
+
 		// if it's not the first dimension
 		if (i > 0)
 		{
@@ -210,6 +210,7 @@ _ERR_CODE sort_matching(const match_data_t data, const bitmatrix out)
 	// bitwise NOT of the non-matching table to obtain the matching table
 	vector_bitwise_not(out[0], matrix_size);
 #endif // __LOWMEM
-	
+
+
 	return err_none;
 }

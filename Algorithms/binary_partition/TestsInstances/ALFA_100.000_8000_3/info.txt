@@ -1,0 +1,12 @@
+#Instance name: ALFA_100.000_8000_3
+#Instance version: 1
+#Author: Nicholas Ricci
+#Random Seed: XXXX
+#Sequence length:
+1
+#Dimensions
+3
+#Subscription Regions
+4000
+#Update Regions
+4000

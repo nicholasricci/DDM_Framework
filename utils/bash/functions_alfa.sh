@@ -21,12 +21,12 @@ function create_alfa_folders_and_files {
   #$1 ALFA
   #$2 EXTENTS
 
-  local ALFA_FOLDER="../../../TestsInstances/ALFA_$1_$2_$DIMENSION"
+  local ALFA_FOLDER="../TestsInstances/ALFA_$1_$2_$DIMENSION"
   local INFO="info.txt"
   local INPUT="input-0.txt"
   local ALFA_INFO="$ALFA_FOLDER/$INFO"
   local ALFA_INPUT="$ALFA_FOLDER/$INPUT"
-  local ALFA_CREATOR="../../../utils/alfa_creator"
+  local ALFA_CREATOR="../utils/alfa_creator"
   
   mkdir -p $ALFA_FOLDER
   
@@ -93,7 +93,6 @@ function run_alfa_executable_sequential {
 		  for ((R=1; R<=$RUN; R++))
 		  do
 			  echo "running >$1< $EXTENTS/$ALFA:$R"
-			  
 			  #If VALGRIND VARIABLE IS USED RUN WITH DIFFERENT COMMAND
 			  if [ "$3" = "mem" ];
 			  then

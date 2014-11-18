@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    write_test(list_updates, updates, list_subscriptions, subscriptions, dimensions);
 
     DDM_Start_Timer(ddm_input);
 
@@ -148,7 +149,7 @@ int main(int argc, char *argv[])
 
     printf("\nnmatches: %"PRIu64"\n", bitmatrix_count_ones(ddm_input->result_mat, updates, subscriptions));
     //Write result
-    
+
     DDM_Write_Result(ddm_input);
 
 

@@ -321,8 +321,10 @@ function run {
   
   if  [ $# -ge 1 ] && [ $# -le 2 ] && [ "$1" == "alfa" ] && [ "$2" != "all" ]; 
   then
-    
+
     cd $_ALGORITHMS
+    #prepare alfa folders and files
+    create_all_alfa_folders_and_files "${ALFAS[@]}"
     algs=($(ls -d */))
     for i in ${algs[*]}
     do
@@ -332,9 +334,8 @@ function run {
       exe_parallel=$(read_file DDM_Parallel)
       #change to bin directory
       cd $_ALGORITHM_BIN
-      #prepare alfa folders and files
-      create_all_alfa_folders_and_files "${ALFAS[@]}"
       #for each executables sequential starts program in some configuration
+      
       for exe in ${exe_sequential[*]}
       do
 	if [ "$2" != "mem" ] && [ "$2" != "dist" ];
@@ -356,6 +357,7 @@ function run {
 	  run_alfa_executable_parallel $exe_par $1 $2
 	fi
       done
+
       #change to algorithm directory
       cd ..
       #change to Algoirthms directory
