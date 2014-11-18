@@ -130,10 +130,10 @@ function run_other_executable_parallel {
       temporaneous_variable=`echo "${temporaneous_variable//^}"`
       if [ "$unit" = "KB" ];
       then 
-	temporaneous_variable=`echo "$temporaneous_variable / 1024" | bc`
+	temporaneous_variable=`echo "$temporaneous_variable / 1024" | bc -l`
       elif [ "$unit" = "GB" ];
       then
-	temporaneous_variable=`echo "$temporaneous_variable * 1024" | bc`
+	temporaneous_variable=`echo "$temporaneous_variable * 1024" | bc -l`
       fi
       $temporaneous_variable > $_VALGRIND_OUT_FILE
       rm -f "temp"
