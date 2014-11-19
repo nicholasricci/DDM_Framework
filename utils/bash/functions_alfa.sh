@@ -144,6 +144,10 @@ function run_alfa_executable_sequential {
 		  fi
 
 		  let EXTENTS+=$STEP_SIZE
+		  rm -f $filename
+		  rm -f $executed_filename
+		  rm -f $executed_filename_memory
+		  rm -f $_BITMATRIX_NAME
 		  
 	  done
 
@@ -234,6 +238,11 @@ function run_alfa_executable_parallel {
 		    fi
 		    
 		    let EXTENTS+=$STEP_SIZE
+		    
+		    rm -f $filename
+		    rm -f $executed_filename
+		    rm -f $executed_filename_memory
+		    rm -f $_BITMATRIX_NAME
 		    
 	    done
 

@@ -325,6 +325,7 @@ function run {
     cd $_ALGORITHMS
     #prepare alfa folders and files
     create_all_alfa_folders_and_files "${ALFAS[@]}"
+    create_all_alfa_folders_and_files "${ALFAS_PAR[@]}"
     algs=($(ls -d */))
     for i in ${algs[*]}
     do
@@ -345,8 +346,6 @@ function run {
 	  run_alfa_executable_sequential $exe $1 $2
 	fi
       done
-      #prepare alfa folders and files
-      create_all_alfa_folders_and_files "${ALFAS_PAR[@]}"
       #for each executables parallel starts program in some configuration
       for exe_par in ${exe_parallel[*]}
       do
